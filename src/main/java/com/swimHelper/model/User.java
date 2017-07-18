@@ -9,23 +9,35 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Collection;
 
 /**
  * Created by marcinus on 19.04.17.
  */
 @Entity
 @Data
-@RequiredArgsConstructor
 public class User {
-    @Column
-    @NotNull
-    private String email;
-    @Column
-    @NotNull
-    @Size(min = 5, max = 32)
-    private String password;
+
     @GeneratedValue
     @Id
     private Long id;
 
+    @NotNull
+    private String email;
+
+    private String firstname;
+
+    private String lastname;
+
+    @NotNull
+    @Size(min = 5, max = 32)
+    private String password;
+
+    private double weight;
+
+    private Collection<Training> trainings;
+
+    private Collection<Record> records;
+
+    private Collection<StyleStatistics> styleStatistics;
 }
