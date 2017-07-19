@@ -2,9 +2,7 @@ package com.swimHelper.model;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
@@ -17,8 +15,10 @@ public class Training {
     @Id
     @GeneratedValue
     private Long id;
+    @OneToMany
     private Collection<ExerciseSeries> exerciseSeries;
     private LocalDateTime dateTime;
     private int durationInMinutes;
+    @ManyToOne
     private User user;
 }
