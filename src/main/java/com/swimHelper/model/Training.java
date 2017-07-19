@@ -3,6 +3,8 @@ package com.swimHelper.model;
 import lombok.Data;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
@@ -12,6 +14,9 @@ import java.util.Collection;
 @Entity
 @Data
 public class Training {
+    @Id
+    @GeneratedValue
+    private Long id;
     private Collection<ExerciseSeries> exerciseSeries;
     private LocalDateTime dateTime;
     private int durationInMinutes;
