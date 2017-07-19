@@ -1,14 +1,13 @@
 package com.swimHelper.model;
 
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -35,9 +34,9 @@ public class User {
 
     private double weight;
 
-    private Collection<Training> trainings;
+    private Collection<Training> trainings = new ArrayList<>();
 
-    private Collection<Record> records;
+    private Collection<Record> records = new ArrayList<>();
 
-    private Collection<StyleStatistics> styleStatistics;
+    private Collection<StyleStatistics> styleStatistics = new ArrayList<>();
 }
