@@ -2,6 +2,7 @@ package com.swimHelper.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +12,7 @@ import java.util.Collection;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor //jpa
 public class TrainingRequirements {
     private Collection<Style> styles = new ArrayList<>();
     private DifficultyLevel difficultyLevel;

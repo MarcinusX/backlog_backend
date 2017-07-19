@@ -3,6 +3,8 @@ package com.swimHelper.model;
 import lombok.Data;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 /**
@@ -11,6 +13,9 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 public class Competition {
+    @Id
+    @GeneratedValue
+    private Long id;
     private String name;
     private String location;
     private LocalDateTime dateTime;

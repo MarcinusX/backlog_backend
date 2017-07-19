@@ -1,5 +1,6 @@
 package com.swimHelper;
 
+import com.swimHelper.model.User;
 import com.swimHelper.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -18,7 +19,7 @@ public class MainApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        /*User user = new User();
+        User user = new User();
         user.setEmail("dowlny@email.com");
         user.setPassword("abcdef");
 		userRepository.saveAndFlush(user);
@@ -26,6 +27,6 @@ public class MainApplication implements CommandLineRunner {
         User user2 = new User();
         user2.setEmail("dowlny2@email.com");
         user2.setPassword("abcdef2");
-        userRepository.saveAndFlush(user2);*/
+        userRepository.saveAndFlush(user2);
     }
 }
