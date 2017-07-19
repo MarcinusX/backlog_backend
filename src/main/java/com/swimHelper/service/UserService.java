@@ -25,4 +25,8 @@ public class UserService {
     public User addUser(User user) {
         return userRepository.saveAndFlush(user);
     }
+
+    public User getUser(Long id) {
+        return userRepository.findOne(id);
+    }
 }

@@ -27,4 +27,26 @@ public class UserServiceUnitTest {
         //then
         assertThat(returnedUser).isEqualTo(userSaved);
     }
+
+    @Test
+    public void getUser_shouldReturnFromRepo() throws Exception {
+        //given
+        User user = new User();
+        when(userRepositoryMock.findOne(1L)).thenReturn(user);
+        //when
+        User returnedUser = sut.getUser(1L);
+        //then
+        assertThat(returnedUser).isEqualTo(user);
+    }
+
+    @Test
+    public void getUser_ifRepoGivesNull_shouldReturnNull() throws Exception {
+        //given
+        when(userRepositoryMock.getOne(1L)).thenReturn(null);
+        //when
+        User returnedUser = sut.getUser(1L);
+        //then
+        assertThat(returnedUser).isNull();
+    }
+
 }

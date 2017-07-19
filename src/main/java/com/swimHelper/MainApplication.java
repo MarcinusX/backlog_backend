@@ -7,6 +7,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import javax.transaction.Transactional;
+
 @SpringBootApplication
 public class MainApplication implements CommandLineRunner {
 
@@ -18,6 +20,7 @@ public class MainApplication implements CommandLineRunner {
 	}
 
     @Override
+    @Transactional
     public void run(String... args) throws Exception {
         User user = new User();
         user.setEmail("dowlny@email.com");
@@ -28,5 +31,7 @@ public class MainApplication implements CommandLineRunner {
         user2.setEmail("dowlny2@email.com");
         user2.setPassword("abcdef2");
         userRepository.saveAndFlush(user2);
+
+        userRepository.findAll().forEach(System.out::println);
     }
 }

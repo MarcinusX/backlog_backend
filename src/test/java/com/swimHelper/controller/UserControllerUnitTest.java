@@ -1,10 +1,12 @@
 package com.swimHelper.controller;
 
+import com.swimHelper.exception.UserNotFoundException;
 import com.swimHelper.model.User;
 import com.swimHelper.service.UserService;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,5 +28,26 @@ public class UserControllerUnitTest {
         User returnedUser = sut.postUser(user);
         //then
         assertThat(returnedUser).isEqualTo(userSaved);
+    }
+
+    @Test
+    public void getUser_shouldReturnFromService() throws Exception {
+        //given
+        User user = new User();
+        when(userServiceMock.getUser(1L)).thenReturn(user);
+        //when
+        User returnedUser = sut.getUser(1L);
+        //then
+        assertThat(returnedUser).isEqualTo(user);
+    }
+
+    @Test
+    public void getUser_whenServiceGivesNull_shouldThrowException() throws Exception {
+        //given
+        when(userServiceMock.getUser(1L)).thenReturn(null);
+        //when
+        Throwable throwable = catchThrowable(() -> sut.getUser(1L));
+        //then
+        assertThat(throwable).isInstanceOf(UserNotFoundException.class);
     }
 }
