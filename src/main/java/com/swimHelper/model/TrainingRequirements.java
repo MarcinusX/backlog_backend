@@ -1,5 +1,6 @@
 package com.swimHelper.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Collection;
  * Created by mstobieniecka on 2017-07-19.
  */
 @Data
+@AllArgsConstructor
 public class TrainingRequirements {
     private Collection<Style> styles = new ArrayList<>();
     private DifficultyLevel difficultyLevel;
