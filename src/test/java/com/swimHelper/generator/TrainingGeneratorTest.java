@@ -112,7 +112,7 @@ public class TrainingGeneratorTest {
         styles.add(Style.FREESTYLE);
         styles.add(Style.BACKSTROKE);
         Collection<Equipment> availableEquipment = new ArrayList<>();
-        availableEquipment.add(new Equipment());
+        availableEquipment.add(Equipment.TEMP);
         Collection<TrainingPurpose> trainingPurposes = new ArrayList<>();
         trainingPurposes.add(TrainingPurpose.IMPROVE_RECORDS);
         return new TrainingRequirements(styles, DifficultyLevel.BEGINNER, 30, 1000,
@@ -121,11 +121,11 @@ public class TrainingGeneratorTest {
 
     private User createValidUser() {
         Collection<StyleStatistics> styleStatistics = new ArrayList<>();
-        styleStatistics.add(new StyleStatistics(Style.BACKSTROKE, 100, 120));
-        styleStatistics.add(new StyleStatistics(Style.FREESTYLE, 100, 100));
-        styleStatistics.add(new StyleStatistics(Style.BREASTSTROKE, 100, 200));
-        styleStatistics.add(new StyleStatistics(Style.BUTTERFLY, 100, 230));
-        styleStatistics.add(new StyleStatistics(Style.INDIVIDUAL_MEDLEY, 100, 140));
+        styleStatistics.add(new StyleStatistics(1L, Style.BACKSTROKE, 100, 120));
+        styleStatistics.add(new StyleStatistics(2L, Style.FREESTYLE, 100, 100));
+        styleStatistics.add(new StyleStatistics(3L, Style.BREASTSTROKE, 100, 200));
+        styleStatistics.add(new StyleStatistics(4L, Style.BUTTERFLY, 100, 230));
+        styleStatistics.add(new StyleStatistics(5L, Style.INDIVIDUAL_MEDLEY, 100, 140));
 
         User user = new User();
         user.setStyleStatistics(styleStatistics);
