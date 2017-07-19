@@ -24,6 +24,8 @@ public class TrainingGenerator {
                 user.getStyleStatistics().stream().map(StyleStatistics::getStyle).collect(Collectors.toList());
         boolean doesUserHaveStatisticsForChosenStyles = trainingRequirements.getStyles().stream().allMatch(userStylesFromStatistics::contains);
         boolean doesUserChoseStyles = !trainingRequirements.getStyles().isEmpty();
-        return (doesUserHaveStatisticsForChosenStyles && doesUserChoseStyles);
+        boolean isDifficultyLevelSet = trainingRequirements.getDifficultyLevel() != null;
+        boolean isMaxDurationOrMaxDistanceSet = (trainingRequirements.getMaxDistance() > 0 || trainingRequirements.getMaxDurationInMinutes() > 0);
+        return (doesUserHaveStatisticsForChosenStyles && doesUserChoseStyles && isDifficultyLevelSet && isMaxDurationOrMaxDistanceSet);
     }
 }
