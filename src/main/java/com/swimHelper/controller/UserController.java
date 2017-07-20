@@ -1,5 +1,6 @@
 package com.swimHelper.controller;
 
+import com.swimHelper.exception.BusinessException;
 import com.swimHelper.exception.UserNotFoundException;
 import com.swimHelper.model.User;
 import com.swimHelper.service.UserService;
@@ -21,7 +22,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User postUser(@RequestBody User user) {
+    public User postUser(@RequestBody User user) throws BusinessException {
         return userService.addUser(user);
     }
 
