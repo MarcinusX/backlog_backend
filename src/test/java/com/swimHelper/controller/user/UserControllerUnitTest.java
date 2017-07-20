@@ -1,5 +1,6 @@
-package com.swimHelper.controller;
+package com.swimHelper.controller.user;
 
+import com.swimHelper.controller.UserController;
 import com.swimHelper.exception.UserNotFoundException;
 import com.swimHelper.model.User;
 import com.swimHelper.service.UserService;
