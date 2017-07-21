@@ -16,6 +16,7 @@ public class Exercise {
     private Long id;
     private String name;
     private DifficultyLevel difficultyLevel;
+    private IntensityLevel intensityLevel;
     private String description;
     private String videoUrl;
     private Style style;
@@ -25,4 +26,8 @@ public class Exercise {
     @ElementCollection(targetClass = TrainingPurpose.class)
     @Enumerated
     private Collection<TrainingPurpose> purposes;
+
+    public Exercise(Style style) {
+        this.style = style;
+    }
 }

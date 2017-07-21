@@ -16,6 +16,7 @@ import java.util.Collection;
 public class TrainingRequirements {
     private Collection<Style> styles = new ArrayList<>();
     private DifficultyLevel difficultyLevel;
+    private IntensityLevel intensityLevel;
     private int maxDurationInMinutes;
     private int maxDistance;
     private Collection<Equipment> availableEquipment = new ArrayList<>();
