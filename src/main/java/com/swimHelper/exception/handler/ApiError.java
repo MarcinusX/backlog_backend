@@ -1,4 +1,4 @@
-package com.swimHelper.exception;
+package com.swimHelper.exception.handler;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,4 +10,9 @@ import lombok.Data;
 @Data
 public class ApiError {
     private String message;
+    private Throwable cause;
+
+    public ApiError(String message) {
+        this.message = message;
+    }
 }

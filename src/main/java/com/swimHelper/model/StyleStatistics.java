@@ -2,6 +2,7 @@ package com.swimHelper.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,6 +14,7 @@ import javax.persistence.Id;
 @Entity
 @Data
 @AllArgsConstructor
+@NoArgsConstructor //jpa
 public class StyleStatistics {
     @Id
     @GeneratedValue
@@ -20,4 +22,10 @@ public class StyleStatistics {
     private Style style;
     private int distance;
     private int timeInSeconds;
+
+    public StyleStatistics(Style style, int distance, int timeInSeconds) {
+        this.style = style;
+        this.distance = distance;
+        this.timeInSeconds = timeInSeconds;
+    }
 }
