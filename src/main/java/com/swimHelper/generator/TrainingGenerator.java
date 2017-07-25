@@ -96,4 +96,34 @@ public class TrainingGenerator {
     public int getDurationOfOneExerciseSeries(int numberOfExerciseSeries, int maxDurationInMinutes) {
         return maxDurationInMinutes / numberOfExerciseSeries;
     }
+
+    public int getDurationOfOneExerciseRepeatInSeconds(ExerciseSeries exerciseSeries, User user) {
+        StyleStatistics styleStatistics = user.getStyleStatistics()
+                .stream()
+                .filter(styleStatistics1 -> exerciseSeries.getExercise().getStyle().equals(styleStatistics1.getStyle()))
+                .findFirst().get();
+        int userTimeInStyle = styleStatistics.getTimeInSeconds();
+        if (exerciseSeries.getDistance() == 50) {
+            return userTimeInStyle / 2;
+        } else if (exerciseSeries.getDistance() == 100) {
+            return userTimeInStyle;
+        } else {
+            double multipleTimeFactor = exerciseSeries.getDistance() / 100;
+            double increasingDurationFactor = 0.4 * multipleTimeFactor * multipleTimeFactor * 1 / 7 * userTimeInStyle;
+            Double durationOfOneExerciseSeriesInSeconds = multipleTimeFactor * userTimeInStyle + increasingDurationFactor;
+            return durationOfOneExerciseSeriesInSeconds.intValue();
+        }
+    }
+
+    public int getBreakOfOneExerciseRepeatInSeconds(IntensityLevel intensityLevel, int durationOfOneExerciseRepeatInSeconds) {
+        int breakOfOneExerciseRepeatInSeconds;
+        if (intensityLevel.equals(IntensityLevel.LOW)) {
+            breakOfOneExerciseRepeatInSeconds = durationOfOneExerciseRepeatInSeconds / 6;
+        } else if (intensityLevel.equals(IntensityLevel.MEDIUM)) {
+            breakOfOneExerciseRepeatInSeconds = durationOfOneExerciseRepeatInSeconds / 7;
+        } else {
+            breakOfOneExerciseRepeatInSeconds = durationOfOneExerciseRepeatInSeconds / 8;
+        }
+        return (breakOfOneExerciseRepeatInSeconds - breakOfOneExerciseRepeatInSeconds % 10);
+    }
 }
