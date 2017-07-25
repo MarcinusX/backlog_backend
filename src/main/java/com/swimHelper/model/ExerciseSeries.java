@@ -1,6 +1,7 @@
 package com.swimHelper.model;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import javax.persistence.OneToOne;
  */
 @Entity
 @Data
+@RequiredArgsConstructor
 public class ExerciseSeries {
     @Id
     @GeneratedValue

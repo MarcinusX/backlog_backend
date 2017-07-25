@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -16,7 +17,7 @@ public class Training {
     @GeneratedValue
     private Long id;
     @OneToMany
-    private Collection<ExerciseSeries> exerciseSeries;
+    private Collection<ExerciseSeries> exerciseSeries = new ArrayList<>();
     private LocalDateTime dateTime;
     private int durationInMinutes;
     @ManyToOne
