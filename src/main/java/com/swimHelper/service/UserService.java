@@ -6,6 +6,9 @@ import com.swimHelper.exception.UserExistsException;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +16,7 @@ import org.springframework.stereotype.Service;
  * Created by Marcin Szalek on 19.07.17.
  */
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -44,5 +47,10 @@ public class UserService {
         } else if (userRepository.findByEmail(user.getEmail()) != null) {
             throw new UserExistsException("User with that email already exists");
         }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email);
     }
 }

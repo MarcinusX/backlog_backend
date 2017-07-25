@@ -1,5 +1,6 @@
 package com.swimHelper.exception.handler;
 
+import com.swimHelper.exception.ForbiddenAccessException;
 import com.swimHelper.exception.InvalidUserException;
 import com.swimHelper.exception.UserExistsException;
 import com.swimHelper.exception.UserNotFoundException;
@@ -39,6 +40,13 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError("Invalid user body", ex);
         logger.error("Invalid user body.", ex.getMessage());
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(value = ForbiddenAccessException.class)
+    protected ResponseEntity<Object> handleForbiddenAccessException(ForbiddenAccessException ex, WebRequest request) {
+        ApiError apiError = new ApiError("Forbidden access", ex);
+        logger.error("Forbidden access.", ex.getMessage());
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
 }

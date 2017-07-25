@@ -5,6 +5,7 @@ import com.swimHelper.exception.UserNotFoundException;
 import com.swimHelper.model.User;
 import com.swimHelper.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,7 +28,8 @@ public class UserController {
     }
 
     @RequestMapping("{userId}")
-    public User getUser(@PathVariable Long userId) throws UserNotFoundException {
+    @PreAuthorize("principal.id == #userId")
+    public User getUser(@PathVariable Long userId) throws BusinessException {
         User user = userService.getUser(userId);
         if (user == null) {
             throw new UserNotFoundException("Couldnt find user with id: " + userId);
