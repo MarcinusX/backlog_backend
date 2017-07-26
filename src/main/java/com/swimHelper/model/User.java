@@ -1,5 +1,7 @@
 package com.swimHelper.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cascade;
@@ -51,6 +53,16 @@ public class User implements UserDetails {
 
     public User(String email, String password) {
         this.email = email;
+        this.password = password;
+    }
+
+    @JsonIgnore
+    public String getPassword() {
+        return password;
+    }
+
+    @JsonProperty
+    public void setPassword(String password) {
         this.password = password;
     }
 
