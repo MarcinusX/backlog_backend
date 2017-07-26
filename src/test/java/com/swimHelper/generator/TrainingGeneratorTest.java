@@ -287,6 +287,112 @@ public class TrainingGeneratorTest {
         assertThat(durationOfOneExerciseSeries).isEqualTo(3);
     }
 
+    @Test
+    public void getDurationOfOneExerciseRepeat_whenShortDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
+        //given
+        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
+        User user = createValidUser();
+        ExerciseSeries exerciseSeries = new ExerciseSeries();
+        exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
+        exerciseSeries.setDistance(100);
+        //when
+        Integer durationOfOneExerciseRepeat = sut.getDurationOfOneExerciseRepeatInSeconds(exerciseSeries, user);
+        StyleStatistics styleStatistics = user
+                .getStyleStatistics().stream()
+                .filter(styleStatistics1 -> styleStatistics1.getStyle().equals(exerciseSeries.getExercise().getStyle())).findFirst().get();
+        //then
+        assertThat(durationOfOneExerciseRepeat).isEqualTo(styleStatistics.getTimeInSeconds());
+    }
+
+    @Test
+    public void getDurationOfOneExerciseRepeat_whenVeryShortDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
+        //given
+        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
+        User user = createValidUser();
+        ExerciseSeries exerciseSeries = new ExerciseSeries();
+        exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
+        exerciseSeries.setDistance(50);
+        //when
+        Integer durationOfOneExerciseRepeat = sut.getDurationOfOneExerciseRepeatInSeconds(exerciseSeries, user);
+        StyleStatistics styleStatistics = user
+                .getStyleStatistics().stream()
+                .filter(styleStatistics1 -> styleStatistics1.getStyle().equals(exerciseSeries.getExercise().getStyle())).findFirst().get();
+        //then
+        assertThat(durationOfOneExerciseRepeat).isEqualTo(styleStatistics.getTimeInSeconds() / 2);
+    }
+
+    @Test
+    public void getDurationOfOneExerciseRepeat_whenMediumDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
+        //given
+        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
+        User user = createValidUser();
+        ExerciseSeries exerciseSeries = new ExerciseSeries();
+        exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
+        exerciseSeries.setDistance(300);
+        //when
+        Integer durationOfOneExerciseRepeat = sut.getDurationOfOneExerciseRepeatInSeconds(exerciseSeries, user);
+        //then
+        assertThat(durationOfOneExerciseRepeat).isEqualTo(351);
+    }
+
+    @Test
+    public void getDurationOfOneExerciseRepeat_whenQuiteLongDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
+        //given
+        User user = createValidUser();
+        ExerciseSeries exerciseSeries = new ExerciseSeries();
+        exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
+        exerciseSeries.setDistance(500);
+        //when
+        Integer durationOfOneExerciseRepeat = sut.getDurationOfOneExerciseRepeatInSeconds(exerciseSeries, user);
+        //then
+        assertThat(durationOfOneExerciseRepeat).isEqualTo(642);
+    }
+
+    @Test
+    public void getDurationOfOneExerciseRepeat_whenLongDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
+        //given
+        User user = createValidUser();
+        ExerciseSeries exerciseSeries = new ExerciseSeries();
+        exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
+        exerciseSeries.setDistance(800);
+        //when
+        Integer durationOfOneExerciseRepeat = sut.getDurationOfOneExerciseRepeatInSeconds(exerciseSeries, user);
+        //then
+        assertThat(durationOfOneExerciseRepeat).isEqualTo(1165);
+    }
+
+    @Test
+    public void getBreakOfOneExerciseRepeatInSeconds_whenLowIntensityLevelAndDurationOfOneExerciseSeriesGiven_shouldReturnBreakForOneExerciseRepeat() {
+        //given
+        int durationOfOneExerciseRepeat = 300;
+        IntensityLevel intensityLevel = IntensityLevel.LOW;
+        //when
+        int breakDurationOfOneExerciseRepeat = sut.getBreakOfOneExerciseRepeatInSeconds(intensityLevel, durationOfOneExerciseRepeat);
+        //then
+        assertThat(breakDurationOfOneExerciseRepeat).isEqualTo(50);
+    }
+
+    @Test
+    public void getBreakOfOneExerciseRepeatInSeconds_whenMediumIntensityLevelAndDurationOfOneExerciseSeriesGiven_shouldReturnBreakForOneExerciseRepeat() {
+        //given
+        int durationOfOneExerciseRepeat = 300;
+        IntensityLevel intensityLevel = IntensityLevel.MEDIUM;
+        //when
+        int breakDurationOfOneExerciseRepeat = sut.getBreakOfOneExerciseRepeatInSeconds(intensityLevel, durationOfOneExerciseRepeat);
+        //then
+        assertThat(breakDurationOfOneExerciseRepeat).isEqualTo(40);
+    }
+
+    @Test
+    public void getBreakOfOneExerciseRepeatInSeconds_whenHighIntensityLevelAndDurationOfOneExerciseSeriesGiven_shouldReturnBreakForOneExerciseRepeat() {
+        //given
+        int durationOfOneExerciseRepeat = 300;
+        IntensityLevel intensityLevel = IntensityLevel.HIGH;
+        //when
+        int breakDurationOfOneExerciseRepeat = sut.getBreakOfOneExerciseRepeatInSeconds(intensityLevel, durationOfOneExerciseRepeat);
+        //then
+        assertThat(breakDurationOfOneExerciseRepeat).isEqualTo(30);
+    }
 
     private TrainingRequirements createValidTrainingRequirements() {
         Collection<Style> styles = new ArrayList<>();
