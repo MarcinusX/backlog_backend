@@ -1,8 +1,6 @@
 package com.swimHelper;
 
-import com.swimHelper.model.Style;
-import com.swimHelper.model.StyleStatistics;
-import com.swimHelper.model.User;
+import com.swimHelper.model.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,5 +23,17 @@ public class TestUtil {
         user.setEmail("some@email.com");
         user.setPassword("somePassword");
         return user;
+    }
+
+    public static TrainingRequirements createValidTrainingRequirements() {
+        Collection<Style> styles = new ArrayList<>();
+        styles.add(Style.FREESTYLE);
+        styles.add(Style.BACKSTROKE);
+        Collection<Equipment> availableEquipment = new ArrayList<>();
+        availableEquipment.add(Equipment.TEMP);
+        Collection<TrainingPurpose> trainingPurposes = new ArrayList<>();
+        trainingPurposes.add(TrainingPurpose.IMPROVE_RECORDS);
+        return new TrainingRequirements(styles, DifficultyLevel.BEGINNER, IntensityLevel.LOW, 600, 1000,
+                availableEquipment, trainingPurposes);
     }
 }

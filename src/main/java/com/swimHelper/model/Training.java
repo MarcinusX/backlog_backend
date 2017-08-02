@@ -19,7 +19,7 @@ public class Training {
     @OneToMany
     private Collection<ExerciseSeries> exerciseSeries = new ArrayList<>();
     private LocalDateTime dateTime;
-    private int durationInMinutes;
+    private int durationInSeconds;
     @ManyToOne
     private User user;
 }

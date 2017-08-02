@@ -24,4 +24,5 @@ public class ExerciseSeries {
     private int repeats;
     private int orderNumber;
     private int breakInSeconds;
+    private int durationOfOneExerciseInSeconds;
 }

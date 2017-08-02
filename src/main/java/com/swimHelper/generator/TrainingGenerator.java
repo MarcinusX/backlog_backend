@@ -1,6 +1,7 @@
 package com.swimHelper.generator;
 
 import com.swimHelper.exception.MissingTrainingRequirementsException;
+import com.swimHelper.exception.UnsatisfiedTimeRequirementsException;
 import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
@@ -20,23 +20,30 @@ import java.util.stream.Collectors;
 public class TrainingGenerator {
 
     private final ExerciseRepository exerciseRepository;
+    private final TrainingCalculator trainingCalculator;
     private final Random randomGenerator;
 
     @Autowired
-    public TrainingGenerator(ExerciseRepository exerciseRepository, Random randomGenerator) {
+    public TrainingGenerator(ExerciseRepository exerciseRepository, TrainingCalculator trainingCalculator, Random randomGenerator) {
         this.exerciseRepository = exerciseRepository;
+        this.trainingCalculator = trainingCalculator;
         this.randomGenerator = randomGenerator;
     }
 
-    public Training generateTraining(User user, TrainingRequirements trainingRequirements) throws MissingTrainingRequirementsException {
+    public Training generateTraining(User user, TrainingRequirements trainingRequirements) throws MissingTrainingRequirementsException, UnsatisfiedTimeRequirementsException {
         if (!areTrainingRequirementsGiven(user, trainingRequirements)) {
             throw new MissingTrainingRequirementsException();
         }
         List<Exercise> exercisesByStyles = new ArrayList<>();
         trainingRequirements.getStyles().forEach(style -> exercisesByStyles.addAll(exerciseRepository.findByStyle(style)));
         Training training = new Training();
-
-        exercisesByStyles.forEach(exercise -> addExerciseSeries(training, exercise, trainingRequirements));
+        int numberOfExerciseSeries = trainingCalculator.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInSeconds());
+        int durationOfOneExerciseSeriesInSeconds = trainingCalculator.getDurationOfOneExerciseSeries(numberOfExerciseSeries, trainingRequirements.getMaxDurationInSeconds());
+        for (int i = 0; i < numberOfExerciseSeries; i++) {
+            Exercise exercise = exercisesByStyles.get(randomGenerator.nextInt(exercisesByStyles.size()));
+            addExerciseSeries(training, exercise, trainingRequirements, user, durationOfOneExerciseSeriesInSeconds);
+            exercisesByStyles.remove(exercise);
+        }
 
         return training;
     }
@@ -47,83 +54,25 @@ public class TrainingGenerator {
         boolean doesUserHaveStatisticsForChosenStyles = trainingRequirements.getStyles().stream().allMatch(userStylesFromStatistics::contains);
         boolean doesUserChoseStyles = !trainingRequirements.getStyles().isEmpty();
         boolean isDifficultyLevelSet = trainingRequirements.getDifficultyLevel() != null;
-        boolean isMaxDurationOrMaxDistanceSet = (trainingRequirements.getMaxDistance() > 0 || trainingRequirements.getMaxDurationInMinutes() > 0);
+        boolean isMaxDurationOrMaxDistanceSet = (trainingRequirements.getMaxDistance() > 0 || trainingRequirements.getMaxDurationInSeconds() > 0);
         boolean isIntensityLevelSet = trainingRequirements.getIntensityLevel() != null;
         return (doesUserHaveStatisticsForChosenStyles && doesUserChoseStyles && isDifficultyLevelSet && isMaxDurationOrMaxDistanceSet && isIntensityLevelSet);
     }
 
-    private int getRandomDistanceForIntensityLevel(List<Integer> availableDistances) {
-        int randomDistanceIndex = randomGenerator.nextInt(availableDistances.size());
-        return availableDistances.get(randomDistanceIndex);
-    }
-
-    private ExerciseSeries createExerciseSeries(Exercise exercise, List<Integer> availableDistances) {
+    private ExerciseSeries createExerciseSeries(Exercise exercise, TrainingRequirements trainingRequirements, User user, int durationOfOneSeries) throws UnsatisfiedTimeRequirementsException {
         ExerciseSeries exerciseSeries = new ExerciseSeries();
-        exerciseSeries.setDistance(getRandomDistanceForIntensityLevel(availableDistances));
+        int distance = trainingCalculator.getRandomDistanceForIntensityLevel(trainingRequirements.getIntensityLevel().getDistances());
+        exerciseSeries.setDistance(distance);
+        int durationOfOneRepeatInSeconds = trainingCalculator.getDurationOfOneExerciseRepeatInSeconds(exercise, distance, user);
+        exerciseSeries.setDurationOfOneExerciseInSeconds(durationOfOneRepeatInSeconds);
         exerciseSeries.setExercise(exercise);
+        int breakInSeconds = trainingCalculator.getBreakOfOneExerciseRepeatInSeconds(trainingRequirements.getIntensityLevel(), durationOfOneRepeatInSeconds);
+        exerciseSeries.setBreakInSeconds(breakInSeconds);
+        exerciseSeries.setRepeats(trainingCalculator.getNumberOfRepeatsInOneSeries(durationOfOneSeries, durationOfOneRepeatInSeconds, breakInSeconds));
         return exerciseSeries;
     }
 
-    private void addExerciseSeries(Training training, Exercise exercise, TrainingRequirements trainingRequirements) {
-        training.getExerciseSeries().add(createExerciseSeries(exercise, trainingRequirements.getIntensityLevel().getDistances()));
-    }
-
-    private void createTrainingWithGivenTime(User user, TrainingRequirements trainingRequirements) {
-
-    }
-
-    public int getNumberOfExerciseSeries(IntensityLevel intensityLevel, int maxDurationInMinutes) {
-        if (maxDurationInMinutes <= 15) {
-            return 1;
-        }
-        if (intensityLevel.equals(IntensityLevel.LOW)) {
-            if (maxDurationInMinutes <= 30) {
-                return 2;
-            } else if (maxDurationInMinutes > 30 && maxDurationInMinutes <= 45) {
-                return 3;
-            }
-            return ThreadLocalRandom.current().nextInt(3, 5);
-        } else {
-            if (maxDurationInMinutes <= 30) {
-                return 3;
-            } else if (maxDurationInMinutes > 30 && maxDurationInMinutes <= 45) {
-                return ThreadLocalRandom.current().nextInt(3, 5);
-            }
-            return ThreadLocalRandom.current().nextInt(5, 8);
-        }
-    }
-
-    public int getDurationOfOneExerciseSeries(int numberOfExerciseSeries, int maxDurationInMinutes) {
-        return maxDurationInMinutes / numberOfExerciseSeries;
-    }
-
-    public int getDurationOfOneExerciseRepeatInSeconds(ExerciseSeries exerciseSeries, User user) {
-        StyleStatistics styleStatistics = user.getStyleStatistics()
-                .stream()
-                .filter(styleStatistics1 -> exerciseSeries.getExercise().getStyle().equals(styleStatistics1.getStyle()))
-                .findFirst().get();
-        int userTimeInStyle = styleStatistics.getTimeInSeconds();
-        if (exerciseSeries.getDistance() == 50) {
-            return userTimeInStyle / 2;
-        } else if (exerciseSeries.getDistance() == 100) {
-            return userTimeInStyle;
-        } else {
-            double multipleTimeFactor = exerciseSeries.getDistance() / 100;
-            double increasingDurationFactor = 0.4 * multipleTimeFactor * multipleTimeFactor * 1 / 7 * userTimeInStyle;
-            Double durationOfOneExerciseSeriesInSeconds = multipleTimeFactor * userTimeInStyle + increasingDurationFactor;
-            return durationOfOneExerciseSeriesInSeconds.intValue();
-        }
-    }
-
-    public int getBreakOfOneExerciseRepeatInSeconds(IntensityLevel intensityLevel, int durationOfOneExerciseRepeatInSeconds) {
-        int breakOfOneExerciseRepeatInSeconds;
-        if (intensityLevel.equals(IntensityLevel.LOW)) {
-            breakOfOneExerciseRepeatInSeconds = durationOfOneExerciseRepeatInSeconds / 6;
-        } else if (intensityLevel.equals(IntensityLevel.MEDIUM)) {
-            breakOfOneExerciseRepeatInSeconds = durationOfOneExerciseRepeatInSeconds / 7;
-        } else {
-            breakOfOneExerciseRepeatInSeconds = durationOfOneExerciseRepeatInSeconds / 8;
-        }
-        return (breakOfOneExerciseRepeatInSeconds - breakOfOneExerciseRepeatInSeconds % 10);
+    private void addExerciseSeries(Training training, Exercise exercise, TrainingRequirements trainingRequirements, User user, int durationOfOneSeries) throws UnsatisfiedTimeRequirementsException {
+        training.getExerciseSeries().add(createExerciseSeries(exercise, trainingRequirements, user, durationOfOneSeries));
     }
 }
