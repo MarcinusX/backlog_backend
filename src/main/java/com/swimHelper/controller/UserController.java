@@ -27,6 +27,12 @@ public class UserController {
         return userService.addUser(user);
     }
 
+    @PutMapping
+    @PreAuthorize("principal.id == #user.id")
+    public User putUser(@RequestBody User user) throws BusinessException {
+        return userService.updateUser(user);
+    }
+
     @RequestMapping("{userId}")
     @PreAuthorize("principal.id == #userId")
     public User getUser(@PathVariable Long userId) throws BusinessException {

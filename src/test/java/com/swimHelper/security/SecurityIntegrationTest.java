@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Collections;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -86,6 +88,38 @@ public class SecurityIntegrationTest {
                 testRestTemplate
                         .withBasicAuth("user1@email.com", "pass1")
                         .getForEntity("/users/" + createdUserEntity2.getBody().getId(), User.class);
+        //then
+        assertThat(userResponseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void userCanUpdateOwnUserData() throws Exception {
+        //given
+        User user = createUser("some@email.com", "12345");
+        ResponseEntity<User> createdUserEntity = testUtil.postUser(testRestTemplate, user);
+        user = createdUserEntity.getBody();
+        user.setWeight(23.0);
+        //when
+        ResponseEntity<User> userResponseEntity = testUtil.putUser(testRestTemplate
+                .withBasicAuth("some@email.com", "12345"), user);
+        //then
+        assertThat(userResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(userResponseEntity.getBody()).isNotNull();
+    }
+
+    @Test
+    public void userCantUpdateOtherUserData() throws Exception {
+        //given
+        User user1 = createUser("user1@email.com", "pass1");
+        User user2 = createUser("user2@email.com", "pass2");
+        ResponseEntity<User> createdUserEntity1 = testUtil.postUser(testRestTemplate, user1);
+        ResponseEntity<User> createdUserEntity2 = testUtil.postUser(testRestTemplate, user2);
+        user2 = createdUserEntity2.getBody();
+        user2.setStyleStatistics(Collections.emptyList());
+        //when
+        ResponseEntity<User> userResponseEntity =
+                testUtil.putUser(testRestTemplate.withBasicAuth("user1@email.com", "pass1"),
+                        user2);
         //then
         assertThat(userResponseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
