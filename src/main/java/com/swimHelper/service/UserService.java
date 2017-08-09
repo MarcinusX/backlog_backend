@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.validation.ConstraintViolationException;
+
 /**
  * Created by Marcin Szalek on 19.07.17.
  */
@@ -35,7 +37,11 @@ public class UserService implements UserDetailsService {
     public User addUser(User user) throws BusinessException {
         checkUserAddingPrerequisites(user);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.saveAndFlush(user);
+        try {
+            return userRepository.saveAndFlush(user);
+        } catch (ConstraintViolationException e) {
+            throw new InvalidUserException(e);
+        }
     }
 
     public User getUser(Long id) {
@@ -43,6 +49,16 @@ public class UserService implements UserDetailsService {
     }
 
     public User updateUser(User user) throws BusinessException {
+        User userFromRepo = getUserForUpdate(user);
+        user.setPassword(userFromRepo.getPassword());
+        try {
+            return userRepository.saveAndFlush(user);
+        } catch (ConstraintViolationException e) {
+            throw new InvalidUserException(e);
+        }
+    }
+
+    private User getUserForUpdate(User user) throws InvalidUserException, UserNotFoundException {
         if (user == null || user.getId() == null) {
             throw new InvalidUserException("Invalid user");
         }
@@ -50,8 +66,7 @@ public class UserService implements UserDetailsService {
         if (userFromRepo == null) {
             throw new UserNotFoundException("Could not find user with id: " + user.getId());
         }
-        user.setPassword(userFromRepo.getPassword());
-        return userRepository.saveAndFlush(user);
+        return userFromRepo;
     }
 
     private void checkUserAddingPrerequisites(User user) throws BusinessException {

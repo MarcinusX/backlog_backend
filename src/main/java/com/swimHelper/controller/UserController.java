@@ -38,7 +38,7 @@ public class UserController {
     public User getUser(@PathVariable Long userId) throws BusinessException {
         User user = userService.getUser(userId);
         if (user == null) {
-            throw new UserNotFoundException("Couldnt find user with id: " + userId);
+            throw new UserNotFoundException("Couldn't find user with id: " + userId);
         }
         return user;
     }

@@ -1,4 +1,4 @@
-package com.swimHelper.service;
+package com.swimHelper.service.user;
 
 import com.swimHelper.TestUtil;
 import com.swimHelper.exception.InvalidUserException;
@@ -6,6 +6,7 @@ import com.swimHelper.exception.UserExistsException;
 import com.swimHelper.exception.UserNotFoundException;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.UserRepository;
+import com.swimHelper.service.UserService;
 import org.junit.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
