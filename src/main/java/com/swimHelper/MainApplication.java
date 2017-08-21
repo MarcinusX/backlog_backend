@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.transaction.Transactional;
 
 @SpringBootApplication
+@EnableScheduling
 public class MainApplication implements CommandLineRunner {
 
     @Autowired
