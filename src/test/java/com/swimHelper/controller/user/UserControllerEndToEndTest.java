@@ -1,5 +1,6 @@
 package com.swimHelper.controller.user;
 
+import com.swimHelper.TestUtil;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.UserRepository;
 import org.junit.Test;
@@ -29,18 +30,25 @@ public class UserControllerEndToEndTest {
     @Autowired
     private TestRestTemplate testRestTemplate;
 
+    @Autowired
+    private TestUtil testUtil;
+
     @Test
-    public void addAndGetUser() throws Exception {
+    public void addUpdateAndGetUser() throws Exception {
         //given
         userRepository.deleteAll();
         User user = new User();
         user.setEmail("some@email.com");
         user.setPassword("12345");
         //when
-        ResponseEntity<User> user1 = testRestTemplate.postForEntity("/users", user, User.class);
-        ResponseEntity<User> user2 = testRestTemplate.getForEntity("/users/" + user1.getBody().getId(), User.class);
+        ResponseEntity<User> responseEntity1 = testUtil.postUser(testRestTemplate, user);
+        User userToUpdate = responseEntity1.getBody();
+        userToUpdate.setWeight(75.0);
+        ResponseEntity<User> responseEntity2 = testUtil.putUser(testRestTemplate, userToUpdate);
+        ResponseEntity<User> responseEntity3 = testRestTemplate.getForEntity("/users/" + userToUpdate.getId(), User.class);
         //then
-        assertThat(user2.getBody().getEmail()).isEqualTo("some@email.com");
-        //TODO: password should not be visible
+        assertThat(responseEntity3.getBody().getEmail()).isEqualTo("some@email.com");
+        assertThat(responseEntity3.getBody().getWeight()).isEqualTo(75.0);
+        assertThat(responseEntity3.getBody().getPassword()).isNull();
     }
 }

@@ -32,6 +32,9 @@ public class UserControllerStatusCodesTest {
     @Autowired
     private TestRestTemplate testRestTemplate;
 
+    @Autowired
+    private TestUtil testUtil;
+
     @Before
     public void before() {
         userRepository.deleteAll();
@@ -40,7 +43,7 @@ public class UserControllerStatusCodesTest {
     @Test
     public void getUser_ReturnsUserWithStatusOk() throws Exception {
         //given
-        User user = TestUtil.createValidUser();
+        User user = testUtil.createValidUser();
         User addedUser = userRepository.saveAndFlush(user);
         //when
         ResponseEntity<User> responseEntity =
@@ -62,10 +65,10 @@ public class UserControllerStatusCodesTest {
     @Test
     public void addUser_whenUserHasId_returns400() throws Exception {
         //given
-        User user = TestUtil.createValidUser();
+        User user = testUtil.createValidUser();
         user.setId(1L);
         //when
-        ResponseEntity<User> responseEntity = testRestTemplate.postForEntity("/users", user, User.class);
+        ResponseEntity<User> responseEntity = testUtil.postUser(testRestTemplate, user);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
@@ -73,14 +76,26 @@ public class UserControllerStatusCodesTest {
     @Test
     public void addUser_whenUserExists_returns409() throws Exception {
         //given
-        User savedUser = TestUtil.createValidUser();
+        User savedUser = testUtil.createValidUser();
         savedUser.setEmail("some@email.com");
         userRepository.saveAndFlush(savedUser);
-        User userToRequest = TestUtil.createValidUser();
+        User userToRequest = testUtil.createValidUser();
         userToRequest.setEmail("some@email.com");
         //when
-        ResponseEntity<User> responseEntity = testRestTemplate.postForEntity("/users", userToRequest, User.class);
+        ResponseEntity<User> responseEntity = testUtil.postUser(testRestTemplate, userToRequest);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    public void getUser_hidesPassword() throws Exception {
+        //given
+        User user = testUtil.createValidUser();
+        User savedUser = userRepository.saveAndFlush(user);
+        //when
+        ResponseEntity<User> responseEntity =
+                testRestTemplate.getForEntity("/users/" + savedUser.getId(), User.class);
+        //then
+        assertThat(responseEntity.getBody().getPassword()).isNull();
     }
 }

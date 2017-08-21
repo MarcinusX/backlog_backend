@@ -27,12 +27,18 @@ public class UserController {
         return userService.addUser(user);
     }
 
+    @PutMapping
+    @PreAuthorize("principal.id == #user.id")
+    public User putUser(@RequestBody User user) throws BusinessException {
+        return userService.updateUser(user);
+    }
+
     @RequestMapping("{userId}")
     @PreAuthorize("principal.id == #userId")
     public User getUser(@PathVariable Long userId) throws BusinessException {
         User user = userService.getUser(userId);
         if (user == null) {
-            throw new UserNotFoundException("Couldnt find user with id: " + userId);
+            throw new UserNotFoundException("Couldn't find user with id: " + userId);
         }
         return user;
     }

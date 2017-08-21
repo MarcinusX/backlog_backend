@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,5 +51,16 @@ public class UserControllerUnitTest {
         Throwable throwable = catchThrowable(() -> sut.getUser(1L));
         //then
         assertThat(throwable).isInstanceOf(UserNotFoundException.class);
+    }
+
+    @Test
+    public void putUser_shouldReturnFromService() throws Exception {
+        //given
+        User user = new User();
+        when(userServiceMock.updateUser(any())).thenReturn(user);
+        //when
+        User returnedUser = sut.putUser(new User());
+        //then
+        assertThat(returnedUser).isEqualTo(user);
     }
 }

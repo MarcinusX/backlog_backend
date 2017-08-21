@@ -1,9 +1,12 @@
-package com.swimHelper.service;
+package com.swimHelper.service.user;
 
+import com.swimHelper.TestUtil;
 import com.swimHelper.exception.InvalidUserException;
 import com.swimHelper.exception.UserExistsException;
+import com.swimHelper.exception.UserNotFoundException;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.UserRepository;
+import com.swimHelper.service.UserService;
 import org.junit.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -94,4 +97,62 @@ public class UserServiceUnitTest {
         assertThat(returnedUser).isNull();
     }
 
+    @Test
+    public void putUser_ifUserNotExists_throwsException() throws Exception {
+        //given
+        when(userRepositoryMock.getOne(1L)).thenReturn(null);
+        User user = new TestUtil().createValidUser();
+        user.setId(1L);
+        //when
+        Throwable thrown = catchThrowable(() -> sut.updateUser(user));
+        //then
+        assertThat(thrown).isInstanceOf(UserNotFoundException.class);
+    }
+
+    @Test
+    public void putUser_ifUserHasNullId_throwsException() throws Exception {
+        //given
+        User user = new TestUtil().createValidUser();
+        user.setId(null);
+        //when
+        Throwable thrown = catchThrowable(() -> sut.updateUser(user));
+        //then
+        assertThat(thrown).isInstanceOf(InvalidUserException.class);
+    }
+
+    @Test
+    public void putUser_ifUserIsNull_throwsException() throws Exception {
+        //given
+
+        //when
+        Throwable thrown = catchThrowable(() -> sut.updateUser(null));
+        //then
+        assertThat(thrown).isInstanceOf(InvalidUserException.class);
+    }
+
+    @Test
+    public void putUser_callsRepo() throws Exception {
+        //given
+        User user = new TestUtil().createValidUser();
+        user.setId(1L);
+        when(userRepositoryMock.findOne(1L)).thenReturn(new User());
+        //when
+        sut.updateUser(user);
+        //then
+        verify(userRepositoryMock).saveAndFlush(user);
+    }
+
+    @Test
+    public void putUser_returnsEntityFromRepo() throws Exception {
+        //given
+        User userToReturn = new TestUtil().createValidUser();
+        User user = new TestUtil().createValidUser();
+        user.setId(1L);
+        when(userRepositoryMock.findOne(1L)).thenReturn(userToReturn);
+        when(userRepositoryMock.saveAndFlush(user)).thenReturn(userToReturn);
+        //when
+        User returnedUser = sut.updateUser(user);
+        //then
+        assertThat(returnedUser).isEqualTo(userToReturn);
+    }
 }
