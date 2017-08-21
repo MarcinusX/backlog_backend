@@ -6,10 +6,7 @@ import com.swimHelper.model.User;
 import com.swimHelper.util.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -46,5 +43,14 @@ public class TestUtil {
         HttpEntity<String> entity = new HttpEntity<>(json, headers);
 
         return testRestTemplate.postForEntity("/users", entity, User.class);
+    }
+
+    public ResponseEntity<User> putUser(TestRestTemplate testRestTemplate, User user) {
+        String json = jsonUtil.toJson(user);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(json, headers);
+
+        return testRestTemplate.exchange("/users", HttpMethod.PUT, entity, User.class);
     }
 }
