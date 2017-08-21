@@ -1,14 +1,11 @@
 package com.swimHelper;
 
-import com.swimHelper.model.Style;
-import com.swimHelper.model.StyleStatistics;
-import com.swimHelper.model.User;
+import com.swimHelper.model.*;
 import com.swimHelper.util.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import com.swimHelper.model.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,7 +53,7 @@ public class TestUtil {
         return testRestTemplate.exchange("/users", HttpMethod.PUT, entity, User.class);
     }
 
-    public static TrainingRequirements createValidTrainingRequirements() {
+    public TrainingRequirements createValidTrainingRequirements() {
         Collection<Style> styles = new ArrayList<>();
         styles.add(Style.FREESTYLE);
         styles.add(Style.BACKSTROKE);
@@ -68,7 +65,7 @@ public class TestUtil {
                 availableEquipment, trainingPurposes);
     }
 
-    public static Training createValidTraining() {
+    public Training createValidTraining() {
         Training training = new Training();
         List<ExerciseSeries> exerciseSeriesList = new ArrayList<>();
 

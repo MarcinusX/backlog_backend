@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
  */
 public class TrainingGeneratorTest {
 
+    private TestUtil testUtil = new TestUtil();
     private final ExerciseRepository exerciseRepository = mock(ExerciseRepository.class);
     private final Random random = new Random();
     private final TrainingCalculator trainingCalculator = spy(new TrainingCalculator(random));
@@ -31,8 +32,8 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenValidParameters_doesntThrowException() throws Exception {
         //given
-        User user = TestUtil.createValidUser();
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
         doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
@@ -46,9 +47,9 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenMissingUserData_shouldThrowException() {
         //given
-        User user = TestUtil.createValidUser();
+        User user = testUtil.createValidUser();
         user.setStyleStatistics(new ArrayList<>());
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         //when
         Throwable throwable = catchThrowable(() -> sut.generateTraining(user, trainingRequirements));
         //then
@@ -59,8 +60,8 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenMissingStyles_shouldThrowException() {
         //given
-        User user = TestUtil.createValidUser();
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setStyles(new ArrayList<>());
         //when
         Throwable throwable = catchThrowable(() -> sut.generateTraining(user, trainingRequirements));
@@ -72,8 +73,8 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenMissingDifficultyLevel_shouldThrowException() {
         //given
-        User user = TestUtil.createValidUser();
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setDifficultyLevel(null);
         //when
         Throwable throwable = catchThrowable(() -> sut.generateTraining(user, trainingRequirements));
@@ -85,8 +86,8 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenMissingIntensityLevel_shouldThrowException() {
         //given
-        User user = TestUtil.createValidUser();
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setIntensityLevel(null);
         //when
         Throwable throwable = catchThrowable(() -> sut.generateTraining(user, trainingRequirements));
@@ -98,8 +99,8 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenMissingMaxDurationAndMaxDistance_shouldThrowException() {
         //given
-        User user = TestUtil.createValidUser();
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDistance(0);
         trainingRequirements.setMaxDurationInSeconds(0);
         //when
@@ -112,8 +113,8 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenMissingMaxDistance_shouldNotThrowException() throws Exception {
         //given
-        User user = TestUtil.createValidUser();
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDistance(0);
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
@@ -128,8 +129,8 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenMissingMaxDuration_shouldNotThrowException() throws Exception {
         //given
-        User user = TestUtil.createValidUser();
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(0);
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
@@ -144,8 +145,8 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenValidParameters_doesntReturnNull() throws Exception {
         //given
-        User user = TestUtil.createValidUser();
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
         doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
@@ -159,8 +160,8 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenStylesGiven_shouldReturnTrainingInGivenStyles() throws BusinessException {
         //given
-        User user = TestUtil.createValidUser();
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
         doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
@@ -179,8 +180,8 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenIntensityLevelGiven_shouldCreateExerciseSeriesDueToIntensityLevel() throws Exception {
         //given
-        User user = TestUtil.createValidUser();
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
         doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
@@ -198,8 +199,8 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenMaxDurationGiven_shouldReturnTrainingWithGivenMaxDuration() throws BusinessException {
         //given
-        User user = TestUtil.createValidUser();
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));        //when
         doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
@@ -213,9 +214,9 @@ public class TrainingGeneratorTest {
     @Test
     public void adaptTrainingToMaxDistance_whenMaxDistanceIsShorterThanTrainingDistance_shouldReturnTrainingThatMaxDistanceIsLongerOrEqualToTrainingDistance() throws BusinessException {
         //given
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDistance(500);
-        Training training = TestUtil.createValidTraining();
+        Training training = testUtil.createValidTraining();
         //when
         Training trainingAfterAdaptation = sut.getAdaptedTrainingToMaxDistance(training, trainingRequirements.getMaxDistance());
         int distance = 0;
@@ -229,9 +230,9 @@ public class TrainingGeneratorTest {
     @Test
     public void adaptTrainingToMaxDistance_whenMaxDistanceIsLongerThanTrainingDistance_shouldReturnTheSameTrainingAsGivenAsParameter() throws BusinessException {
         //given
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDistance(8000);
-        Training training = TestUtil.createValidTraining();
+        Training training = testUtil.createValidTraining();
         //when
         Training trainingAfterAdaptation = sut.getAdaptedTrainingToMaxDistance(training, trainingRequirements.getMaxDistance());
         //then
@@ -241,9 +242,9 @@ public class TrainingGeneratorTest {
     @Test
     public void adaptTrainingToMaxDistance_whenMaxDistanceIsTheSameAsTrainingDistance_shouldReturnTheSameTrainingAsGivenAsParameter() throws BusinessException {
         //given
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDistance(7500);
-        Training training = TestUtil.createValidTraining();
+        Training training = testUtil.createValidTraining();
         //when
         Training trainingAfterAdaptation = sut.getAdaptedTrainingToMaxDistance(training, trainingRequirements.getMaxDistance());
         //then

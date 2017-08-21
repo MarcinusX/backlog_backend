@@ -18,13 +18,14 @@ import static org.assertj.core.api.Assertions.catchThrowable;
  */
 public class TrainingCalculatorTest {
 
+    private TestUtil testUtil = new TestUtil();
     private final Random random = new Random();
     private final TrainingCalculator sut = new TrainingCalculator(random);
 
     @Test
     public void getNumberOfExerciseSeries_whenLittleMaxDurationAndLowIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
         //given
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         //when
         Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInSeconds());
         //then
@@ -34,7 +35,7 @@ public class TrainingCalculatorTest {
     @Test
     public void getNumberOfExerciseSeries_whenAverageMaxDurationAndLowIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
         //given
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(2400);
         //when
         Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInSeconds());
@@ -49,7 +50,7 @@ public class TrainingCalculatorTest {
     @Test
     public void getNumberOfExerciseSeries_whenLongMaxDurationAndLowIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
         //given
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(3600);
         List<Integer> possibleNumberOfSeries = new ArrayList<>();
         possibleNumberOfSeries.add(3);
@@ -63,7 +64,7 @@ public class TrainingCalculatorTest {
     @Test
     public void getNumberOfExerciseSeries_whenLongMaxDurationAndHighIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
         //given
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
         trainingRequirements.setMaxDurationInSeconds(3000);
         List<Integer> numberOfExerciseSeriesForHighLevel = new ArrayList<>();
@@ -79,7 +80,7 @@ public class TrainingCalculatorTest {
     @Test
     public void getNumberOfExerciseSeries_whenAverageMaxDurationAndHighIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
         //given
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
         trainingRequirements.setMaxDurationInSeconds(2400);
         List<Integer> numberOfExerciseSeriesForHighLevel = new ArrayList<>();
@@ -94,7 +95,7 @@ public class TrainingCalculatorTest {
     @Test
     public void getNumberOfExerciseSeries_whenShortMaxDurationAndHighIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
         //given
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
         trainingRequirements.setMaxDurationInSeconds(1500);
         //when
@@ -106,7 +107,7 @@ public class TrainingCalculatorTest {
     @Test
     public void getNumberOfExerciseSeries_whenLittleMaxDurationGiven_shouldReturnNumberOfExerciseSeries() {
         //given
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
         trainingRequirements.setMaxDurationInSeconds(600);
         //when
@@ -118,7 +119,7 @@ public class TrainingCalculatorTest {
     @Test
     public void getDurationOfOneExerciseSeries_whenNumberOfExerciseSeriesAndMaxDurationGiven_shouldReturnDurationOfOneExerciseSeries() {
         //given
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         //when
         Integer durationOfOneExerciseSeries = sut.getDurationOfOneExerciseSeries(8, trainingRequirements.getMaxDurationInSeconds());
         //then
@@ -128,7 +129,7 @@ public class TrainingCalculatorTest {
     @Test
     public void getDurationOfOneExerciseRepeat_whenShortDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
         //given
-        User user = TestUtil.createValidUser();
+        User user = testUtil.createValidUser();
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
         exerciseSeries.setDistance(100);
@@ -144,8 +145,8 @@ public class TrainingCalculatorTest {
     @Test
     public void getDurationOfOneExerciseRepeat_whenVeryShortDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
         //given
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
-        User user = TestUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
         exerciseSeries.setDistance(50);
@@ -161,8 +162,8 @@ public class TrainingCalculatorTest {
     @Test
     public void getDurationOfOneExerciseRepeat_whenMediumDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
         //given
-        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
-        User user = TestUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
         exerciseSeries.setDistance(300);
@@ -175,7 +176,7 @@ public class TrainingCalculatorTest {
     @Test
     public void getDurationOfOneExerciseRepeat_whenQuiteLongDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
         //given
-        User user = TestUtil.createValidUser();
+        User user = testUtil.createValidUser();
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
         exerciseSeries.setDistance(500);
@@ -188,7 +189,7 @@ public class TrainingCalculatorTest {
     @Test
     public void getDurationOfOneExerciseRepeat_whenLongDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
         //given
-        User user = TestUtil.createValidUser();
+        User user = testUtil.createValidUser();
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
         exerciseSeries.setDistance(800);
@@ -258,7 +259,7 @@ public class TrainingCalculatorTest {
     @Test
     public void calculateDistanceOfTraining_whenExerciseSeriesGiven_shouldReturnDistanceOfTrainingInMeters() {
         //given
-        Training training = TestUtil.createValidTraining();
+        Training training = testUtil.createValidTraining();
         //when
         int distanceOfTraining = sut.calculateDistanceOfTraining(new ArrayList<>(training.getExerciseSeries()));
         //then
