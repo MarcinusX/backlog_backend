@@ -254,4 +254,14 @@ public class TrainingCalculatorTest {
         //then
         assertThat(throwable).isInstanceOf(UnsatisfiedTimeRequirementsException.class);
     }
+
+    @Test
+    public void calculateDistanceOfTraining_whenExerciseSeriesGiven_shouldReturnDistanceOfTrainingInMeters() {
+        //given
+        Training training = TestUtil.createValidTraining();
+        //when
+        int distanceOfTraining = sut.calculateDistanceOfTraining(new ArrayList<>(training.getExerciseSeries()));
+        //then
+        assertThat(distanceOfTraining).isEqualTo(7500);
+    }
 }

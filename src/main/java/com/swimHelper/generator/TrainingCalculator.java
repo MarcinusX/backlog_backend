@@ -1,13 +1,11 @@
 package com.swimHelper.generator;
 
 import com.swimHelper.exception.UnsatisfiedTimeRequirementsException;
-import com.swimHelper.model.Exercise;
-import com.swimHelper.model.IntensityLevel;
-import com.swimHelper.model.StyleStatistics;
-import com.swimHelper.model.User;
+import com.swimHelper.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -93,4 +91,13 @@ public class TrainingCalculator {
         int randomDistanceIndex = randomGenerator.nextInt(availableDistances.size());
         return availableDistances.get(randomDistanceIndex);
     }
+
+    public int calculateDistanceOfTraining(Collection<ExerciseSeries> exerciseSeries) {
+        int distance = 0;
+        for (ExerciseSeries series : exerciseSeries) {
+            distance += series.getDistance() * series.getRepeats();
+        }
+        return distance;
+    }
+
 }

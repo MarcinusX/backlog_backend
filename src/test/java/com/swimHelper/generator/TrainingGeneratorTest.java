@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by mstobieniecka on 2017-07-19.
@@ -24,8 +24,8 @@ import static org.mockito.Mockito.when;
 public class TrainingGeneratorTest {
 
     private final ExerciseRepository exerciseRepository = mock(ExerciseRepository.class);
-    private final TrainingCalculator trainingCalculator = mock(TrainingCalculator.class);
     private final Random random = new Random();
+    private final TrainingCalculator trainingCalculator = spy(new TrainingCalculator(random));
     private final TrainingGenerator sut = new TrainingGenerator(exerciseRepository, trainingCalculator, random);
 
     @Test
@@ -35,6 +35,7 @@ public class TrainingGeneratorTest {
         TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
         //when
         sut.generateTraining(user, trainingRequirements);
         //then
@@ -116,6 +117,7 @@ public class TrainingGeneratorTest {
         trainingRequirements.setMaxDistance(0);
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
         //when
         sut.generateTraining(user, trainingRequirements);
         //then
@@ -131,6 +133,7 @@ public class TrainingGeneratorTest {
         trainingRequirements.setMaxDurationInSeconds(0);
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
         //when
         sut.generateTraining(user, trainingRequirements);
         //then
@@ -145,6 +148,7 @@ public class TrainingGeneratorTest {
         TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
         //when
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
@@ -159,6 +163,7 @@ public class TrainingGeneratorTest {
         TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
         //when
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
@@ -178,6 +183,7 @@ public class TrainingGeneratorTest {
         TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
         //then
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
@@ -196,13 +202,51 @@ public class TrainingGeneratorTest {
         TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));        //when
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
+
         //when
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
         assertThat(training.getDurationInSeconds()).isLessThanOrEqualTo(trainingRequirements.getMaxDurationInSeconds());
     }
 
+    @Test
+    public void adaptTrainingToMaxDistance_whenMaxDistanceIsShorterThanTrainingDistance_shouldReturnTrainingThatMaxDistanceIsLongerOrEqualToTrainingDistance() throws BusinessException {
+        //given
+        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        trainingRequirements.setMaxDistance(500);
+        Training training = TestUtil.createValidTraining();
+        //when
+        Training trainingAfterAdaptation = sut.getAdaptedTrainingToMaxDistance(training, trainingRequirements.getMaxDistance());
+        int distance = 0;
+        for (ExerciseSeries series : trainingAfterAdaptation.getExerciseSeries()) {
+            distance += series.getDistance() * series.getRepeats();
+        }
+        //then
+        assertThat(distance).isLessThanOrEqualTo(trainingRequirements.getMaxDistance());
+    }
 
+    @Test
+    public void adaptTrainingToMaxDistance_whenMaxDistanceIsLongerThanTrainingDistance_shouldReturnTheSameTrainingAsGivenAsParameter() throws BusinessException {
+        //given
+        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        trainingRequirements.setMaxDistance(8000);
+        Training training = TestUtil.createValidTraining();
+        //when
+        Training trainingAfterAdaptation = sut.getAdaptedTrainingToMaxDistance(training, trainingRequirements.getMaxDistance());
+        //then
+        assertThat(trainingAfterAdaptation).isEqualTo(training);
+    }
 
-
+    @Test
+    public void adaptTrainingToMaxDistance_whenMaxDistanceIsTheSameAsTrainingDistance_shouldReturnTheSameTrainingAsGivenAsParameter() throws BusinessException {
+        //given
+        TrainingRequirements trainingRequirements = TestUtil.createValidTrainingRequirements();
+        trainingRequirements.setMaxDistance(7500);
+        Training training = TestUtil.createValidTraining();
+        //when
+        Training trainingAfterAdaptation = sut.getAdaptedTrainingToMaxDistance(training, trainingRequirements.getMaxDistance());
+        //then
+        assertThat(trainingAfterAdaptation).isEqualTo(training);
+    }
 }

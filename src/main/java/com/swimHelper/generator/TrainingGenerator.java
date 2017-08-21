@@ -45,6 +45,10 @@ public class TrainingGenerator {
             exercisesByStyles.remove(exercise);
         }
 
+        if (trainingRequirements.getMaxDistance() != 0) {
+            training = getAdaptedTrainingToMaxDistance(training, trainingRequirements.getMaxDistance());
+        }
+
         return training;
     }
 
@@ -74,5 +78,31 @@ public class TrainingGenerator {
 
     private void addExerciseSeries(Training training, Exercise exercise, TrainingRequirements trainingRequirements, User user, int durationOfOneSeries) throws UnsatisfiedTimeRequirementsException {
         training.getExerciseSeries().add(createExerciseSeries(exercise, trainingRequirements, user, durationOfOneSeries));
+    }
+
+    public Training getAdaptedTrainingToMaxDistance(Training training, int maxDistance) {
+
+
+        if (trainingCalculator.calculateDistanceOfTraining(training.getExerciseSeries()) > maxDistance) {
+            int i = training.getExerciseSeries().size();
+            List<ExerciseSeries> exerciseSeries = new ArrayList<>(training.getExerciseSeries());
+            boolean isTrainingDistanceLongerThanMaxDistance = true;
+            while (isTrainingDistanceLongerThanMaxDistance) {
+
+                i--;
+
+                exerciseSeries.get(i).setRepeats(exerciseSeries.get(i).getRepeats() - 1);
+
+                isTrainingDistanceLongerThanMaxDistance = trainingCalculator.calculateDistanceOfTraining(exerciseSeries) > maxDistance;
+
+                if (i == 0 && isTrainingDistanceLongerThanMaxDistance) {
+                    i = training.getExerciseSeries().size();
+                }
+            }
+
+            exerciseSeries.removeIf(item -> item.getRepeats() == 0);
+            training.setExerciseSeries(exerciseSeries);
+        }
+        return training;
     }
 }

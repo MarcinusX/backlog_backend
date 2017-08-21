@@ -4,6 +4,7 @@ import com.swimHelper.model.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by Marcin Szalek on 20.07.17.
@@ -35,5 +36,22 @@ public class TestUtil {
         trainingPurposes.add(TrainingPurpose.IMPROVE_RECORDS);
         return new TrainingRequirements(styles, DifficultyLevel.BEGINNER, IntensityLevel.LOW, 600, 1000,
                 availableEquipment, trainingPurposes);
+    }
+
+    public static Training createValidTraining() {
+        Training training = new Training();
+        List<ExerciseSeries> exerciseSeriesList = new ArrayList<>();
+
+        for (int i = 0; i < 5; i++) {
+            ExerciseSeries exerciseSeries = new ExerciseSeries();
+            Exercise exercise = new Exercise(Style.FREESTYLE);
+            exercise.setName("exercise" + i);
+            exerciseSeries.setRepeats(5);
+            exerciseSeries.setDistance((i + 1) * 100);
+            exerciseSeriesList.add(exerciseSeries);
+        }
+
+        training.setExerciseSeries(exerciseSeriesList);
+        return training;
     }
 }
