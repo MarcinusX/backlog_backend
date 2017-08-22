@@ -1,0 +1,15 @@
+# Security
+security:
+  basic:
+    enabled: false
+
+#notifications
+notifications:
+  email:
+    subject: Your training starts soon!
+    textTemplate: Dear %s,\n\nYour training starts at %s. Don't forget about it!
+    author:
+      name: SwimHelper Notification System
+      address: SwimHelper@gmail.com
+  scheduler:
+    rate: 60000 #1 minute
