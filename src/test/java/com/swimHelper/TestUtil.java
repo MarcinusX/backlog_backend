@@ -57,12 +57,7 @@ public class TestUtil {
         Collection<Style> styles = new ArrayList<>();
         styles.add(Style.FREESTYLE);
         styles.add(Style.BACKSTROKE);
-        Collection<Equipment> availableEquipment = new ArrayList<>();
-        availableEquipment.add(Equipment.TEMP);
-        Collection<TrainingPurpose> trainingPurposes = new ArrayList<>();
-        trainingPurposes.add(TrainingPurpose.IMPROVE_RECORDS);
-        return new TrainingRequirements(styles, DifficultyLevel.BEGINNER, IntensityLevel.LOW, 600, 1000,
-                availableEquipment, trainingPurposes);
+        return new TrainingRequirements(styles, IntensityLevel.LOW, 1000, 1000);
     }
 
     public Training createValidTraining() {

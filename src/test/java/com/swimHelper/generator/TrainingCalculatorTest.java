@@ -4,11 +4,12 @@ import com.swimHelper.TestUtil;
 import com.swimHelper.exception.BusinessException;
 import com.swimHelper.exception.UnsatisfiedTimeRequirementsException;
 import com.swimHelper.model.*;
+import com.swimHelper.util.RandomGenerator;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -19,81 +20,73 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 public class TrainingCalculatorTest {
 
     private TestUtil testUtil = new TestUtil();
-    private final Random random = new Random();
+    private final RandomGenerator random = new RandomGenerator();
     private final TrainingCalculator sut = new TrainingCalculator(random);
 
     @Test
-    public void getNumberOfExerciseSeries_whenLittleMaxDurationAndLowIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
+    public void getNumberOfExerciseSeries_whenLittleMaxDurationAndLowIntensityLevel_shouldThrowException() throws BusinessException {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        trainingRequirements.setMaxDurationInSeconds(600);
         //when
-        Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInSeconds());
+        Throwable throwable = catchThrowable(() -> sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInSeconds()));
+        ;
         //then
-        assertThat(numberOfExercisesSeries).isEqualTo(1);
+        assertThat(throwable).isInstanceOf(UnsatisfiedTimeRequirementsException.class);
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenAverageMaxDurationAndLowIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
+    public void getNumberOfExerciseSeries_whenAverageMaxDurationAndLowIntensityLevel_shouldReturnBetween4and6ExerciseSeries() throws BusinessException {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(2400);
         //when
         Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInSeconds());
-        List<Integer> availableValues = new ArrayList<>();
-        availableValues.add(2);
-        availableValues.add(3);
-        availableValues.add(4);
         //then
-        assertThat(numberOfExercisesSeries).isIn(availableValues);
+        List<Integer> expectedAvailableValues = Arrays.asList(4, 5, 6);
+        assertThat(numberOfExercisesSeries).isIn(expectedAvailableValues);
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenLongMaxDurationAndLowIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
+    public void getNumberOfExerciseSeries_whenLongMaxDurationAndLowIntensityLevel_shouldReturn5or6ExerciseSeries() throws BusinessException {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(3600);
-        List<Integer> possibleNumberOfSeries = new ArrayList<>();
-        possibleNumberOfSeries.add(3);
-        possibleNumberOfSeries.add(4);
         //when
         Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInSeconds());
         //then
-        assertThat(numberOfExercisesSeries).isIn(possibleNumberOfSeries);
+        List<Integer> expectedPossibleNumberOfSeries = Arrays.asList(5, 6);
+        assertThat(numberOfExercisesSeries).isIn(expectedPossibleNumberOfSeries);
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenLongMaxDurationAndHighIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
+    public void getNumberOfExerciseSeries_whenLongMaxDurationAndHighIntensityLevel_shouldReturnBetween7and9ExerciseSeries() throws BusinessException {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
-        trainingRequirements.setMaxDurationInSeconds(3000);
-        List<Integer> numberOfExerciseSeriesForHighLevel = new ArrayList<>();
-        numberOfExerciseSeriesForHighLevel.add(5);
-        numberOfExerciseSeriesForHighLevel.add(6);
-        numberOfExerciseSeriesForHighLevel.add(7);
+        trainingRequirements.setMaxDurationInSeconds(4000);
         //when
         Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInSeconds());
         //then
-        assertThat(numberOfExercisesSeries).isIn(numberOfExerciseSeriesForHighLevel);
+        List<Integer> expectedNumberOfExerciseSeriesForHighLevel = Arrays.asList(7, 8, 9);
+        assertThat(numberOfExercisesSeries).isIn(expectedNumberOfExerciseSeriesForHighLevel);
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenAverageMaxDurationAndHighIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
+    public void getNumberOfExerciseSeries_whenAverageMaxDurationAndHighIntensityLevel_shouldReturn5or6ExerciseSeries() throws BusinessException {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
         trainingRequirements.setMaxDurationInSeconds(2400);
-        List<Integer> numberOfExerciseSeriesForHighLevel = new ArrayList<>();
-        numberOfExerciseSeriesForHighLevel.add(3);
-        numberOfExerciseSeriesForHighLevel.add(4);
         //when
         Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInSeconds());
         //then
-        assertThat(numberOfExercisesSeries).isIn(numberOfExerciseSeriesForHighLevel);
+        List<Integer> expectedNumberOfExerciseSeriesForHighLevel = Arrays.asList(5, 6);
+        assertThat(numberOfExercisesSeries).isIn(expectedNumberOfExerciseSeriesForHighLevel);
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenShortMaxDurationAndHighIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
+    public void getNumberOfExerciseSeries_whenShortMaxDurationAndHighIntensityLevel_shouldReturn3ExerciseSeries() throws BusinessException {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
@@ -105,29 +98,29 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenLittleMaxDurationGiven_shouldReturnNumberOfExerciseSeries() {
+    public void getNumberOfExerciseSeries_whenLittleMaxDuration_shouldReturn2ExerciseSeries() throws BusinessException {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
-        trainingRequirements.setMaxDurationInSeconds(600);
+        trainingRequirements.setMaxDurationInSeconds(900);
         //when
         Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInSeconds());
         //then
-        assertThat(numberOfExercisesSeries).isEqualTo(1);
+        assertThat(numberOfExercisesSeries).isEqualTo(2);
     }
 
     @Test
-    public void getDurationOfOneExerciseSeries_whenNumberOfExerciseSeriesAndMaxDurationGiven_shouldReturnDurationOfOneExerciseSeries() {
+    public void getDurationOfOneExerciseSeries_whenNumberOfExerciseSeriesAndMaxDuration_shouldReturn125Seconds() {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         //when
         Integer durationOfOneExerciseSeries = sut.getDurationOfOneExerciseSeries(8, trainingRequirements.getMaxDurationInSeconds());
         //then
-        assertThat(durationOfOneExerciseSeries).isEqualTo(75);
+        assertThat(durationOfOneExerciseSeries).isEqualTo(125);
     }
 
     @Test
-    public void getDurationOfOneExerciseRepeat_whenShortDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
+    public void getDurationOfOneExerciseRepeat_whenShortDistanceAndStyleStatistics_shouldReturnCalculatedDurationOfOneExerciseRepeat() {
         //given
         User user = testUtil.createValidUser();
         ExerciseSeries exerciseSeries = new ExerciseSeries();
@@ -135,34 +128,32 @@ public class TrainingCalculatorTest {
         exerciseSeries.setDistance(100);
         //when
         Integer durationOfOneExerciseRepeat = sut.getDurationOfOneExerciseRepeatInSeconds(exerciseSeries.getExercise(), exerciseSeries.getDistance(), user);
+        //then
         StyleStatistics styleStatistics = user
                 .getStyleStatistics().stream()
                 .filter(styleStatistics1 -> styleStatistics1.getStyle().equals(exerciseSeries.getExercise().getStyle())).findFirst().get();
-        //then
         assertThat(durationOfOneExerciseRepeat).isEqualTo(styleStatistics.getTimeInSeconds());
     }
 
     @Test
-    public void getDurationOfOneExerciseRepeat_whenVeryShortDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
+    public void getDurationOfOneExerciseRepeat_whenVeryShortDistanceAndStyleStatistics_shouldReturnCalculatedDurationOfOneExerciseRepeat() {
         //given
-        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         User user = testUtil.createValidUser();
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
         exerciseSeries.setDistance(50);
         //when
         Integer durationOfOneExerciseRepeat = sut.getDurationOfOneExerciseRepeatInSeconds(exerciseSeries.getExercise(), exerciseSeries.getDistance(), user);
+        //then
         StyleStatistics styleStatistics = user
                 .getStyleStatistics().stream()
                 .filter(styleStatistics1 -> styleStatistics1.getStyle().equals(exerciseSeries.getExercise().getStyle())).findFirst().get();
-        //then
         assertThat(durationOfOneExerciseRepeat).isEqualTo(styleStatistics.getTimeInSeconds() / 2);
     }
 
     @Test
-    public void getDurationOfOneExerciseRepeat_whenMediumDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
+    public void getDurationOfOneExerciseRepeat_whenMediumDistanceAndStyleStatistics_shouldReturn351Seconds() {
         //given
-        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         User user = testUtil.createValidUser();
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
@@ -174,7 +165,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getDurationOfOneExerciseRepeat_whenQuiteLongDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
+    public void getDurationOfOneExerciseRepeat_whenQuiteLongDistanceAndStyleStatistics_shouldReturn642Seconds() {
         //given
         User user = testUtil.createValidUser();
         ExerciseSeries exerciseSeries = new ExerciseSeries();
@@ -187,7 +178,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getDurationOfOneExerciseRepeat_whenLongDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
+    public void getDurationOfOneExerciseRepeat_whenLongDistanceAndStyleStatistics_shouldReturn1165Seconds() {
         //given
         User user = testUtil.createValidUser();
         ExerciseSeries exerciseSeries = new ExerciseSeries();
@@ -200,7 +191,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getBreakOfOneExerciseRepeatInSeconds_whenLowIntensityLevelAndDurationOfOneExerciseSeriesGiven_shouldReturnBreakForOneExerciseRepeat() {
+    public void getBreakOfOneExerciseRepeatInSeconds_whenLowIntensityLevelAndDurationOfOneExerciseSeries_shouldReturn50Seconds() {
         //given
         int durationOfOneExerciseRepeat = 300;
         IntensityLevel intensityLevel = IntensityLevel.LOW;
@@ -211,7 +202,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getBreakOfOneExerciseRepeatInSeconds_whenMediumIntensityLevelAndDurationOfOneExerciseSeriesGiven_shouldReturnBreakForOneExerciseRepeat() {
+    public void getBreakOfOneExerciseRepeatInSeconds_whenMediumIntensityLevelAndDurationOfOneExerciseSeries_shouldReturn40Seconds() {
         //given
         int durationOfOneExerciseRepeat = 300;
         IntensityLevel intensityLevel = IntensityLevel.MEDIUM;
@@ -222,7 +213,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getBreakOfOneExerciseRepeatInSeconds_whenHighIntensityLevelAndDurationOfOneExerciseSeriesGiven_shouldReturnBreakForOneExerciseRepeat() {
+    public void getBreakOfOneExerciseRepeatInSeconds_whenHighIntensityLevelAndDurationOfOneExerciseSeries_shouldReturn30Seconds() {
         //given
         int durationOfOneExerciseRepeat = 300;
         IntensityLevel intensityLevel = IntensityLevel.HIGH;
@@ -233,7 +224,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getNumberOfRepeatsInOneSeries_whenSeriesDurationAndOneRepeatDurationAndBreakGiven_shouldReturnNumberOfRepeats() throws BusinessException {
+    public void getNumberOfRepeatsInOneSeries_whenSeriesDurationAndOneRepeatDurationAndBreak_shouldReturn3Repeats() throws BusinessException {
         //given
         int durationOfOneExerciseRepeat = 200;
         int durationOfSeries = 800;
@@ -245,7 +236,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getNumberOfRepeatsInOneSeries_whenSeriesDurationAndOneRepeatDurationAndBreakGiven_shouldThrowException() throws BusinessException {
+    public void getNumberOfRepeatsInOneSeries_whenSeriesDurationAndOneRepeatDurationAndBreak_shouldThrowException() throws BusinessException {
         //given
         int durationOfOneExerciseRepeat = 200;
         int durationOfSeries = 200;
@@ -257,7 +248,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void calculateDistanceOfTraining_whenExerciseSeriesGiven_shouldReturnDistanceOfTrainingInMeters() {
+    public void calculateDistanceOfTraining_whenExerciseSeries_shouldReturn7500Meters() {
         //given
         Training training = testUtil.createValidTraining();
         //when
