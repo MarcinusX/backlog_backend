@@ -1,6 +1,8 @@
 package com.swimHelper;
 
+import com.swimHelper.model.Training;
 import com.swimHelper.model.User;
+import com.swimHelper.repository.TrainingRepository;
 import com.swimHelper.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -9,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 
 @SpringBootApplication
 @EnableScheduling
@@ -16,6 +19,8 @@ public class MainApplication implements CommandLineRunner {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private TrainingRepository trainingRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(MainApplication.class, args);
@@ -25,15 +30,18 @@ public class MainApplication implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
         User user = new User();
+        user.setFirstname("Monia");
         user.setEmail("dowlny@email.com");
         user.setPassword("abcdef");
-		userRepository.saveAndFlush(user);
+        //user = userRepository.saveAndFlush(user);
 
-        User user2 = new User();
-        user2.setEmail("dowlny2@email.com");
-        user2.setPassword("abcdef2");
-        userRepository.saveAndFlush(user2);
+        Training training = new Training();
+        training.setNotificationDateTime(LocalDateTime.now().plusMinutes(1));
+        training.setDateTime(LocalDateTime.now().plusMinutes(30));
+        training.setUser(user);
+        //trainingRepository.saveAndFlush(training);
 
+        trainingRepository.findAll().forEach(System.out::println);
         userRepository.findAll().forEach(System.out::println);
     }
 }

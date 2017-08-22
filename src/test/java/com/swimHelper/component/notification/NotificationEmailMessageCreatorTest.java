@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class NotificationEmailMessageCreatorTest {
 
     private static final String SUBJECT = "subject";
-    private static final String TEXT_TEMPLATE = "template %s";
+    private static final String TEXT_TEMPLATE = "template {0}";
     private static final String AUTHOR_NAME = "author";
     private static final String AUTHOR_ADDRESS = "email@author.com";
 

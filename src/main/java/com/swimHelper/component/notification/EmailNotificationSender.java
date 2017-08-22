@@ -1,5 +1,6 @@
 package com.swimHelper.component.notification;
 
+import com.swimHelper.exception.EmailFailedException;
 import com.swimHelper.model.EmailMessage;
 import com.swimHelper.model.Training;
 import com.swimHelper.model.User;
@@ -23,8 +24,14 @@ public class EmailNotificationSender implements NotificationSender {
     }
 
     @Override
-    public void remindTraining(User user, Training training) {
+    public boolean remindTraining(User user, Training training) {
         EmailMessage emailMessage = emailMessageCreator.createNotificationEmailMessage(user, training);
-        emailService.sendEmail(emailMessage);
+        try {
+            emailService.sendEmail(emailMessage);
+            return true;
+        } catch (EmailFailedException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

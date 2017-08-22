@@ -7,5 +7,5 @@ import com.swimHelper.model.User;
  * Created by Marcin Szalek on 22.08.17.
  */
 public interface NotificationSender {
-    void remindTraining(User user, Training training);
+    boolean remindTraining(User user, Training training);
 }

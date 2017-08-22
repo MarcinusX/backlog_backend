@@ -7,9 +7,23 @@ security:
 notifications:
   email:
     subject: Your training starts soon!
-    textTemplate: Dear %s,\n\nYour training starts at %s. Don't forget about it!
+    textTemplate: Dear {0},\r\n\r\nYour training starts at {1}. Don't forget about it!
     author:
       name: SwimHelper Notification System
-      address: SwimHelper@gmail.com
+      address: swimminghelper1@gmail.com
   scheduler:
     rate: 60000 #1 minute
+
+#spring
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: swimminghelper1@gmail.com
+    password: ${EMAIL_PASSWORD}
+    protocol: smtp
+    tls: true
+    properties.mail.smtp:
+          auth: true
+          starttls.enable: true
+          ssl.trust: smtp.gmail.com
