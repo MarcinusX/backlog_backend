@@ -35,9 +35,20 @@ public class NotificationEmailMessageCreator {
         emailMessage.setTextContent(
                 MessageFormat.format(textTemplate, user.getFirstname(), training.getDateTime()));
         emailMessage.setTo(
-                new EmailMessage.Person(user.getFirstname() + " " + user.getLastname(), user.getEmail()));
+                new EmailMessage.Person(createRecipientName(user), user.getEmail()));
         emailMessage.setFrom(
                 new EmailMessage.Person(authorName, authorAddress));
         return emailMessage;
+    }
+
+    private String createRecipientName(User user) {
+        String name = "";
+        if (user.getFirstname() != null) {
+            name += user.getFirstname();
+        }
+        if (user.getLastname() != null) {
+            name += " " + user.getLastname();
+        }
+        return name.isEmpty() ? null : name;
     }
 }

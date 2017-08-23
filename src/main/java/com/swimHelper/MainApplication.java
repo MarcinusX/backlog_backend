@@ -31,12 +31,12 @@ public class MainApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
         User user = new User();
         user.setFirstname("Monia");
-        user.setEmail("dowlny@email.com");
+        user.setEmail("example@somemail.com");
         user.setPassword("abcdef");
         //user = userRepository.saveAndFlush(user);
 
         Training training = new Training();
-        training.setNotificationDateTime(LocalDateTime.now().plusMinutes(1));
+        training.setNotificationDateTime(LocalDateTime.now());
         training.setDateTime(LocalDateTime.now().plusMinutes(30));
         training.setUser(user);
         //trainingRepository.saveAndFlush(training);

@@ -7,7 +7,7 @@ security:
 notifications:
   email:
     subject: Your training starts soon!
-    textTemplate: Dear {0},\r\n\r\nYour training starts at {1}. Don't forget about it!
+    textTemplate: Dear {0},<br/><br/>Your training starts at {1}. Don't forget about it!
     author:
       name: SwimHelper Notification System
       address: swimminghelper1@gmail.com

@@ -24,12 +24,14 @@ public class NotificationEmailMessageCreatorTest {
     public void createNotificationEmailMessage() throws Exception {
         //given
         User user = new User();
+        user.setFirstname("Bill");
+        user.setLastname("Gates");
         Training training = new Training();
         //when
         EmailMessage emailMessage = sut.createNotificationEmailMessage(user, training);
         //then
         assertThat(emailMessage.getSubject()).isEqualTo(SUBJECT);
-        assertThat(emailMessage.getTo().getName()).isEqualTo(user.getFirstname() + " " + user.getLastname());
+        assertThat(emailMessage.getTo().getName()).isEqualTo("Bill Gates");
         assertThat(emailMessage.getTo().getEmailAddress()).isEqualTo(user.getEmail());
         assertThat(emailMessage.getFrom().getName()).isEqualTo(AUTHOR_NAME);
         assertThat(emailMessage.getFrom().getEmailAddress()).isEqualTo(AUTHOR_ADDRESS);

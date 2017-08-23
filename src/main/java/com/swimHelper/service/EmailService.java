@@ -42,7 +42,7 @@ public class EmailService {
                 Message.RecipientType.TO,
                 new InternetAddress(emailMessage.getTo().getEmailAddress(), emailMessage.getTo().getName()));
         mimeMessage.setSubject(emailMessage.getSubject());
-        mimeMessage.setText(emailMessage.getTextContent());
+        mimeMessage.setContent(emailMessage.getTextContent(), "text/html");
         return mimeMessage;
     }
 }

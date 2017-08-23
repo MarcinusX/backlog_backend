@@ -3,6 +3,7 @@ package com.swimHelper.component.notification;
 import com.swimHelper.model.Training;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.TrainingRepository;
+import com.swimHelper.service.NotificationService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,10 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
 @ComponentScan
-public class NotificationSchedulerIntegrationTest {
+public class NotificationServiceIntegrationTest {
 
     @Autowired
-    private NotificationScheduler sut;
+    private NotificationService sut;
 
     @MockBean
     private TrainingRepository trainingRepository;

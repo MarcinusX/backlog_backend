@@ -2,7 +2,8 @@ package com.swimHelper.component.notification;
 
 import com.swimHelper.model.Training;
 import com.swimHelper.model.User;
-import com.swimHelper.repository.TrainingRepository;
+import com.swimHelper.service.NotificationService;
+import com.swimHelper.service.TrainingService;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -16,16 +17,16 @@ import static org.mockito.Mockito.*;
  */
 public class NotificationSchedulerTest {
 
-    private final TrainingRepository trainingRepositoryMock = mock(TrainingRepository.class);
+    private final TrainingService trainingServiceMock = mock(TrainingService.class);
     private final NotificationSenderFactory factoryMock = mock(NotificationSenderFactory.class);
-    private final NotificationScheduler sut = new NotificationScheduler(trainingRepositoryMock, factoryMock);
+    private final NotificationService sut = new NotificationService(trainingServiceMock, factoryMock);
 
     @Test
     public void sendNotifications_callsSenderForEveryTraining() throws Exception {
         //given
         NotificationSender someSenderService = mock(NotificationSender.class);
         List<Training> trainingsNeedingNotification = Arrays.asList(training(1), training(2), training(3));
-        when(trainingRepositoryMock.findTrainingsToBeNotified(any())).thenReturn(trainingsNeedingNotification);
+        when(trainingServiceMock.getTrainingsToBeNotified()).thenReturn(trainingsNeedingNotification);
         when(factoryMock.getSenderService(any())).thenReturn(someSenderService);
         //when
         sut.sendNotifications();
