@@ -19,7 +19,7 @@ public class TrainingCalculator {
     private static final int MAX_DURATION_OF_SHORT_TRAINING_IN_SECONDS = 900;
     private static final int MAX_DURATION_OF_AVERAGE_TRAINING_IN_SECONDS = 1800;
     private static final int MIN_DURATION_OF_LONG_TRAINING_IN_SECONDS = 2700;
-    private static final int MIN_EXERCISE_SERIES_DISTANCE_IN_METERS = 50;
+    private static final int MIN_EXERCISE_SERIES_DISTANCE_IN_METERS = 25;
     private static final int STYLE_STATISTICS_DISTANCE_IN_METERS = 100;
     public static final int WARMUP_AND_RELAX_DURATION = 900;
 
@@ -33,20 +33,20 @@ public class TrainingCalculator {
         if (timeForMainPartOfTraining < 0) {
             throw new UnsatisfiedTimeRequirementsException();
         } else if (timeForMainPartOfTraining == 0) {
-            return 2;
+            return 0;
         } else if (timeForMainPartOfTraining <= MAX_DURATION_OF_SHORT_TRAINING_IN_SECONDS) {
-            return 3;
+            return 1;
         } else if (intensityLevel.equals(IntensityLevel.LOW)) {
             if (timeForMainPartOfTraining <= (MAX_DURATION_OF_AVERAGE_TRAINING_IN_SECONDS)) {
-                return 4;
+                return 3;
             } else if (timeForMainPartOfTraining > MAX_DURATION_OF_AVERAGE_TRAINING_IN_SECONDS && timeForMainPartOfTraining <= MIN_DURATION_OF_LONG_TRAINING_IN_SECONDS) {
-                return 5;
+                return 4;
             } else {
-                return randomGenerator.generateRandomIntFromRange(5, 6);
+                return randomGenerator.generateRandomIntFromRange(3, 4);
             }
         } else {
             if (timeForMainPartOfTraining <= (MAX_DURATION_OF_AVERAGE_TRAINING_IN_SECONDS)) {
-                return 5;
+                return 4;
             } else if (timeForMainPartOfTraining > MAX_DURATION_OF_AVERAGE_TRAINING_IN_SECONDS && timeForMainPartOfTraining <= MIN_DURATION_OF_LONG_TRAINING_IN_SECONDS) {
                 return randomGenerator.generateRandomIntFromRange(5, 6);
             } else {
@@ -68,6 +68,8 @@ public class TrainingCalculator {
                 .findFirst().get();
         int userTimeInStyle = styleStatistics.getTimeInSeconds();
         if (distance == MIN_EXERCISE_SERIES_DISTANCE_IN_METERS) {
+            return userTimeInStyle / 4;
+        } else if (distance == 50) {
             return userTimeInStyle / 2;
         } else if (distance == STYLE_STATISTICS_DISTANCE_IN_METERS) {
             return userTimeInStyle;
@@ -93,9 +95,9 @@ public class TrainingCalculator {
 
     int getNumberOfRepeatsInOneSeries(int durationOfSeriesInSeconds, int durationOfOneRepeat, int durationOfOneBreak) throws UnsatisfiedTimeRequirementsException {
         int numberOfRepeatsInOneSeries = durationOfSeriesInSeconds / (durationOfOneBreak + durationOfOneRepeat);
-        if (numberOfRepeatsInOneSeries < 1) {
-            throw new UnsatisfiedTimeRequirementsException();
-        }
+//        if (numberOfRepeatsInOneSeries < 1) {
+//            throw new UnsatisfiedTimeRequirementsException();
+//        }
         return numberOfRepeatsInOneSeries;
     }
 

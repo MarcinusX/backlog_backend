@@ -10,5 +10,7 @@ import java.util.List;
  * Created by mstobieniecka on 2017-07-20.
  */
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
-    public List<Exercise> findByStyle(Style style);
+    List<Exercise> findByStyle(Style style);
+
+    List<Exercise> findByIsWarmUpRelax(boolean isWarmUpRelax);
 }

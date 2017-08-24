@@ -3,7 +3,9 @@ package com.swimHelper.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,6 +23,8 @@ import java.util.Collection;
 @Entity
 @Data
 @NoArgsConstructor //jpa
+@EqualsAndHashCode(exclude = {"trainings", "records", "styleStatistics"})
+@ToString(exclude = "trainings")
 public class User implements UserDetails {
 
     @GeneratedValue

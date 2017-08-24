@@ -53,14 +53,14 @@ public class TrainingGenerator {
         if (trainingRequirements.getMaxDistance() != 0) {
             training = getAdaptedTrainingToMaxDistance(training, trainingRequirements.getMaxDistance());
         }
-
+        training.setUser(user);
         return training;
     }
 
     private void addExercises(User user, TrainingRequirements trainingRequirements,
                               Training training, int numberOfExerciseSeries, List<Exercise> matchingExercises)
             throws UnsatisfiedTimeRequirementsException {
-        int durationOfOneExerciseSeriesInSeconds = trainingCalculator.getDurationOfOneExerciseSeries(numberOfExerciseSeries, trainingRequirements.getMaxDurationInSeconds());
+        int durationOfOneExerciseSeriesInSeconds = trainingCalculator.getDurationOfOneExerciseSeries(numberOfExerciseSeries, trainingRequirements.getMaxDurationInSeconds() - 900);
         for (int i = 0; i < numberOfExerciseSeries; i++) {
             Exercise exercise = matchingExercises.get(randomGenerator.generateRandomInt(matchingExercises.size()));
             addExerciseSeries(training, exercise, trainingRequirements, user, durationOfOneExerciseSeriesInSeconds);
@@ -78,7 +78,9 @@ public class TrainingGenerator {
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setRepeats(1);
         exerciseSeries.setDistance(300);
-        exerciseSeries.setExercise(new Exercise(Style.BACKSTROKE));
+        List<Exercise> exerciseList = exerciseRepository.findByIsWarmUpRelax(true);
+        Exercise exercise = exerciseList.get(randomGenerator.generateRandomInt(exerciseList.size()));
+        exerciseSeries.setExercise(exercise);
         training.getExerciseSeries().add(exerciseSeries);
     }
 
@@ -86,7 +88,9 @@ public class TrainingGenerator {
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setRepeats(1);
         exerciseSeries.setDistance(200);
-        exerciseSeries.setExercise(new Exercise(Style.BACKSTROKE));
+        List<Exercise> exerciseList = exerciseRepository.findByIsWarmUpRelax(true);
+        Exercise exercise = exerciseList.get(randomGenerator.generateRandomInt(exerciseList.size()));
+        exerciseSeries.setExercise(exercise);
         training.getExerciseSeries().add(exerciseSeries);
     }
 
@@ -114,7 +118,10 @@ public class TrainingGenerator {
     }
 
     private void addExerciseSeries(Training training, Exercise exercise, TrainingRequirements trainingRequirements, User user, int durationOfOneSeries) throws UnsatisfiedTimeRequirementsException {
-        training.getExerciseSeries().add(createExerciseSeries(exercise, trainingRequirements, user, durationOfOneSeries));
+        ExerciseSeries exerciseSeries = createExerciseSeries(exercise, trainingRequirements, user, durationOfOneSeries);
+        if (exerciseSeries.getRepeats() > 0) {
+            training.getExerciseSeries().add(exerciseSeries);
+        }
     }
 
     public Training getAdaptedTrainingToMaxDistance(Training training, int maxDistance) {

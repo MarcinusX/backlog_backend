@@ -1,6 +1,7 @@
 package com.swimHelper.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,6 +12,7 @@ import javax.persistence.Id;
  */
 @Entity
 @Data
+@NoArgsConstructor
 public class Exercise {
     @Id
     @GeneratedValue
@@ -19,7 +21,7 @@ public class Exercise {
     private String description;
     private String videoUrl;
     private Style style;
-
+    private boolean isWarmUpRelax = false;
     public Exercise(Style style) {
         this.style = style;
     }
