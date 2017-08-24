@@ -1,7 +1,7 @@
 package com.swimHelper;
 
 import com.swimHelper.model.User;
-import com.swimHelper.repository.UserRepository;
+import com.swimHelper.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -13,7 +13,7 @@ import javax.transaction.Transactional;
 public class MainApplication implements CommandLineRunner {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(MainApplication.class, args);
@@ -23,15 +23,16 @@ public class MainApplication implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
         User user = new User();
-        user.setEmail("dowlny@email.com");
-        user.setPassword("abcdef");
-		userRepository.saveAndFlush(user);
+        user.setEmail("admin@admin.pl");
+        user.setPassword("admin");
+        user = userService.addUser(user);
+        userService.makeUserAdmin(user.getId());
 
         User user2 = new User();
         user2.setEmail("dowlny2@email.com");
         user2.setPassword("abcdef2");
-        userRepository.saveAndFlush(user2);
+        userService.addUser(user2);
 
-        userRepository.findAll().forEach(System.out::println);
+        userService.getAll().forEach(System.out::println);
     }
 }

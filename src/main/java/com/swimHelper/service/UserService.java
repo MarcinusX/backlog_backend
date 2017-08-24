@@ -4,6 +4,7 @@ import com.swimHelper.exception.BusinessException;
 import com.swimHelper.exception.InvalidUserException;
 import com.swimHelper.exception.UserExistsException;
 import com.swimHelper.exception.UserNotFoundException;
+import com.swimHelper.model.Role;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Marcin Szalek on 19.07.17.
@@ -37,11 +42,25 @@ public class UserService implements UserDetailsService {
     public User addUser(User user) throws BusinessException {
         checkUserAddingPrerequisites(user);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(Collections.singleton(Role.USER));
         try {
             return userRepository.saveAndFlush(user);
         } catch (ConstraintViolationException e) {
             throw new InvalidUserException(e);
         }
+    }
+
+    public User makeUserAdmin(Long userId) {
+        User user = getUser(userId);
+        Set<Role> userRoles = new HashSet<>(user.getRoles());
+        userRoles.add(Role.ADMIN);
+        user.setRoles(userRoles);
+        user = userRepository.saveAndFlush(user);
+        return user;
+    }
+
+    public List<User> getAll() {
+        return userRepository.findAll();
     }
 
     public User getUser(Long id) {
@@ -50,12 +69,22 @@ public class UserService implements UserDetailsService {
 
     public User updateUser(User user) throws BusinessException {
         User userFromRepo = getUserForUpdate(user);
-        user.setPassword(userFromRepo.getPassword());
+        User userToUpdate = copyUpdatableFields(userFromRepo, user);
         try {
-            return userRepository.saveAndFlush(user);
+            return userRepository.saveAndFlush(userToUpdate);
         } catch (ConstraintViolationException e) {
             throw new InvalidUserException(e);
         }
+    }
+
+    private User copyUpdatableFields(User userFromDB, User userFromRequest) {
+        userFromDB.setFirstname(userFromRequest.getFirstname());
+        userFromDB.setLastname(userFromRequest.getLastname());
+        userFromDB.setEmail(userFromRequest.getEmail());
+        userFromDB.setWeight(userFromRequest.getWeight());
+        userFromDB.setStyleStatistics(userFromRequest.getStyleStatistics());
+        userFromDB.setRecords(userFromRequest.getRecords());
+        return userFromDB;
     }
 
     private User getUserForUpdate(User user) throws InvalidUserException, UserNotFoundException {
