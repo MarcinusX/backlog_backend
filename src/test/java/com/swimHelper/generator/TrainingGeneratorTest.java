@@ -38,7 +38,10 @@ public class TrainingGeneratorTest {
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
         when(random.generateRandomInt(2)).thenReturn(1);
         when(random.generateRandomInt(1)).thenReturn(0);
-        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         sut.generateTraining(user, trainingRequirements);
         //then
@@ -107,9 +110,12 @@ public class TrainingGeneratorTest {
         trainingRequirements.setMaxDistance(0);
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
-        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
         when(random.generateRandomInt(2)).thenReturn(1);
         when(random.generateRandomInt(1)).thenReturn(0);
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         sut.generateTraining(user, trainingRequirements);
         //then
@@ -125,7 +131,10 @@ public class TrainingGeneratorTest {
         trainingRequirements.setMaxDurationInSeconds(900);
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
-        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
         //when
         sut.generateTraining(user, trainingRequirements);
         //then
@@ -140,7 +149,10 @@ public class TrainingGeneratorTest {
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
-        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
@@ -155,7 +167,10 @@ public class TrainingGeneratorTest {
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
-        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
@@ -175,17 +190,18 @@ public class TrainingGeneratorTest {
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
-        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //then
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
         List<Integer> exerciseSeriesDistances = training.getExerciseSeries()
-                .stream()
+                .stream().filter(s -> !s.getExercise().isWarmUpRelax())
                 .map(ExerciseSeries::getDistance)
                 .collect(Collectors.toList());
         List<Integer> generatedDistances = IntensityLevel.LOW.getDistances();
-        generatedDistances.add(200); //distance from relax
-        generatedDistances.add(300); //distance from warm up
         boolean areDistancesCorrect = exerciseSeriesDistances.stream().allMatch(distance -> generatedDistances.contains(distance));
         assertThat(areDistancesCorrect).isTrue();
     }
@@ -197,7 +213,10 @@ public class TrainingGeneratorTest {
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));        //when
-        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt(), anyInt());
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
@@ -251,6 +270,9 @@ public class TrainingGeneratorTest {
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.emptyList());
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.emptyList());
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         Training training = sut.generateTraining(user, trainingRequirements);
         //then

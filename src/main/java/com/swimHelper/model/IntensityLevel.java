@@ -7,7 +7,7 @@ import java.util.List;
  * Created by mstobieniecka on 2017-07-20.
  */
 public enum IntensityLevel {
-    LOW(300, 400, 500),
+    LOW(200, 250, 300),
     MEDIUM(100, 150, 200),
     HIGH(25, 50, 75);
 

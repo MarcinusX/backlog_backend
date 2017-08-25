@@ -2,6 +2,8 @@ package com.swimHelper.service.training;
 
 import com.swimHelper.TestUtil;
 import com.swimHelper.exception.BusinessException;
+import com.swimHelper.exception.MissingTrainingRequirementsException;
+import com.swimHelper.exception.UnsatisfiedTimeRequirementsException;
 import com.swimHelper.generator.TrainingGenerator;
 import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
@@ -16,11 +18,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 /**
  * Created by mstobieniecka on 2017-07-19.
@@ -50,44 +54,134 @@ public class TrainingServiceIntegrationTest {
     @Before
     public void prepareDatabaseForTests() {
         trainingRepository.deleteAll();
+        userRepository.deleteAll();
         addExercisesInSpecifiedStyle(Style.BACKSTROKE);
         addExercisesInSpecifiedStyle(Style.FREESTYLE);
         addExercisesInSpecifiedStyle(Style.BREASTSTROKE);
-        addExercisesInSpecifiedStyle(Style.INDIVIDUAL_MEDLEY);
         addExercisesInSpecifiedStyle(Style.BUTTERFLY);
         addWarmUpRelaxExercises();
-        addUsers();
     }
 
     @Test
-    public void generateTraining_whenButterflyStyleAndLowIntensityAndShortMaxDuration_shouldGenerateCorrectlyTraining() throws BusinessException {
+    public void generateTraining_whenMissingTrainingRequirements_shouldThrowException() throws BusinessException {
         //given
-        User user = userRepository.findOne(1L);
+        User user = testUtil.createValidUser();
+        User savedUser = userRepository.saveAndFlush(user);
         TrainingRequirements trainingRequirements = new TrainingRequirements();
-        trainingRequirements.setMaxDurationInSeconds(4000);
-        trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
+        trainingRequirements.setIntensityLevel(IntensityLevel.LOW);
         Collection<Style> styles = new ArrayList<>();
         styles.add(Style.BUTTERFLY);
         trainingRequirements.setStyles(styles);
         //when
-        Training training = sut.generateTraining(trainingRequirements, user.getId());
+        Throwable throwable = catchThrowable(() -> sut.generateTraining(trainingRequirements, savedUser.getId()));
+        //then
+        assertThat(throwable).isInstanceOf(MissingTrainingRequirementsException.class);
+    }
+
+    @Test
+    public void generateTraining_whenMissingUserStatistics_shouldThrowException() throws BusinessException {
+        //given
+        User user = new User();
+        user.setEmail("email");
+        user.setPassword("password");
+        User savedUser = userRepository.saveAndFlush(user);
+        TrainingRequirements trainingRequirements = new TrainingRequirements();
+        trainingRequirements.setIntensityLevel(IntensityLevel.LOW);
+        Collection<Style> styles = new ArrayList<>();
+        styles.add(Style.BUTTERFLY);
+        trainingRequirements.setStyles(styles);
+        //when
+        Throwable throwable = catchThrowable(() -> sut.generateTraining(trainingRequirements, savedUser.getId()));
+        //then
+        assertThat(throwable).isInstanceOf(MissingTrainingRequirementsException.class);
+    }
+
+    @Test
+    public void generateTraining_whenButterflyStyleAndLowIntensityAndLongMaxDuration_shouldGenerateCorrectlyTraining() throws BusinessException {
+        //given
+        User user = testUtil.createValidUser();
+        User savedUser = userRepository.saveAndFlush(user);
+        TrainingRequirements trainingRequirements = new TrainingRequirements();
+        trainingRequirements.setMaxDurationInSeconds(5000);
+        trainingRequirements.setIntensityLevel(IntensityLevel.LOW);
+        Collection<Style> styles = new ArrayList<>();
+        styles.add(Style.BUTTERFLY);
+        trainingRequirements.setStyles(styles);
+        //when
+        Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
         List<Style> stylesInGeneratedTraining = training.getExerciseSeries().
                 stream().filter(s -> !s.getExercise().isWarmUpRelax()).map(s -> s.getExercise().getStyle()).collect(Collectors.toList());
         //then
-        boolean equals = user.equals(training.getUser());
-        assertThat(training.getUser()).isEqualTo(user);
+        assertThat(training.getUser()).isEqualTo(savedUser);
         assertThat(training.getDurationInSeconds()).isLessThanOrEqualTo(trainingRequirements.getMaxDurationInSeconds());
         assertThat(stylesInGeneratedTraining).containsOnly(Style.BUTTERFLY);
     }
 
-    private void addUsers() {
-        String email = "email@example.com";
-        for (int i = 0; i < 5; i++) {
-            User user = testUtil.createValidUser();
-            user.setId((long) i);
-            user.setEmail(i + email);
-            userRepository.saveAndFlush(user);
-        }
+    @Test
+    public void generateTraining_whenTwoStylesAndHighIntensityAndAverageMaxDuration_shouldGenerateCorrectlyTraining() throws BusinessException {
+        //given
+        User user = testUtil.createValidUser();
+        User savedUser = userRepository.saveAndFlush(user);
+        TrainingRequirements trainingRequirements = new TrainingRequirements();
+        trainingRequirements.setMaxDurationInSeconds(3000);
+        trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
+        trainingRequirements.setStyles(Arrays.asList(Style.BACKSTROKE, Style.FREESTYLE));
+        //when
+        Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
+        List<Style> stylesInGeneratedTraining = training.getExerciseSeries().
+                stream().filter(s -> !s.getExercise().isWarmUpRelax()).map(s -> s.getExercise().getStyle()).collect(Collectors.toList());
+        //then
+        assertThat(training.getUser()).isEqualTo(savedUser);
+        assertThat(training.getDurationInSeconds()).isLessThanOrEqualTo(trainingRequirements.getMaxDurationInSeconds());
+        assertThat(stylesInGeneratedTraining).containsOnly(Style.FREESTYLE, Style.BACKSTROKE);
+    }
+
+    @Test
+    public void generateTraining_whenShortMaxDuration_shouldGenerateCorrectlyTrainingOnlyWithWarmupAndRelax() throws BusinessException {
+        //given
+        User user = testUtil.createValidUser();
+        User savedUser = userRepository.saveAndFlush(user);
+        TrainingRequirements trainingRequirements = new TrainingRequirements();
+        trainingRequirements.setMaxDurationInSeconds(900);
+        trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
+        trainingRequirements.setStyles(Arrays.asList(Style.BACKSTROKE, Style.FREESTYLE));
+        //when
+        Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
+        //then
+        assertThat(training.getUser()).isEqualTo(savedUser);
+        assertThat(training.getExerciseSeries().size()).isEqualTo(2);
+    }
+
+    @Test
+    public void generateTraining_whenTooShortMaxDuration_shouldThrowException() throws BusinessException {
+        //given
+        User user = testUtil.createValidUser();
+        User savedUser = userRepository.saveAndFlush(user);
+        TrainingRequirements trainingRequirements = new TrainingRequirements();
+        trainingRequirements.setIntensityLevel(IntensityLevel.LOW);
+        trainingRequirements.setMaxDurationInSeconds(600);
+        Collection<Style> styles = new ArrayList<>();
+        styles.add(Style.BUTTERFLY);
+        trainingRequirements.setStyles(styles);
+        //when
+        Throwable throwable = catchThrowable(() -> sut.generateTraining(trainingRequirements, savedUser.getId()));
+        //then
+        assertThat(throwable).isInstanceOf(UnsatisfiedTimeRequirementsException.class);
+    }
+
+    @Test
+    public void generateTraining_whenUserWithWeakStatistics_shouldGenerateCorrectlyTraining() throws BusinessException {
+        //given
+        User user = testUtil.createValidUserWithWeakStatistics();
+        User savedUser = userRepository.saveAndFlush(user);
+        TrainingRequirements trainingRequirements = new TrainingRequirements();
+        trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
+        trainingRequirements.setMaxDurationInSeconds(3000);
+        trainingRequirements.setStyles(Arrays.asList(Style.BACKSTROKE, Style.FREESTYLE));
+        //when
+        Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
+        //then
+        assertThat(training.getExerciseSeries().size()).isGreaterThan(2);
     }
 
     private void addExercisesInSpecifiedStyle(Style style) {

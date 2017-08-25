@@ -42,10 +42,10 @@ public class TrainingCalculator {
             } else if (timeForMainPartOfTraining > MAX_DURATION_OF_AVERAGE_TRAINING_IN_SECONDS && timeForMainPartOfTraining <= MIN_DURATION_OF_LONG_TRAINING_IN_SECONDS) {
                 return 4;
             } else {
-                return randomGenerator.generateRandomIntFromRange(3, 4);
+                return randomGenerator.generateRandomIntFromRange(5, 6);
             }
         } else {
-            if (timeForMainPartOfTraining <= (MAX_DURATION_OF_AVERAGE_TRAINING_IN_SECONDS)) {
+            if (timeForMainPartOfTraining <= MAX_DURATION_OF_AVERAGE_TRAINING_IN_SECONDS) {
                 return 4;
             } else if (timeForMainPartOfTraining > MAX_DURATION_OF_AVERAGE_TRAINING_IN_SECONDS && timeForMainPartOfTraining <= MIN_DURATION_OF_LONG_TRAINING_IN_SECONDS) {
                 return randomGenerator.generateRandomIntFromRange(5, 6);
@@ -93,8 +93,8 @@ public class TrainingCalculator {
         return (breakOfOneExerciseRepeatInSeconds - breakOfOneExerciseRepeatInSeconds % 10);
     }
 
-    int getNumberOfRepeatsInOneSeries(int durationOfSeriesInSeconds, int durationOfOneRepeat, int durationOfOneBreak) throws UnsatisfiedTimeRequirementsException {
-        int numberOfRepeatsInOneSeries = durationOfSeriesInSeconds / (durationOfOneBreak + durationOfOneRepeat);
+    int getNumberOfRepeatsInOneSeries(int durationOfSeriesInSeconds, int durationOfRepeatAndBreak) throws UnsatisfiedTimeRequirementsException {
+        int numberOfRepeatsInOneSeries = durationOfSeriesInSeconds / durationOfRepeatAndBreak;
 //        if (numberOfRepeatsInOneSeries < 1) {
 //            throw new UnsatisfiedTimeRequirementsException();
 //        }

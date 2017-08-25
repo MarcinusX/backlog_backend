@@ -69,15 +69,16 @@ public class TrainingGenerator {
     }
 
     private List<Exercise> getMatchingExercises(TrainingRequirements trainingRequirements) {
-        return trainingRequirements.getStyles().stream()
+        List<Exercise> exerciseList = trainingRequirements.getStyles().stream()
                 .flatMap(style -> exerciseRepository.findByStyle(style).stream())
                 .collect(Collectors.toList());
+        return exerciseList.stream().filter(e -> !e.isWarmUpRelax()).collect(Collectors.toList());
     }
 
     private void addWarmUpExerciseSeries(Training training) {
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setRepeats(1);
-        exerciseSeries.setDistance(300);
+        exerciseSeries.setDistance(200);
         List<Exercise> exerciseList = exerciseRepository.findByIsWarmUpRelax(true);
         Exercise exercise = exerciseList.get(randomGenerator.generateRandomInt(exerciseList.size()));
         exerciseSeries.setExercise(exercise);
@@ -87,7 +88,7 @@ public class TrainingGenerator {
     private void addRelaxExerciseSeries(Training training) {
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setRepeats(1);
-        exerciseSeries.setDistance(200);
+        exerciseSeries.setDistance(100);
         List<Exercise> exerciseList = exerciseRepository.findByIsWarmUpRelax(true);
         Exercise exercise = exerciseList.get(randomGenerator.generateRandomInt(exerciseList.size()));
         exerciseSeries.setExercise(exercise);
@@ -113,7 +114,12 @@ public class TrainingGenerator {
         exerciseSeries.setExercise(exercise);
         int breakInSeconds = trainingCalculator.getBreakOfOneExerciseRepeatInSeconds(trainingRequirements.getIntensityLevel(), durationOfOneRepeatInSeconds);
         exerciseSeries.setBreakInSeconds(breakInSeconds);
-        exerciseSeries.setRepeats(trainingCalculator.getNumberOfRepeatsInOneSeries(durationOfOneSeries, durationOfOneRepeatInSeconds, breakInSeconds));
+        int timeOfRepeatAndBreak = durationOfOneRepeatInSeconds + breakInSeconds;
+        if (timeOfRepeatAndBreak == 0) {
+            exerciseSeries.setRepeats(0);
+        } else {
+            exerciseSeries.setRepeats(trainingCalculator.getNumberOfRepeatsInOneSeries(durationOfOneSeries, timeOfRepeatAndBreak));
+        }
         return exerciseSeries;
     }
 
@@ -124,9 +130,7 @@ public class TrainingGenerator {
         }
     }
 
-    public Training getAdaptedTrainingToMaxDistance(Training training, int maxDistance) {
-
-
+    Training getAdaptedTrainingToMaxDistance(Training training, int maxDistance) {
         if (trainingCalculator.calculateDistanceOfTraining(training.getExerciseSeries()) > maxDistance) {
             Iterator<ExerciseSeries> iterator = training.getExerciseSeries().iterator();
             List<ExerciseSeries> exerciseSeries = new ArrayList<>(training.getExerciseSeries());

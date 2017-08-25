@@ -26,7 +26,20 @@ public class TestUtil {
         styleStatistics.add(new StyleStatistics(Style.FREESTYLE, 100, 100));
         styleStatistics.add(new StyleStatistics(Style.BREASTSTROKE, 100, 200));
         styleStatistics.add(new StyleStatistics(Style.BUTTERFLY, 100, 230));
-        styleStatistics.add(new StyleStatistics(Style.INDIVIDUAL_MEDLEY, 100, 140));
+
+        User user = new User();
+        user.setStyleStatistics(styleStatistics);
+        user.setEmail("some@email.com");
+        user.setPassword("somePassword");
+        return user;
+    }
+
+    public User createValidUserWithWeakStatistics() {
+        Collection<StyleStatistics> styleStatistics = new ArrayList<>();
+        styleStatistics.add(new StyleStatistics(Style.BACKSTROKE, 100, 200));
+        styleStatistics.add(new StyleStatistics(Style.FREESTYLE, 100, 180));
+        styleStatistics.add(new StyleStatistics(Style.BREASTSTROKE, 100, 300));
+        styleStatistics.add(new StyleStatistics(Style.BUTTERFLY, 100, 280));
 
         User user = new User();
         user.setStyleStatistics(styleStatistics);
