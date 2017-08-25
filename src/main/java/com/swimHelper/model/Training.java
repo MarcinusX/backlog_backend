@@ -1,6 +1,7 @@
 package com.swimHelper.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.util.Collection;
  */
 @Entity
 @Data
+@EqualsAndHashCode(exclude = "exerciseSeries")
 public class Training {
     @Id
     @GeneratedValue
@@ -22,4 +24,6 @@ public class Training {
     private int durationInMinutes;
     @ManyToOne
     private User user;
+    private boolean hasUserBeenNotified;
+    private LocalDateTime notificationDateTime;
 }
