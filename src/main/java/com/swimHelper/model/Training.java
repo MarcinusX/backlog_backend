@@ -1,6 +1,8 @@
 package com.swimHelper.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,6 +14,7 @@ import java.util.Collection;
  */
 @Entity
 @Data
+@ToString(exclude = {"user", "exerciseSeries"})
 public class Training {
     @Id
     @GeneratedValue
@@ -21,5 +24,6 @@ public class Training {
     private LocalDateTime dateTime;
     private int durationInSeconds;
     @ManyToOne
+    @JsonIgnoreProperties("trainings")
     private User user;
 }

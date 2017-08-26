@@ -137,6 +137,25 @@ public class TrainingServiceIntegrationTest {
     }
 
     @Test
+    public void generateTraining_whenThreeStylesAndMediumIntensityAndAverageMaxDuration_shouldGenerateCorrectlyTraining() throws BusinessException {
+        //given
+        User user = testUtil.createValidUser();
+        User savedUser = userRepository.saveAndFlush(user);
+        TrainingRequirements trainingRequirements = new TrainingRequirements();
+        trainingRequirements.setMaxDurationInSeconds(3000);
+        trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
+        trainingRequirements.setStyles(Arrays.asList(Style.BACKSTROKE, Style.FREESTYLE, Style.BREASTSTROKE));
+        //when
+        Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
+        List<Style> stylesInGeneratedTraining = training.getExerciseSeries().
+                stream().filter(s -> !s.getExercise().isWarmUpRelax()).map(s -> s.getExercise().getStyle()).collect(Collectors.toList());
+        //then
+        assertThat(training.getUser()).isEqualTo(savedUser);
+        assertThat(training.getDurationInSeconds()).isLessThanOrEqualTo(trainingRequirements.getMaxDurationInSeconds());
+        assertThat(stylesInGeneratedTraining).containsOnly(Style.FREESTYLE, Style.BACKSTROKE, Style.BREASTSTROKE);
+    }
+
+    @Test
     public void generateTraining_whenShortMaxDuration_shouldGenerateCorrectlyTrainingOnlyWithWarmupAndRelax() throws BusinessException {
         //given
         User user = testUtil.createValidUser();

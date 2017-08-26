@@ -41,7 +41,7 @@ public class TrainingGeneratorTest {
         doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
         Exercise exercise = new Exercise(Style.BACKSTROKE);
         exercise.setWarmUpRelax(true);
-        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         sut.generateTraining(user, trainingRequirements);
         //then
@@ -115,7 +115,7 @@ public class TrainingGeneratorTest {
         when(random.generateRandomInt(1)).thenReturn(0);
         Exercise exercise = new Exercise(Style.BACKSTROKE);
         exercise.setWarmUpRelax(true);
-        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         sut.generateTraining(user, trainingRequirements);
         //then
@@ -133,7 +133,7 @@ public class TrainingGeneratorTest {
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
         Exercise exercise = new Exercise(Style.BACKSTROKE);
         exercise.setWarmUpRelax(true);
-        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
         //when
         sut.generateTraining(user, trainingRequirements);
@@ -152,7 +152,7 @@ public class TrainingGeneratorTest {
         doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
         Exercise exercise = new Exercise(Style.BACKSTROKE);
         exercise.setWarmUpRelax(true);
-        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
@@ -170,7 +170,7 @@ public class TrainingGeneratorTest {
         doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
         Exercise exercise = new Exercise(Style.BACKSTROKE);
         exercise.setWarmUpRelax(true);
-        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
@@ -193,7 +193,7 @@ public class TrainingGeneratorTest {
         doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
         Exercise exercise = new Exercise(Style.BACKSTROKE);
         exercise.setWarmUpRelax(true);
-        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //then
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
@@ -216,7 +216,7 @@ public class TrainingGeneratorTest {
         doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
         Exercise exercise = new Exercise(Style.BACKSTROKE);
         exercise.setWarmUpRelax(true);
-        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
@@ -272,7 +272,7 @@ public class TrainingGeneratorTest {
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.emptyList());
         Exercise exercise = new Exercise(Style.BACKSTROKE);
         exercise.setWarmUpRelax(true);
-        when(exerciseRepository.findByIsWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         Training training = sut.generateTraining(user, trainingRequirements);
         //then

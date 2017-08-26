@@ -12,5 +12,5 @@ import java.util.List;
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
     List<Exercise> findByStyle(Style style);
 
-    List<Exercise> findByIsWarmUpRelax(boolean isWarmUpRelax);
+    List<Exercise> findByWarmUpRelax(boolean warmUpRelax);
 }

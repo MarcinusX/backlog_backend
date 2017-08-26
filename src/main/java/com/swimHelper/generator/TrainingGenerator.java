@@ -53,8 +53,17 @@ public class TrainingGenerator {
         if (trainingRequirements.getMaxDistance() != 0) {
             training = getAdaptedTrainingToMaxDistance(training, trainingRequirements.getMaxDistance());
         }
+        training.setDurationInSeconds(getDurationOfTraining(training));
         training.setUser(user);
         return training;
+    }
+
+    private int getDurationOfTraining(Training training) {
+        int durationOfTraining = 900;
+        for (ExerciseSeries exerciseSeries : training.getExerciseSeries()) {
+            durationOfTraining += (exerciseSeries.getDurationOfOneExerciseInSeconds() + exerciseSeries.getBreakInSeconds()) * exerciseSeries.getRepeats();
+        }
+        return durationOfTraining;
     }
 
     private void addExercises(User user, TrainingRequirements trainingRequirements,
@@ -79,7 +88,7 @@ public class TrainingGenerator {
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setRepeats(1);
         exerciseSeries.setDistance(200);
-        List<Exercise> exerciseList = exerciseRepository.findByIsWarmUpRelax(true);
+        List<Exercise> exerciseList = exerciseRepository.findByWarmUpRelax(true);
         Exercise exercise = exerciseList.get(randomGenerator.generateRandomInt(exerciseList.size()));
         exerciseSeries.setExercise(exercise);
         training.getExerciseSeries().add(exerciseSeries);
@@ -89,17 +98,19 @@ public class TrainingGenerator {
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setRepeats(1);
         exerciseSeries.setDistance(100);
-        List<Exercise> exerciseList = exerciseRepository.findByIsWarmUpRelax(true);
+        List<Exercise> exerciseList = exerciseRepository.findByWarmUpRelax(true);
         Exercise exercise = exerciseList.get(randomGenerator.generateRandomInt(exerciseList.size()));
         exerciseSeries.setExercise(exercise);
         training.getExerciseSeries().add(exerciseSeries);
     }
 
     private boolean areTrainingRequirementsGiven(User user, TrainingRequirements trainingRequirements) {
-        Collection<Style> userStylesFromStatistics =
-                user.getStyleStatistics().stream().map(StyleStatistics::getStyle).collect(Collectors.toList());
-        boolean doesUserHaveStatisticsForChosenStyles = trainingRequirements.getStyles().stream().allMatch(userStylesFromStatistics::contains);
+        Collection<Style> userStylesFromStatistics = user.getStyleStatistics().stream().map(StyleStatistics::getStyle).collect(Collectors.toList());
         boolean doesUserChoseStyles = !trainingRequirements.getStyles().isEmpty();
+        boolean doesUserHaveStatisticsForChosenStyles = false;
+        if (doesUserChoseStyles) {
+            doesUserHaveStatisticsForChosenStyles = trainingRequirements.getStyles().stream().allMatch(userStylesFromStatistics::contains);
+        }
         boolean isMaxDurationOrMaxDistanceSet = (trainingRequirements.getMaxDistance() > 0 || trainingRequirements.getMaxDurationInSeconds() > 0);
         boolean isIntensityLevelSet = trainingRequirements.getIntensityLevel() != null;
         return (doesUserHaveStatisticsForChosenStyles && doesUserChoseStyles && isMaxDurationOrMaxDistanceSet && isIntensityLevelSet);
