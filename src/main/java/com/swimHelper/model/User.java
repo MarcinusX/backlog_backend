@@ -14,6 +14,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by marcinus on 19.04.17.
@@ -40,6 +42,12 @@ public class User implements UserDetails {
     private boolean accountNonExpired = true;
     private boolean accountNonLocked = true;
     private boolean enabled = true;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "roles")
+    @Column(name = "role")
+    private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
     private Collection<Training> trainings = new ArrayList<>();
@@ -71,8 +79,9 @@ public class User implements UserDetails {
     //
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;//TODO
+        return roles;
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.swimHelper;
 import com.swimHelper.model.Training;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.TrainingRepository;
-import com.swimHelper.repository.UserRepository;
+import com.swimHelper.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class MainApplication implements CommandLineRunner {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
     @Autowired
     private TrainingRepository trainingRepository;
 
@@ -30,10 +30,10 @@ public class MainApplication implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
         User user = new User();
-        user.setFirstname("Monia");
-        user.setEmail("example@somemail.com");
-        user.setPassword("abcdef");
-        //user = userRepository.saveAndFlush(user);
+        user.setEmail("admin@admin.pl");
+        user.setPassword("admin");
+        //user = userService.addUser(user);
+        //userService.makeUserAdmin(user.getId());
 
         Training training = new Training();
         training.setNotificationDateTime(LocalDateTime.now());
@@ -42,6 +42,6 @@ public class MainApplication implements CommandLineRunner {
         //trainingRepository.saveAndFlush(training);
 
         trainingRepository.findAll().forEach(System.out::println);
-        userRepository.findAll().forEach(System.out::println);
+        userService.getAll().forEach(System.out::println);
     }
 }
