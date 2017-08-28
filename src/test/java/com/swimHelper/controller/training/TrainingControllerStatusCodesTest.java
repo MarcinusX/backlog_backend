@@ -60,7 +60,6 @@ public class TrainingControllerStatusCodesTest {
         exerciseSeriesRepository.deleteAll();
         userRepository.deleteAll();
         exerciseRepository.deleteAll();
-
     }
 
     @Test

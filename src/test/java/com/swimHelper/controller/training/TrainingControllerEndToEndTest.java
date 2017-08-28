@@ -3,6 +3,7 @@ package com.swimHelper.controller.training;
 import com.swimHelper.ExerciseSeriesRepository;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
+import com.swimHelper.model.IntensityLevel;
 import com.swimHelper.model.Style;
 import com.swimHelper.model.Training;
 import com.swimHelper.model.TrainingRequirements;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,7 +69,7 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void generateTrainingTest() {
+    public void generateTrainingTest_shouldRetrnMoreThanTwoExerciseSeriesNotLongerThan3000Seconds() {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingTestUtil.addUser(testRestTemplate);
@@ -83,7 +85,76 @@ public class TrainingControllerEndToEndTest {
         //then
         assertThat(areStylesCorrect).isTrue();
         assertThat(trainingFromResponse.getExerciseSeries().size()).isGreaterThanOrEqualTo(2);
-        assertThat(trainingFromResponse.getDurationInSeconds()).isGreaterThan(0);
+        assertThat(trainingFromResponse.getDurationInSeconds()).isGreaterThan(900).isLessThanOrEqualTo(3000);
+        assertThat(trainingFromResponse.getId()).isNotNull();
+    }
+
+    @Test
+    public void generateTrainingTest_shouldReturnTrainingOnlyWarmUpExercises() {
+        //given
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        trainingRequirements.setMaxDurationInSeconds(900);
+        trainingTestUtil.addUser(testRestTemplate);
+        trainingTestUtil.addExercises(testRestTemplate);
+        //when
+        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        Training trainingFromResponse = responseEntity.getBody();
+        List<Boolean> areWarmUpRelaxExercises = trainingFromResponse.getExerciseSeries()
+                .stream()
+                .map(exerciseSeries1 -> exerciseSeries1.getExercise().isWarmUpRelax())
+                .collect(Collectors.toList());
+        boolean areExercisesOnlyWarmUpRelax = areWarmUpRelaxExercises.contains(false);
+        //then
+        assertThat(areExercisesOnlyWarmUpRelax).isFalse();
+        assertThat(trainingFromResponse.getExerciseSeries().size()).isEqualTo(2);
+        assertThat(trainingFromResponse.getDurationInSeconds()).isEqualTo(900);
+        assertThat(trainingFromResponse.getId()).isNotNull();
+    }
+
+    @Test
+    public void generateTrainingTest_shouldReturnMoreThan2ExerciseSeriesNotLongerThan2000Seconds() {
+        //given
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        trainingRequirements.setMaxDurationInSeconds(2000);
+        trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
+        trainingTestUtil.addUser(testRestTemplate);
+        trainingTestUtil.addExercises(testRestTemplate);
+        //when
+        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        Training trainingFromResponse = responseEntity.getBody();
+        List<Style> stylesUsed = trainingFromResponse.getExerciseSeries()
+                .stream()
+                .map(exerciseSeries1 -> exerciseSeries1.getExercise().getStyle())
+                .distinct().collect(Collectors.toList());
+        boolean areStylesCorrect = stylesUsed.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
+        //then
+        assertThat(areStylesCorrect).isTrue();
+        assertThat(trainingFromResponse.getExerciseSeries().size()).isGreaterThan(2);
+        assertThat(trainingFromResponse.getDurationInSeconds()).isGreaterThan(900).isLessThanOrEqualTo(2000);
+        assertThat(trainingFromResponse.getId()).isNotNull();
+    }
+
+    @Test
+    public void generateTrainingTest_shouldReturnMoreThan2ExerciseSeriesNotLongerThan5000Seconds() {
+        //given
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        trainingRequirements.getStyles().addAll(Arrays.asList(Style.FREESTYLE, Style.BREASTSTROKE, Style.BUTTERFLY));
+        trainingRequirements.setMaxDurationInSeconds(5000);
+        trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
+        trainingTestUtil.addUser(testRestTemplate);
+        trainingTestUtil.addExercises(testRestTemplate);
+        //when
+        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        Training trainingFromResponse = responseEntity.getBody();
+        List<Style> stylesUsed = trainingFromResponse.getExerciseSeries()
+                .stream()
+                .map(exerciseSeries1 -> exerciseSeries1.getExercise().getStyle())
+                .distinct().collect(Collectors.toList());
+        boolean areStylesCorrect = stylesUsed.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
+        //then
+        assertThat(areStylesCorrect).isTrue();
+        assertThat(trainingFromResponse.getExerciseSeries().size()).isGreaterThan(2);
+        assertThat(trainingFromResponse.getDurationInSeconds()).isGreaterThan(900).isLessThanOrEqualTo(5000);
         assertThat(trainingFromResponse.getId()).isNotNull();
     }
 }
