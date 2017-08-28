@@ -110,13 +110,13 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getDurationOfOneExerciseSeries_whenNumberOfExerciseSeriesAndMaxDuration_shouldReturn125Seconds() {
+    public void getDurationOfOneExerciseSeries_whenNumberOfExerciseSeriesAndMaxDuration_shouldReturn375Seconds() {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         //when
         Integer durationOfOneExerciseSeries = sut.getDurationOfOneExerciseSeries(8, trainingRequirements.getMaxDurationInSeconds());
         //then
-        assertThat(durationOfOneExerciseSeries).isEqualTo(125);
+        assertThat(durationOfOneExerciseSeries).isEqualTo(375);
     }
 
     @Test

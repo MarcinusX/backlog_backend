@@ -24,6 +24,6 @@ public class Training {
     private LocalDateTime dateTime;
     private int durationInSeconds;
     @ManyToOne
-    @JsonIgnoreProperties("trainings")
+    @JsonIgnoreProperties(value = {"trainings"}, allowSetters = true)
     private User user;
 }

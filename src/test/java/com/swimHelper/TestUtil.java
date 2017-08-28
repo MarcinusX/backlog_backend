@@ -66,46 +66,11 @@ public class TestUtil {
         return testRestTemplate.exchange("/users", HttpMethod.PUT, entity, User.class);
     }
 
-    public ResponseEntity<Exercise> postExercise(TestRestTemplate testRestTemplate, Exercise exercise) {
-        String json = jsonUtil.toJson(exercise);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(json, headers);
-
-        return testRestTemplate.postForEntity("/exercises", entity, Exercise.class);
-    }
-
-    public ResponseEntity<Exercise> putExercise(TestRestTemplate testRestTemplate, Exercise exercise) {
-        String json = jsonUtil.toJson(exercise);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(json, headers);
-
-        return testRestTemplate.exchange("/exercises", HttpMethod.PUT, entity, Exercise.class);
-    }
-
-    public ResponseEntity<Exercise> getExercise(TestRestTemplate testRestTemplate, Long id) {
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        return testRestTemplate.exchange("/exercises/" + id, HttpMethod.GET, entity, Exercise.class);
-    }
-
-    public ResponseEntity<Training> postTrainingRequirements(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements) {
-        String json = jsonUtil.toJson(trainingRequirements);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(json, headers);
-
-        return testRestTemplate.withBasicAuth("aaa@example.com", "aaaaa").
-                exchange("/trainings", HttpMethod.POST, entity, Training.class);
-    }
-
     public TrainingRequirements createValidTrainingRequirements() {
         Collection<Style> styles = new ArrayList<>();
         styles.add(Style.FREESTYLE);
         styles.add(Style.BACKSTROKE);
-        return new TrainingRequirements(styles, IntensityLevel.LOW, 1000, 1000);
+        return new TrainingRequirements(styles, IntensityLevel.LOW, 3000, 1000);
     }
 
     public Training createValidTraining() {

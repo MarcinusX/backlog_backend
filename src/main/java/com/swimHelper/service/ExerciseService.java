@@ -30,10 +30,10 @@ public class ExerciseService {
     public Exercise addExercise(Exercise exercise) throws BusinessException {
         try {
             return exerciseRepository.saveAndFlush(exercise);
-        } catch (ConstraintViolationException ex) {
-            throw new InvalidExerciseException(ex.getMessage());
         } catch (DataIntegrityViolationException ex) {
             throw new ExerciseExistsException(EXERCISE_EXISTS_MESSAGE);
+        } catch (ConstraintViolationException ex) {
+            throw new InvalidExerciseException(ex.getMessage());
         }
     }
 
@@ -49,10 +49,10 @@ public class ExerciseService {
         exerciseFromRepo.setVideoUrl(exercise.getVideoUrl());
         try {
             return exerciseRepository.saveAndFlush(exerciseFromRepo);
-        } catch (ConstraintViolationException ex) {
-            throw new InvalidExerciseException(ex.getMessage());
         } catch (DataIntegrityViolationException ex) {
             throw new ExerciseExistsException(EXERCISE_EXISTS_MESSAGE);
+        } catch (ConstraintViolationException ex) {
+            throw new InvalidExerciseException(ex.getMessage());
         }
     }
 

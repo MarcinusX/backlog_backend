@@ -1,15 +1,16 @@
 package com.swimHelper.service.training;
 
+import com.swimHelper.ExerciseSeriesRepository;
 import com.swimHelper.TestUtil;
 import com.swimHelper.exception.BusinessException;
 import com.swimHelper.exception.MissingTrainingRequirementsException;
 import com.swimHelper.exception.UnsatisfiedTimeRequirementsException;
-import com.swimHelper.generator.TrainingGenerator;
 import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.repository.TrainingRepository;
 import com.swimHelper.repository.UserRepository;
 import com.swimHelper.service.TrainingService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,15 +47,25 @@ public class TrainingServiceIntegrationTest {
     private UserRepository userRepository;
 
     @Autowired
-    private TrainingGenerator trainingGenerator;
+    private ExerciseSeriesRepository exerciseSeriesRepository;
 
     @Autowired
     private TestUtil testUtil;
 
-    @Before
-    public void prepareDatabaseForTests() {
+    @After
+    public void cleanUp() {
         trainingRepository.deleteAll();
+        exerciseSeriesRepository.deleteAll();
         userRepository.deleteAll();
+        exerciseRepository.deleteAll();
+    }
+
+    @Before
+    public void prepare() {
+        trainingRepository.deleteAll();
+        exerciseSeriesRepository.deleteAll();
+        userRepository.deleteAll();
+        exerciseRepository.deleteAll();
         addExercisesInSpecifiedStyle(Style.BACKSTROKE);
         addExercisesInSpecifiedStyle(Style.FREESTYLE);
         addExercisesInSpecifiedStyle(Style.BREASTSTROKE);
@@ -130,10 +141,11 @@ public class TrainingServiceIntegrationTest {
         Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
         List<Style> stylesInGeneratedTraining = training.getExerciseSeries().
                 stream().filter(s -> !s.getExercise().isWarmUpRelax()).map(s -> s.getExercise().getStyle()).collect(Collectors.toList());
+        boolean areStylesCorrect = stylesInGeneratedTraining.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
         //then
         assertThat(training.getUser()).isEqualTo(savedUser);
         assertThat(training.getDurationInSeconds()).isLessThanOrEqualTo(trainingRequirements.getMaxDurationInSeconds());
-        assertThat(stylesInGeneratedTraining).containsOnly(Style.FREESTYLE, Style.BACKSTROKE);
+        assertThat(areStylesCorrect).isTrue();
     }
 
     @Test
@@ -149,10 +161,11 @@ public class TrainingServiceIntegrationTest {
         Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
         List<Style> stylesInGeneratedTraining = training.getExerciseSeries().
                 stream().filter(s -> !s.getExercise().isWarmUpRelax()).map(s -> s.getExercise().getStyle()).collect(Collectors.toList());
+        boolean areStylesCorrect = stylesInGeneratedTraining.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
         //then
         assertThat(training.getUser()).isEqualTo(savedUser);
         assertThat(training.getDurationInSeconds()).isLessThanOrEqualTo(trainingRequirements.getMaxDurationInSeconds());
-        assertThat(stylesInGeneratedTraining).containsOnly(Style.FREESTYLE, Style.BACKSTROKE, Style.BREASTSTROKE);
+        assertThat(areStylesCorrect).isTrue();
     }
 
     @Test
@@ -204,11 +217,10 @@ public class TrainingServiceIntegrationTest {
     }
 
     private void addExercisesInSpecifiedStyle(Style style) {
-        String name = "name";
         String description = "description";
         for (int i = 0; i < 12; i++) {
             Exercise exercise = new Exercise(style);
-            exercise.setName(name + i);
+            exercise.setName(style.name() + i);
             exercise.setDescription(description + i);
             saveExercise(exercise);
         }
@@ -219,14 +231,14 @@ public class TrainingServiceIntegrationTest {
         String description = "description";
         for (int i = 13; i < 17; i++) {
             Exercise exercise = new Exercise(Style.BACKSTROKE);
-            exercise.setName(name + i);
+            exercise.setName(Style.BACKSTROKE.name() + i);
             exercise.setDescription(description + i);
             exercise.setWarmUpRelax(true);
             saveExercise(exercise);
         }
         for (int i = 18; i < 23; i++) {
             Exercise exercise = new Exercise(Style.BREASTSTROKE);
-            exercise.setName(name + i);
+            exercise.setName(Style.BREASTSTROKE.name() + i);
             exercise.setDescription(description + i);
             exercise.setWarmUpRelax(true);
             saveExercise(exercise);

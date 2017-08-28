@@ -3,6 +3,7 @@ package com.swimHelper.security;
 import com.swimHelper.TestUtil;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.UserRepository;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +36,11 @@ public class SecurityIntegrationTest {
 
     @Before
     public void init() {
+        userRepository.deleteAll();
+    }
+
+    @After
+    public void cleanUp() {
         userRepository.deleteAll();
     }
 

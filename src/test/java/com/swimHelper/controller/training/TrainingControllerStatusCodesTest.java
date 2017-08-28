@@ -3,7 +3,6 @@ package com.swimHelper.controller.training;
 import com.swimHelper.ExerciseSeriesRepository;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
-import com.swimHelper.model.Style;
 import com.swimHelper.model.Training;
 import com.swimHelper.model.TrainingRequirements;
 import com.swimHelper.repository.ExerciseRepository;
@@ -17,12 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,11 +30,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ComponentScan
 @ActiveProfiles("security")
-public class TrainingControllerEndToEndTest {
-    @Autowired
-    private ExerciseRepository exerciseRepository;
+public class TrainingControllerStatusCodesTest {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ExerciseRepository exerciseRepository;
     @Autowired
     private TrainingRepository trainingRepository;
     @Autowired
@@ -67,23 +64,44 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void generateTrainingTest() {
+    public void generateTraining_returnsOK() throws Exception {
         //given
-        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingTestUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         //when
         ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
-        Training trainingFromResponse = responseEntity.getBody();
-        List<Style> stylesUsed = trainingFromResponse.getExerciseSeries()
-                .stream()
-                .map(exerciseSeries1 -> exerciseSeries1.getExercise().getStyle())
-                .distinct().collect(Collectors.toList());
-        boolean areStylesCorrect = stylesUsed.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
         //then
-        assertThat(areStylesCorrect).isTrue();
-        assertThat(trainingFromResponse.getExerciseSeries().size()).isGreaterThanOrEqualTo(2);
-        assertThat(trainingFromResponse.getDurationInSeconds()).isGreaterThan(0);
-        assertThat(trainingFromResponse.getId()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    public void generateTraining_whenMissingTrainingRequirements_returns400() throws Exception {
+        //given
+        userRepository.deleteAll();
+        exerciseRepository.deleteAll();
+        trainingTestUtil.addUser(testRestTemplate);
+        trainingTestUtil.addExercises(testRestTemplate);
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        trainingRequirements.setMaxDurationInSeconds(0);
+        //when
+        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        //then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void generateTraining_whenUnsatisfiedTimeRequirements_returns400() throws Exception {
+        //given
+        userRepository.deleteAll();
+        exerciseRepository.deleteAll();
+        trainingTestUtil.addUser(testRestTemplate);
+        trainingTestUtil.addExercises(testRestTemplate);
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        trainingRequirements.setMaxDurationInSeconds(600);
+        //when
+        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        //then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 }
