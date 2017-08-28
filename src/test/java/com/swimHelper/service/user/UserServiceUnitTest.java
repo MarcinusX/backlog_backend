@@ -4,6 +4,7 @@ import com.swimHelper.TestUtil;
 import com.swimHelper.exception.InvalidUserException;
 import com.swimHelper.exception.UserExistsException;
 import com.swimHelper.exception.UserNotFoundException;
+import com.swimHelper.model.Role;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.UserRepository;
 import com.swimHelper.service.UserService;
@@ -139,7 +140,7 @@ public class UserServiceUnitTest {
         //when
         sut.updateUser(user);
         //then
-        verify(userRepositoryMock).saveAndFlush(user);
+        verify(userRepositoryMock).saveAndFlush(any());
     }
 
     @Test
@@ -149,10 +150,22 @@ public class UserServiceUnitTest {
         User user = new TestUtil().createValidUser();
         user.setId(1L);
         when(userRepositoryMock.findOne(1L)).thenReturn(userToReturn);
-        when(userRepositoryMock.saveAndFlush(user)).thenReturn(userToReturn);
+        when(userRepositoryMock.saveAndFlush(any())).thenReturn(userToReturn);
         //when
         User returnedUser = sut.updateUser(user);
         //then
         assertThat(returnedUser).isEqualTo(userToReturn);
+    }
+
+    @Test
+    public void makeUserAdmin_makesUserAdmin() throws Exception {
+        //given
+        User user = new TestUtil().createValidUser();
+        when(userRepositoryMock.findOne(anyLong())).thenReturn(user);
+        when(userRepositoryMock.saveAndFlush(user)).thenReturn(user);
+        //when
+        User returnedUser = sut.makeUserAdmin(1l);
+        //then
+        assertThat(returnedUser.getRoles()).contains(Role.ADMIN);
     }
 }

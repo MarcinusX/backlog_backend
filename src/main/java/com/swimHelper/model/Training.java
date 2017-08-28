@@ -2,6 +2,7 @@ package com.swimHelper.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ import java.util.Collection;
 @Entity
 @Data
 @ToString(exclude = {"user", "exerciseSeries"})
+@EqualsAndHashCode(exclude = "exerciseSeries")
 public class Training {
     @Id
     @GeneratedValue
@@ -26,4 +28,6 @@ public class Training {
     @ManyToOne
     @JsonIgnoreProperties(value = {"trainings"}, allowSetters = true)
     private User user;
+    private boolean hasUserBeenNotified;
+    private LocalDateTime notificationDateTime;
 }

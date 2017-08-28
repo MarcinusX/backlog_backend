@@ -5,11 +5,17 @@ import com.swimHelper.exception.UnsatisfiedTimeRequirementsException;
 import com.swimHelper.exception.UserNotFoundException;
 import com.swimHelper.generator.TrainingGenerator;
 import com.swimHelper.model.Training;
+import com.swimHelper.repository.TrainingRepository;
+import com.swimHelper.model.Training;
 import com.swimHelper.model.TrainingRequirements;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.TrainingRepository;
 import com.swimHelper.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +43,18 @@ public class TrainingService {
             throw new UserNotFoundException("Could not find user with id: " + user.getId());
         }
         Training training = trainingGenerator.generateTraining(user, trainingRequirements);
+        return trainingRepository.saveAndFlush(training);
+    }
+
+    public List<Training> getTrainingsToBeNotified() {
+        return trainingRepository.findTrainingsToBeNotified(LocalDateTime.now());
+    }
+
+    //TODO: ADD TESTS
+    public Training updateTraining(Training training) {
+        if (trainingRepository.findOne(training.getId()) == null) {
+            //TODO: throw Exception
+        }
         return trainingRepository.saveAndFlush(training);
     }
 }
