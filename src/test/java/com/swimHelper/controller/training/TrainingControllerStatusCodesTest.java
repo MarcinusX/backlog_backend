@@ -63,8 +63,9 @@ public class TrainingControllerStatusCodesTest {
     }
 
     @Test
-    public void generateTraining_returnsOK() throws Exception {
+    public void generateTraining_whenValidTrainingRequirements_returns200() throws Exception {
         //given
+        testUtil.createAdminForTests(); //required to add exercises
         trainingTestUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
@@ -77,8 +78,7 @@ public class TrainingControllerStatusCodesTest {
     @Test
     public void generateTraining_whenMissingTrainingRequirements_returns400() throws Exception {
         //given
-        userRepository.deleteAll();
-        exerciseRepository.deleteAll();
+        testUtil.createAdminForTests(); //required to add exercises
         trainingTestUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
@@ -92,8 +92,7 @@ public class TrainingControllerStatusCodesTest {
     @Test
     public void generateTraining_whenUnsatisfiedTimeRequirements_returns400() throws Exception {
         //given
-        userRepository.deleteAll();
-        exerciseRepository.deleteAll();
+        testUtil.createAdminForTests(); //required to add exercises
         trainingTestUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();

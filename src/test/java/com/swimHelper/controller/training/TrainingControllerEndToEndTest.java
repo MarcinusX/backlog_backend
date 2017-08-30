@@ -3,6 +3,7 @@ package com.swimHelper.controller.training;
 import com.swimHelper.ExerciseSeriesRepository;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
+import com.swimHelper.exception.BusinessException;
 import com.swimHelper.model.IntensityLevel;
 import com.swimHelper.model.Style;
 import com.swimHelper.model.Training;
@@ -65,13 +66,13 @@ public class TrainingControllerEndToEndTest {
         exerciseSeriesRepository.deleteAll();
         userRepository.deleteAll();
         exerciseRepository.deleteAll();
-
     }
 
     @Test
-    public void generateTrainingTest_shouldRetrnMoreThanTwoExerciseSeriesNotLongerThan3000Seconds() {
+    public void generateTrainingTest_shouldReturnMoreThanTwoExerciseSeriesNotLongerThan3000Seconds() throws BusinessException {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        testUtil.createAdminForTests(); //required to add exercises
         trainingTestUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         //when
@@ -90,10 +91,11 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void generateTrainingTest_shouldReturnTrainingOnlyWarmUpExercises() {
+    public void generateTrainingTest_shouldReturnTrainingOnlyWarmUpExercises() throws BusinessException {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(900);
+        testUtil.createAdminForTests(); //required to add exercises
         trainingTestUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         //when
@@ -112,11 +114,12 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void generateTrainingTest_shouldReturnMoreThan2ExerciseSeriesNotLongerThan2000Seconds() {
+    public void generateTrainingTest_shouldReturnMoreThan2ExerciseSeriesNotLongerThan2000Seconds() throws BusinessException {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(2000);
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
+        testUtil.createAdminForTests(); //required to add exercises
         trainingTestUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         //when
@@ -135,12 +138,13 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void generateTrainingTest_shouldReturnMoreThan2ExerciseSeriesNotLongerThan5000Seconds() {
+    public void generateTrainingTest_shouldReturnMoreThan2ExerciseSeriesNotLongerThan5000Seconds() throws BusinessException {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
-        trainingRequirements.getStyles().addAll(Arrays.asList(Style.FREESTYLE, Style.BREASTSTROKE, Style.BUTTERFLY));
+        trainingRequirements.getStyles().addAll(Arrays.asList(Style.BREASTSTROKE, Style.BUTTERFLY));
         trainingRequirements.setMaxDurationInSeconds(5000);
         trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
+        testUtil.createAdminForTests(); //required to add exercises
         trainingTestUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         //when

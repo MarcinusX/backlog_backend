@@ -12,9 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -54,7 +51,7 @@ public class ExerciseControllerEndToEndTest {
         exercise.setName("name");
         exercise.setStyle(Style.BACKSTROKE);
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null, null);
         Exercise exerciseFromResponse = responseEntity.getBody();
         //then
         assertThat(exerciseFromResponse.getName()).isEqualTo("name");
@@ -70,10 +67,11 @@ public class ExerciseControllerEndToEndTest {
         exercise.setDescription("description");
         exercise.setName("name");
         exercise.setStyle(Style.BACKSTROKE);
-        Exercise savedExercise = exerciseRepository.saveAndFlush(exercise);
+        ResponseEntity<Exercise> savedResponseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null, null);
+        Exercise savedExercise = savedResponseEntity.getBody();
         savedExercise.setDescription("description1");
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise, null, null);
         Exercise exerciseFromResponse = responseEntity.getBody();
         //then
         assertThat(exerciseFromResponse.getName()).isEqualTo("name");
@@ -89,21 +87,15 @@ public class ExerciseControllerEndToEndTest {
         exercise.setDescription("description");
         exercise.setName("name");
         exercise.setStyle(Style.BACKSTROKE);
-        Exercise savedExercise = exerciseRepository.saveAndFlush(exercise);
+        ResponseEntity<Exercise> savedResponseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null, null);
+        Exercise savedExercise = savedResponseEntity.getBody();
         //when
-        ResponseEntity<Exercise> responseEntity = getExercise(testRestTemplate, savedExercise.getId());
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.getExercise(testRestTemplate, savedExercise.getId(), null, null);
         Exercise exerciseFromResponse = responseEntity.getBody();
         //then
         assertThat(exerciseFromResponse.getName()).isEqualTo("name");
         assertThat(exerciseFromResponse.getDescription()).isEqualTo("description");
         assertThat(exerciseFromResponse.getStyle()).isEqualTo(Style.BACKSTROKE);
         assertThat(exerciseFromResponse.getId()).isNotNull();
-    }
-
-    private ResponseEntity<Exercise> getExercise(TestRestTemplate testRestTemplate, Long id) {
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        return testRestTemplate.exchange("/exercises/" + id, HttpMethod.GET, entity, Exercise.class);
     }
 }

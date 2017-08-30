@@ -1,6 +1,8 @@
 package com.swimHelper;
 
+import com.swimHelper.exception.BusinessException;
 import com.swimHelper.model.*;
+import com.swimHelper.service.UserService;
 import com.swimHelper.util.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -18,7 +20,9 @@ import java.util.List;
 public class TestUtil {
 
     @Autowired
-    JsonUtil jsonUtil;
+    private JsonUtil jsonUtil;
+    @Autowired
+    private UserService userService;
 
     public User createValidUser() {
         Collection<StyleStatistics> styleStatistics = new ArrayList<>();
@@ -88,5 +92,14 @@ public class TestUtil {
 
         training.setExerciseSeries(exerciseSeriesList);
         return training;
+    }
+
+    public User createAdminForTests() throws BusinessException {
+        User admin = new User();
+        admin.setEmail(TrainingTestUtil.ADMIN_EMAIL);
+        admin.setPassword(TrainingTestUtil.ADMIN_PASSWORD);
+        admin = userService.addUser(admin);
+        userService.makeUserAdmin(admin.getId());
+        return admin;
     }
 }

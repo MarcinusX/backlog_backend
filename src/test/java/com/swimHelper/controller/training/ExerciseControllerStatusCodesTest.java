@@ -45,7 +45,7 @@ public class ExerciseControllerStatusCodesTest {
     }
 
     @Test
-    public void getExercise_ReturnsExerciseWithStatusOk() throws Exception {
+    public void getExercise_whenExerciseExists_returns200() throws Exception {
         //given
         Exercise exercise = new Exercise(Style.BACKSTROKE);
         exercise.setName("name");
@@ -68,13 +68,13 @@ public class ExerciseControllerStatusCodesTest {
     }
 
     @Test
-    public void addExercise_returnsOK() throws Exception {
+    public void addExercise_whenExerciseValid_returns200() throws Exception {
         //given
         Exercise exercise = new Exercise(Style.BACKSTROKE);
         exercise.setName("name");
         exercise.setDescription("description");
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null, null);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -86,7 +86,7 @@ public class ExerciseControllerStatusCodesTest {
         exercise.setName("name");
         exercise.setDescription("description");
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null, null);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
@@ -101,13 +101,13 @@ public class ExerciseControllerStatusCodesTest {
         Exercise exerciseWithExistingName = new Exercise(Style.BACKSTROKE);
         exerciseWithExistingName.setName("name");
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exerciseWithExistingName);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exerciseWithExistingName, null, null);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
 
     @Test
-    public void updateExercise_returnsOK() throws Exception {
+    public void updateExercise_whenValidExercise_returns200() throws Exception {
         //given
         Exercise exercise = new Exercise(Style.BACKSTROKE);
         exercise.setName("name");
@@ -115,7 +115,7 @@ public class ExerciseControllerStatusCodesTest {
         Exercise savedExercise = exerciseRepository.saveAndFlush(exercise);
         savedExercise.setName("name1");
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise, null, null);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -129,7 +129,7 @@ public class ExerciseControllerStatusCodesTest {
         Exercise savedExercise = exerciseRepository.saveAndFlush(exercise);
         savedExercise.setStyle(null);
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise, null, null);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
@@ -147,7 +147,7 @@ public class ExerciseControllerStatusCodesTest {
         Exercise savedExercise2 = exerciseRepository.saveAndFlush(exercise2);
         savedExercise2.setName("name");
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise2);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise2, null, null);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
