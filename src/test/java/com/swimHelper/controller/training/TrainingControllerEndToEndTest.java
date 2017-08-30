@@ -18,7 +18,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -34,7 +33,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ComponentScan
 @ActiveProfiles("security")
 public class TrainingControllerEndToEndTest {
     @Autowired
@@ -78,12 +76,12 @@ public class TrainingControllerEndToEndTest {
         //when
         ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
         Training trainingFromResponse = responseEntity.getBody();
+        //then
         List<Style> stylesUsed = trainingFromResponse.getExerciseSeries()
                 .stream()
                 .map(exerciseSeries1 -> exerciseSeries1.getExercise().getStyle())
                 .distinct().collect(Collectors.toList());
         boolean areStylesCorrect = stylesUsed.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
-        //then
         assertThat(areStylesCorrect).isTrue();
         assertThat(trainingFromResponse.getExerciseSeries().size()).isGreaterThanOrEqualTo(2);
         assertThat(trainingFromResponse.getDurationInSeconds()).isGreaterThan(900).isLessThanOrEqualTo(3000);
@@ -101,12 +99,12 @@ public class TrainingControllerEndToEndTest {
         //when
         ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
         Training trainingFromResponse = responseEntity.getBody();
+        //then
         List<Boolean> areWarmUpRelaxExercises = trainingFromResponse.getExerciseSeries()
                 .stream()
                 .map(exerciseSeries1 -> exerciseSeries1.getExercise().isWarmUpRelax())
                 .collect(Collectors.toList());
         boolean areExercisesOnlyWarmUpRelax = areWarmUpRelaxExercises.contains(false);
-        //then
         assertThat(areExercisesOnlyWarmUpRelax).isFalse();
         assertThat(trainingFromResponse.getExerciseSeries().size()).isEqualTo(2);
         assertThat(trainingFromResponse.getDurationInSeconds()).isEqualTo(900);
@@ -125,12 +123,12 @@ public class TrainingControllerEndToEndTest {
         //when
         ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
         Training trainingFromResponse = responseEntity.getBody();
+        //then
         List<Style> stylesUsed = trainingFromResponse.getExerciseSeries()
                 .stream()
                 .map(exerciseSeries1 -> exerciseSeries1.getExercise().getStyle())
                 .distinct().collect(Collectors.toList());
         boolean areStylesCorrect = stylesUsed.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
-        //then
         assertThat(areStylesCorrect).isTrue();
         assertThat(trainingFromResponse.getExerciseSeries().size()).isGreaterThan(2);
         assertThat(trainingFromResponse.getDurationInSeconds()).isGreaterThan(900).isLessThanOrEqualTo(2000);
@@ -150,12 +148,12 @@ public class TrainingControllerEndToEndTest {
         //when
         ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
         Training trainingFromResponse = responseEntity.getBody();
+        //then
         List<Style> stylesUsed = trainingFromResponse.getExerciseSeries()
                 .stream()
                 .map(exerciseSeries1 -> exerciseSeries1.getExercise().getStyle())
                 .distinct().collect(Collectors.toList());
         boolean areStylesCorrect = stylesUsed.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
-        //then
         assertThat(areStylesCorrect).isTrue();
         assertThat(trainingFromResponse.getExerciseSeries().size()).isGreaterThan(2);
         assertThat(trainingFromResponse.getDurationInSeconds()).isGreaterThan(900).isLessThanOrEqualTo(5000);

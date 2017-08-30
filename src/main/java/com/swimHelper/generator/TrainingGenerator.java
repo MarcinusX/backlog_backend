@@ -78,10 +78,9 @@ public class TrainingGenerator {
     }
 
     private List<Exercise> getMatchingExercises(TrainingRequirements trainingRequirements) {
-        List<Exercise> exerciseList = trainingRequirements.getStyles().stream()
+        return trainingRequirements.getStyles().stream()
                 .flatMap(style -> exerciseRepository.findByStyle(style).stream())
-                .collect(Collectors.toList());
-        return exerciseList.stream().filter(e -> !e.isWarmUpRelax()).collect(Collectors.toList());
+                .filter(e -> !e.isWarmUpRelax()).collect(Collectors.toList());
     }
 
     private void addWarmUpExerciseSeries(Training training) {

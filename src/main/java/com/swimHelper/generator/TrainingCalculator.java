@@ -20,6 +20,7 @@ public class TrainingCalculator {
     private static final int MAX_DURATION_OF_AVERAGE_TRAINING_IN_SECONDS = 1800;
     private static final int MIN_DURATION_OF_LONG_TRAINING_IN_SECONDS = 2700;
     private static final int MIN_EXERCISE_SERIES_DISTANCE_IN_METERS = 25;
+    private static final int MEDIUM_DISTANCE_FOR_LOW_INTENSITY_LEVEL_IN_METERS = 50;
     private static final int STYLE_STATISTICS_DISTANCE_IN_METERS = 100;
     public static final int WARMUP_AND_RELAX_DURATION = 900;
 
@@ -28,7 +29,7 @@ public class TrainingCalculator {
         this.randomGenerator = randomGenerator;
     }
 
-    int getNumberOfExerciseSeries(IntensityLevel intensityLevel, int maxDurationInSeconds) throws UnsatisfiedTimeRequirementsException {
+    public int getNumberOfExerciseSeries(IntensityLevel intensityLevel, int maxDurationInSeconds) throws UnsatisfiedTimeRequirementsException {
         int timeForMainPartOfTraining = maxDurationInSeconds - WARMUP_AND_RELAX_DURATION;
         if (timeForMainPartOfTraining < 0) {
             throw new UnsatisfiedTimeRequirementsException();
@@ -55,13 +56,13 @@ public class TrainingCalculator {
         }
     }
 
-    int getDurationOfOneExerciseSeries(int numberOfExerciseSeries, int maxDurationInMinutes) {
+    public int getDurationOfOneExerciseSeries(int numberOfExerciseSeries, int maxDurationInMinutes) {
         return maxDurationInMinutes / numberOfExerciseSeries;
     }
 
     //before invoking this method there is checking if user has style statistics according to
     //training requirements
-    int getDurationOfOneExerciseRepeatInSeconds(Exercise exercise, int distance, User user) {
+    public int getDurationOfOneExerciseRepeatInSeconds(Exercise exercise, int distance, User user) {
         StyleStatistics styleStatistics = user.getStyleStatistics()
                 .stream()
                 .filter(styleStatistics1 -> exercise.getStyle().equals(styleStatistics1.getStyle()))
@@ -69,7 +70,7 @@ public class TrainingCalculator {
         int userTimeInStyle = styleStatistics.getTimeInSeconds();
         if (distance == MIN_EXERCISE_SERIES_DISTANCE_IN_METERS) {
             return userTimeInStyle / 4;
-        } else if (distance == 50) {
+        } else if (distance == MEDIUM_DISTANCE_FOR_LOW_INTENSITY_LEVEL_IN_METERS) {
             return userTimeInStyle / 2;
         } else if (distance == STYLE_STATISTICS_DISTANCE_IN_METERS) {
             return userTimeInStyle;
@@ -81,7 +82,7 @@ public class TrainingCalculator {
         }
     }
 
-    int getBreakOfOneExerciseRepeatInSeconds(IntensityLevel intensityLevel, int durationOfOneExerciseRepeatInSeconds) {
+    public int getBreakOfOneExerciseRepeatInSeconds(IntensityLevel intensityLevel, int durationOfOneExerciseRepeatInSeconds) {
         int breakOfOneExerciseRepeatInSeconds;
         if (intensityLevel.equals(IntensityLevel.LOW)) {
             breakOfOneExerciseRepeatInSeconds = durationOfOneExerciseRepeatInSeconds / 6;
@@ -93,20 +94,16 @@ public class TrainingCalculator {
         return (breakOfOneExerciseRepeatInSeconds - breakOfOneExerciseRepeatInSeconds % 10);
     }
 
-    int getNumberOfRepeatsInOneSeries(int durationOfSeriesInSeconds, int durationOfRepeatAndBreak) throws UnsatisfiedTimeRequirementsException {
-        int numberOfRepeatsInOneSeries = durationOfSeriesInSeconds / durationOfRepeatAndBreak;
-//        if (numberOfRepeatsInOneSeries < 1) {
-//            throw new UnsatisfiedTimeRequirementsException();
-//        }
-        return numberOfRepeatsInOneSeries;
+    public int getNumberOfRepeatsInOneSeries(int durationOfSeriesInSeconds, int durationOfRepeatAndBreak) throws UnsatisfiedTimeRequirementsException {
+        return durationOfSeriesInSeconds / durationOfRepeatAndBreak;
     }
 
-    int getRandomDistanceForIntensityLevel(List<Integer> availableDistances) {
+    public int getRandomDistanceForIntensityLevel(List<Integer> availableDistances) {
         int randomDistanceIndex = randomGenerator.generateRandomInt(availableDistances.size());
         return availableDistances.get(randomDistanceIndex);
     }
 
-    int calculateDistanceOfTraining(Collection<ExerciseSeries> exerciseSeries) {
+    public int calculateDistanceOfTraining(Collection<ExerciseSeries> exerciseSeries) {
         int distance = 0;
         for (ExerciseSeries series : exerciseSeries) {
             distance += series.getDistance() * series.getRepeats();

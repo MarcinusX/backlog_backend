@@ -30,7 +30,6 @@ public class TrainingCalculatorTest {
         trainingRequirements.setMaxDurationInSeconds(600);
         //when
         Throwable throwable = catchThrowable(() -> sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInSeconds()));
-        ;
         //then
         assertThat(throwable).isInstanceOf(UnsatisfiedTimeRequirementsException.class);
     }

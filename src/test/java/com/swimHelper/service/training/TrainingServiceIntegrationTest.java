@@ -120,9 +120,9 @@ public class TrainingServiceIntegrationTest {
         trainingRequirements.setStyles(styles);
         //when
         Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
+        //then
         List<Style> stylesInGeneratedTraining = training.getExerciseSeries().
                 stream().filter(s -> !s.getExercise().isWarmUpRelax()).map(s -> s.getExercise().getStyle()).collect(Collectors.toList());
-        //then
         assertThat(training.getUser()).isEqualTo(savedUser);
         assertThat(training.getDurationInSeconds()).isLessThanOrEqualTo(trainingRequirements.getMaxDurationInSeconds());
         assertThat(stylesInGeneratedTraining).containsOnly(Style.BUTTERFLY);
@@ -139,10 +139,10 @@ public class TrainingServiceIntegrationTest {
         trainingRequirements.setStyles(Arrays.asList(Style.BACKSTROKE, Style.FREESTYLE));
         //when
         Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
+        //then
         List<Style> stylesInGeneratedTraining = training.getExerciseSeries().
                 stream().filter(s -> !s.getExercise().isWarmUpRelax()).map(s -> s.getExercise().getStyle()).collect(Collectors.toList());
         boolean areStylesCorrect = stylesInGeneratedTraining.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
-        //then
         assertThat(training.getUser()).isEqualTo(savedUser);
         assertThat(training.getDurationInSeconds()).isLessThanOrEqualTo(trainingRequirements.getMaxDurationInSeconds());
         assertThat(areStylesCorrect).isTrue();
@@ -159,10 +159,10 @@ public class TrainingServiceIntegrationTest {
         trainingRequirements.setStyles(Arrays.asList(Style.BACKSTROKE, Style.FREESTYLE, Style.BREASTSTROKE));
         //when
         Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
+        //then
         List<Style> stylesInGeneratedTraining = training.getExerciseSeries().
                 stream().filter(s -> !s.getExercise().isWarmUpRelax()).map(s -> s.getExercise().getStyle()).collect(Collectors.toList());
         boolean areStylesCorrect = stylesInGeneratedTraining.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
-        //then
         assertThat(training.getUser()).isEqualTo(savedUser);
         assertThat(training.getDurationInSeconds()).isLessThanOrEqualTo(trainingRequirements.getMaxDurationInSeconds());
         assertThat(areStylesCorrect).isTrue();

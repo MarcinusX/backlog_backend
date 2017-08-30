@@ -5,19 +5,16 @@ import com.swimHelper.exception.UnsatisfiedTimeRequirementsException;
 import com.swimHelper.exception.UserNotFoundException;
 import com.swimHelper.generator.TrainingGenerator;
 import com.swimHelper.model.Training;
-import com.swimHelper.repository.TrainingRepository;
-import com.swimHelper.model.Training;
 import com.swimHelper.model.TrainingRequirements;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.TrainingRepository;
 import com.swimHelper.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by mstobieniecka on 2017-07-19.
