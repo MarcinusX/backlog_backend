@@ -4,6 +4,7 @@ import com.swimHelper.TestUtil;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.UserRepository;
 import com.swimHelper.service.UserService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +40,11 @@ public class UserSecurityIntegrationTest {
 
     @Before
     public void init() {
+        userRepository.deleteAll();
+    }
+
+    @After
+    public void cleanUp() {
         userRepository.deleteAll();
     }
 

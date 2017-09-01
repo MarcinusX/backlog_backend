@@ -15,10 +15,7 @@ import java.util.Collection;
 @NoArgsConstructor //jpa
 public class TrainingRequirements {
     private Collection<Style> styles = new ArrayList<>();
-    private DifficultyLevel difficultyLevel;
     private IntensityLevel intensityLevel;
-    private int maxDurationInMinutes;
+    private int maxDurationInSeconds;
     private int maxDistance;
-    private Collection<Equipment> availableEquipment = new ArrayList<>();
-    private Collection<TrainingPurpose> trainingPurposes = new ArrayList<>();
 }
