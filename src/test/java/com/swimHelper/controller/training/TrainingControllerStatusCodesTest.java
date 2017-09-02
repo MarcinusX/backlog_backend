@@ -22,6 +22,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -135,7 +138,8 @@ public class TrainingControllerStatusCodesTest {
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         ResponseEntity<Training> responseEntityAddedTraining = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
         Training addedTraining = responseEntityAddedTraining.getBody();
-        ExerciseSeries exerciseSeriesToUpdate = addedTraining.getExerciseSeries().stream().filter(ex -> ex.getId().equals(1L)).findFirst().get();
+        List<ExerciseSeries> exerciseSeriesList = new ArrayList<>(addedTraining.getExerciseSeries());
+        ExerciseSeries exerciseSeriesToUpdate = exerciseSeriesList.get(0);
         exerciseSeriesToUpdate.setCompletedRepeats(5);
         exerciseSeriesToUpdate.setAverageDurationOfOneRepeatInSeconds(300);
         //then
