@@ -3,8 +3,10 @@ package com.swimHelper.controller.training;
 import com.swimHelper.ExerciseSeriesRepository;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
+import com.swimHelper.model.ExerciseSeries;
 import com.swimHelper.model.Training;
 import com.swimHelper.model.TrainingRequirements;
+import com.swimHelper.model.User;
 import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.repository.TrainingRepository;
 import com.swimHelper.repository.UserRepository;
@@ -99,5 +101,46 @@ public class TrainingControllerStatusCodesTest {
         ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void putTraining_whenInvalidTraining_returns400() throws Exception {
+        //given
+        trainingTestUtil.addUser(testRestTemplate);
+        //then
+        ResponseEntity<Training> responseEntity = trainingTestUtil.putTraining(testRestTemplate, null);
+        //when
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void putTraining_whenTrainingDoesntExistTraining_returns404() throws Exception {
+        //given
+        User user = trainingTestUtil.addUser(testRestTemplate);
+        Training training = trainingTestUtil.createValidTraining(); //id = 1L
+        training.setId(2L);
+        training.setUser(user);
+        //then
+        ResponseEntity<Training> responseEntity = trainingTestUtil.putTraining(testRestTemplate, training);
+        //when
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void putTraining_whenValidTraining_returns200() throws Exception {
+        //given
+        testUtil.createAdminForTests();
+        trainingTestUtil.addUser(testRestTemplate);
+        trainingTestUtil.addExercises(testRestTemplate);
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        ResponseEntity<Training> responseEntityAddedTraining = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        Training addedTraining = responseEntityAddedTraining.getBody();
+        ExerciseSeries exerciseSeriesToUpdate = addedTraining.getExerciseSeries().stream().filter(ex -> ex.getId().equals(1L)).findFirst().get();
+        exerciseSeriesToUpdate.setCompletedRepeats(5);
+        exerciseSeriesToUpdate.setAverageDurationOfOneRepeatInSeconds(300);
+        //then
+        ResponseEntity<Training> responseEntity = trainingTestUtil.putTraining(testRestTemplate, addedTraining);
+        //when
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 }

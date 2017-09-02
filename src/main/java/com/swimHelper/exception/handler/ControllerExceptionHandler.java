@@ -80,4 +80,18 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         logger.error("Unsatisfied time requirements.", ex.getMessage());
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
+
+    @ExceptionHandler(value = TrainingNotFoundException.class)
+    protected ResponseEntity<Object> handleTrainingNotFoundException(TrainingNotFoundException ex, WebRequest request) {
+        ApiError apiError = new ApiError("Failed to find training by id");
+        logger.error("Failed to find training by id.", ex.getMessage());
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
+
+    @ExceptionHandler(value = InvalidTrainingException.class)
+    protected ResponseEntity<Object> handleInvalidTrainingException(InvalidTrainingException ex, WebRequest request) {
+        ApiError apiError = new ApiError("Invalid training body", ex);
+        logger.error("Invalid training body.", ex.getMessage());
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
 }

@@ -57,16 +57,12 @@ public class TrainingService {
     }
 
     public Training setTrainingCompletion(Training training) throws TrainingNotFoundException, InvalidTrainingException {
-        Training trainingFromDb = trainingRepository.findOne(training.getId());
-        if (trainingFromDb != null) {
-            updateTrainingSeries(training, trainingFromDb);
-            try {
-                return trainingRepository.save(trainingFromDb);
-            } catch (ConstraintViolationException e) {
-                throw new InvalidTrainingException(e.getMessage());
-            }
-        } else {
-            throw new TrainingNotFoundException("Could not find user with id: " + training.getId());
+        Training trainingFromDb = getTrainingForUpdate(training);
+        updateTrainingSeries(training, trainingFromDb);
+        try {
+            return trainingRepository.saveAndFlush(trainingFromDb);
+        } catch (ConstraintViolationException e) {
+            throw new InvalidTrainingException(e.getMessage());
         }
     }
 
@@ -82,5 +78,16 @@ public class TrainingService {
                             }
                     );
         });
+    }
+
+    private Training getTrainingForUpdate(Training training) throws InvalidTrainingException, TrainingNotFoundException {
+        if (training == null || training.getId() == null) {
+            throw new InvalidTrainingException("Invalid training");
+        }
+        Training trainingFromDb = trainingRepository.findOne(training.getId());
+        if (trainingFromDb == null) {
+            throw new TrainingNotFoundException("Could not find training with id: " + training.getId());
+        }
+        return trainingFromDb;
     }
 }
