@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -166,13 +167,16 @@ public class TrainingControllerEndToEndTest {
         trainingTestUtil.addExercises(testRestTemplate);
         ResponseEntity<Training> responseEntityFromAddingTraining = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
         Training addedTraining = responseEntityFromAddingTraining.getBody();
-        ExerciseSeries exerciseSeriesToUpdate = addedTraining.getExerciseSeries().stream().filter(ex -> ex.getId().equals(1L)).findFirst().get();
+        ExerciseSeries exerciseSeriesToUpdate = new ArrayList<>(addedTraining.getExerciseSeries()).get(0);
         exerciseSeriesToUpdate.setCompletedRepeats(5);
         exerciseSeriesToUpdate.setAverageDurationOfOneRepeatInSeconds(300);
         //when
         ResponseEntity<Training> responseEntity = trainingTestUtil.putTraining(testRestTemplate, addedTraining);
         Training trainingFromResponse = responseEntity.getBody();
-        ExerciseSeries updatedExerciseSeries = trainingFromResponse.getExerciseSeries().stream().filter(ex -> ex.getId().equals(1L)).findFirst().get();
+        ExerciseSeries updatedExerciseSeries = trainingFromResponse.getExerciseSeries()
+                .stream()
+                .filter(ex -> ex.getId().equals(exerciseSeriesToUpdate.getId()))
+                .findFirst().get();
         //then
         assertThat(updatedExerciseSeries.getCompletedRepeats()).isEqualTo(exerciseSeriesToUpdate.getCompletedRepeats());
         assertThat(updatedExerciseSeries.getAverageDurationOfOneRepeatInSeconds()).isEqualTo(exerciseSeriesToUpdate.getAverageDurationOfOneRepeatInSeconds());
