@@ -7,6 +7,9 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by mstobieniecka on 2017-08-26.
  */
@@ -68,6 +71,16 @@ public class TrainingTestUtil {
                 exchange("/trainings", HttpMethod.POST, entity, Training.class);
     }
 
+    public ResponseEntity<Training> putTraining(TestRestTemplate testRestTemplate, Training training) {
+        String json = jsonUtil.toJson(training);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(json, headers);
+
+        return testRestTemplate.withBasicAuth(USER_EMAIL, USER_PASSWORD).
+                exchange("/trainings", HttpMethod.PUT, entity, Training.class);
+    }
+
     public void addExercises(TestRestTemplate testRestTemplate) {
         for (int i = 0; i < 6; i++) {
             Exercise exercise = new Exercise(Style.BACKSTROKE);
@@ -83,8 +96,41 @@ public class TrainingTestUtil {
         }
     }
 
-    public void addUser(TestRestTemplate testRestTemplate) {
+    public User addUser(TestRestTemplate testRestTemplate) {
         User user = testUtil.createValidUser();
-        testUtil.postUser(testRestTemplate, user);
+        ResponseEntity<User> responseEntity = testUtil.postUser(testRestTemplate, user);
+        return responseEntity.getBody();
+    }
+
+    public Training createValidTraining() {
+        Training training = new Training();
+        training.setId(1L);
+        List<ExerciseSeries> exerciseSeriesList = new ArrayList<>();
+        for (int i = 0; i < 7; i++) {
+            ExerciseSeries exerciseSeries = new ExerciseSeries();
+            exerciseSeries.setId((long) i);
+            exerciseSeries.setRepeats(3);
+            exerciseSeries.setDurationOfOneExerciseInSeconds(600);
+            exerciseSeries.setBreakInSeconds(40);
+            exerciseSeries.setDistance(300);
+            Exercise exercise = new Exercise(Style.BACKSTROKE);
+            exercise.setName("name" + i);
+            exercise.setId((long) i);
+            exercise.setDescription("desc" + i);
+            if (i < 3) {
+                exercise.setWarmUpRelax(true);
+            } else {
+                exercise.setWarmUpRelax(false);
+            }
+            exerciseSeries.setExercise(exercise);
+            exerciseSeriesList.add(exerciseSeries);
+        }
+        training.setExerciseSeries(exerciseSeriesList);
+        User user = new User();
+        user.setId(1L);
+        user.setEmail("some@email.com");
+        user.setPassword("somePassword");
+        training.setUser(user);
+        return training;
     }
 }

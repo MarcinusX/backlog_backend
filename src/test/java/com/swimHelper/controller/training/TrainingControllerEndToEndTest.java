@@ -4,10 +4,7 @@ import com.swimHelper.ExerciseSeriesRepository;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
 import com.swimHelper.exception.BusinessException;
-import com.swimHelper.model.IntensityLevel;
-import com.swimHelper.model.Style;
-import com.swimHelper.model.Training;
-import com.swimHelper.model.TrainingRequirements;
+import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.repository.TrainingRepository;
 import com.swimHelper.repository.UserRepository;
@@ -22,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -158,5 +156,52 @@ public class TrainingControllerEndToEndTest {
         assertThat(trainingFromResponse.getExerciseSeries().size()).isGreaterThan(2);
         assertThat(trainingFromResponse.getDurationInSeconds()).isGreaterThan(900).isLessThanOrEqualTo(5000);
         assertThat(trainingFromResponse.getId()).isNotNull();
+    }
+
+    @Test
+    public void putTrainingTest_shouldReturnTrainingWithOneExerciseSeriesUpdated() throws BusinessException {
+        //given
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        testUtil.createAdminForTests(); //required to add exercises
+        trainingTestUtil.addUser(testRestTemplate);
+        trainingTestUtil.addExercises(testRestTemplate);
+        ResponseEntity<Training> responseEntityFromAddingTraining = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        Training addedTraining = responseEntityFromAddingTraining.getBody();
+        ExerciseSeries exerciseSeriesToUpdate = new ArrayList<>(addedTraining.getExerciseSeries()).get(0);
+        exerciseSeriesToUpdate.setCompletedRepeats(5);
+        exerciseSeriesToUpdate.setAverageDurationOfOneRepeatInSeconds(300);
+        //when
+        ResponseEntity<Training> responseEntity = trainingTestUtil.putTraining(testRestTemplate, addedTraining);
+        Training trainingFromResponse = responseEntity.getBody();
+        ExerciseSeries updatedExerciseSeries = trainingFromResponse.getExerciseSeries()
+                .stream()
+                .filter(ex -> ex.getId().equals(exerciseSeriesToUpdate.getId()))
+                .findFirst().get();
+        //then
+        assertThat(updatedExerciseSeries.getCompletedRepeats()).isEqualTo(exerciseSeriesToUpdate.getCompletedRepeats());
+        assertThat(updatedExerciseSeries.getAverageDurationOfOneRepeatInSeconds()).isEqualTo(exerciseSeriesToUpdate.getAverageDurationOfOneRepeatInSeconds());
+    }
+
+    @Test
+    public void putTrainingTest_shouldReturnTrainingWithEveryExerciseSeriesUpdated() throws BusinessException {
+        //given
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        testUtil.createAdminForTests(); //required to add exercises
+        trainingTestUtil.addUser(testRestTemplate);
+        trainingTestUtil.addExercises(testRestTemplate);
+        ResponseEntity<Training> responseEntityFromAddingTraining = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        Training addedTraining = responseEntityFromAddingTraining.getBody();
+        addedTraining.getExerciseSeries().forEach(es -> {
+                    es.setAverageDurationOfOneRepeatInSeconds(5);
+                    es.setCompletedRepeats(5);
+                }
+        );
+        //when
+        ResponseEntity<Training> responseEntity = trainingTestUtil.putTraining(testRestTemplate, addedTraining);
+        Training trainingFromResponse = responseEntity.getBody();
+        List<ExerciseSeries> exerciseSeriesFromUpdatedTraining = trainingFromResponse.getExerciseSeries().stream().filter(es ->
+                es.getAverageDurationOfOneRepeatInSeconds() == 5 && es.getCompletedRepeats() == 5).collect(Collectors.toList());
+        //then
+        assertThat(exerciseSeriesFromUpdatedTraining.size()).isEqualTo(addedTraining.getExerciseSeries().size());
     }
 }
