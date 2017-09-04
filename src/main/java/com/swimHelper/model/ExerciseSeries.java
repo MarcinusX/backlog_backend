@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 
 /**
  * Created by Monia on 2017-07-18.
@@ -18,10 +18,11 @@ public class ExerciseSeries {
     @Id
     @GeneratedValue
     private Long id;
-    @OneToOne
+    @ManyToOne
     private Exercise exercise;
     private int distance;
     private int repeats;
     private int orderNumber;
     private int breakInSeconds;
+    private int durationOfOneExerciseInSeconds;
 }

@@ -1,9 +1,6 @@
 package com.swimHelper.exception.handler;
 
-import com.swimHelper.exception.ForbiddenAccessException;
-import com.swimHelper.exception.InvalidUserException;
-import com.swimHelper.exception.UserExistsException;
-import com.swimHelper.exception.UserNotFoundException;
+import com.swimHelper.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -49,4 +46,38 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
+    @ExceptionHandler(value = ExerciseExistsException.class)
+    protected ResponseEntity<Object> handleExerciseExistsException(ExerciseExistsException ex, WebRequest request) {
+        ApiError apiError = new ApiError("Exercise already exists", ex);
+        logger.error("Exercise already exists.", ex.getMessage());
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(value = ExerciseNotFoundException.class)
+    protected ResponseEntity<Object> handleExerciseNotFoundException(ExerciseNotFoundException ex, WebRequest request) {
+        ApiError apiError = new ApiError("Failed to find exercise by id");
+        logger.error("Failed to find exercise by id.", ex.getMessage());
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
+
+    @ExceptionHandler(value = InvalidExerciseException.class)
+    protected ResponseEntity<Object> handleInvalidExerciseException(InvalidExerciseException ex, WebRequest request) {
+        ApiError apiError = new ApiError("Invalid exercise body", ex);
+        logger.error("Invalid exercise body.", ex.getMessage());
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(value = MissingTrainingRequirementsException.class)
+    protected ResponseEntity<Object> handleMissingTrainingRequirementsException(MissingTrainingRequirementsException ex, WebRequest request) {
+        ApiError apiError = new ApiError("Missing training requirements", ex);
+        logger.error("Missing training requirements.", ex.getMessage());
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(value = UnsatisfiedTimeRequirementsException.class)
+    protected ResponseEntity<Object> handleUnsatisfiedTimeRequirementsException(UnsatisfiedTimeRequirementsException ex, WebRequest request) {
+        ApiError apiError = new ApiError("Unsatisfied time requirements", ex);
+        logger.error("Unsatisfied time requirements.", ex.getMessage());
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
 }

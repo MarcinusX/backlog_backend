@@ -1,32 +1,47 @@
 package com.swimHelper.generator;
 
+import com.swimHelper.TestUtil;
+import com.swimHelper.exception.BusinessException;
 import com.swimHelper.exception.MissingTrainingRequirementsException;
 import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
+import com.swimHelper.util.RandomGenerator;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by mstobieniecka on 2017-07-19.
  */
 public class TrainingGeneratorTest {
 
+    private TestUtil testUtil = new TestUtil();
     private final ExerciseRepository exerciseRepository = mock(ExerciseRepository.class);
-    private final Random random = new Random();
-    private final TrainingGenerator sut = new TrainingGenerator(exerciseRepository, random);
+    private final RandomGenerator random = mock(RandomGenerator.class);
+    private final TrainingCalculator trainingCalculator = spy(new TrainingCalculator(random));
+    private final TrainingGenerator sut = new TrainingGenerator(exerciseRepository, trainingCalculator, random);
 
     @Test
     public void generateTraining_whenValidParameters_doesntThrowException() throws Exception {
         //given
-        User user = createValidUser();
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
+        when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
+        when(random.generateRandomInt(2)).thenReturn(1);
+        when(random.generateRandomInt(1)).thenReturn(0);
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         sut.generateTraining(user, trainingRequirements);
         //then
@@ -37,9 +52,9 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenMissingUserData_shouldThrowException() {
         //given
-        User user = createValidUser();
+        User user = testUtil.createValidUser();
         user.setStyleStatistics(new ArrayList<>());
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         //when
         Throwable throwable = catchThrowable(() -> sut.generateTraining(user, trainingRequirements));
         //then
@@ -50,22 +65,9 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenMissingStyles_shouldThrowException() {
         //given
-        User user = createValidUser();
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setStyles(new ArrayList<>());
-        //when
-        Throwable throwable = catchThrowable(() -> sut.generateTraining(user, trainingRequirements));
-        //then
-        assertThat(throwable).isInstanceOf(MissingTrainingRequirementsException.class);
-    }
-
-    //when user wants to generate training he has to choose difficulty level
-    @Test
-    public void generateTraining_whenMissingDifficultyLevel_shouldThrowException() {
-        //given
-        User user = createValidUser();
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
-        trainingRequirements.setDifficultyLevel(null);
         //when
         Throwable throwable = catchThrowable(() -> sut.generateTraining(user, trainingRequirements));
         //then
@@ -76,8 +78,8 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenMissingIntensityLevel_shouldThrowException() {
         //given
-        User user = createValidUser();
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setIntensityLevel(null);
         //when
         Throwable throwable = catchThrowable(() -> sut.generateTraining(user, trainingRequirements));
@@ -89,10 +91,10 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenMissingMaxDurationAndMaxDistance_shouldThrowException() {
         //given
-        User user = createValidUser();
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDistance(0);
-        trainingRequirements.setMaxDurationInMinutes(0);
+        trainingRequirements.setMaxDurationInSeconds(0);
         //when
         Throwable throwable = catchThrowable(() -> sut.generateTraining(user, trainingRequirements));
         //then
@@ -103,9 +105,17 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenMissingMaxDistance_shouldNotThrowException() throws Exception {
         //given
-        User user = createValidUser();
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDistance(0);
+        when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
+        when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
+        when(random.generateRandomInt(2)).thenReturn(1);
+        when(random.generateRandomInt(1)).thenReturn(0);
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         sut.generateTraining(user, trainingRequirements);
         //then
@@ -116,9 +126,15 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenMissingMaxDuration_shouldNotThrowException() throws Exception {
         //given
-        User user = createValidUser();
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
-        trainingRequirements.setMaxDurationInMinutes(0);
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        trainingRequirements.setMaxDurationInSeconds(900);
+        when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
+        when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
         //when
         sut.generateTraining(user, trainingRequirements);
         //then
@@ -129,8 +145,14 @@ public class TrainingGeneratorTest {
     @Test
     public void generateTraining_whenValidParameters_doesntReturnNull() throws Exception {
         //given
-        User user = createValidUser();
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
+        when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
@@ -139,12 +161,16 @@ public class TrainingGeneratorTest {
 
     //when user generates training the most important are given styles
     @Test
-    public void generateTraining_whenStylesGiven_shouldReturnTrainingInGivenStyles() throws MissingTrainingRequirementsException {
+    public void generateTraining_whenStyles_shouldReturnTrainingInGivenStyles() throws BusinessException {
         //given
-        User user = createValidUser();
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
@@ -152,270 +178,104 @@ public class TrainingGeneratorTest {
                 .stream()
                 .map(exerciseSeries1 -> exerciseSeries1.getExercise().getStyle())
                 .distinct().collect(Collectors.toList());
-        assertThat(stylesUsed).containsExactlyElementsOf(trainingRequirements.getStyles());
+        boolean areStylesCorrect = stylesUsed.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
+        assertThat(areStylesCorrect).isTrue();
     }
 
     //when user generates training exercise series is created on the basis of intensity level
     @Test
-    public void generateTraining_whenIntensityLevelGiven_shouldCreateExerciseSeriesDueToIntensityLevel() throws Exception {
+    public void generateTraining_whenIntensityLevel_shouldCreateExerciseSeriesDueToIntensityLevel() throws Exception {
         //given
-        User user = createValidUser();
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //then
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
         List<Integer> exerciseSeriesDistances = training.getExerciseSeries()
-                .stream()
+                .stream().filter(s -> !s.getExercise().isWarmUpRelax())
                 .map(ExerciseSeries::getDistance)
                 .collect(Collectors.toList());
-        boolean areDistancesCorrect = exerciseSeriesDistances.stream().allMatch(distance -> IntensityLevel.LOW.getDistances().contains(distance));
+        List<Integer> generatedDistances = IntensityLevel.LOW.getDistances();
+        boolean areDistancesCorrect = exerciseSeriesDistances.stream().allMatch(distance -> generatedDistances.contains(distance));
         assertThat(areDistancesCorrect).isTrue();
     }
 
     @Test
-    public void generateTraining_whenMaxDurationGiven_shouldReturnTrainingWithGivenMaxDuration() throws MissingTrainingRequirementsException {
+    public void generateTraining_whenMaxDuration_shouldReturnTrainingWithGivenMaxDuration() throws BusinessException {
         //given
-        User user = createValidUser();
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.singletonList(new Exercise(Style.FREESTYLE)));
         when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.singletonList(new Exercise(Style.BACKSTROKE)));        //when
+        doReturn(1).when(trainingCalculator).getNumberOfRepeatsInOneSeries(anyInt(), anyInt());
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
         Training training = sut.generateTraining(user, trainingRequirements);
         //then
-        assertThat(training.getDurationInMinutes()).isLessThanOrEqualTo(trainingRequirements.getMaxDurationInMinutes());
+        assertThat(training.getDurationInSeconds()).isLessThanOrEqualTo(trainingRequirements.getMaxDurationInSeconds());
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenLittleMaxDurationAndLowIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
+    public void adaptTrainingToMaxDistance_whenMaxDistanceIsShorterThanTrainingDistance_shouldReturnTrainingThatMaxDistanceIsLongerOrEqualToTrainingDistance() throws BusinessException {
         //given
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        trainingRequirements.setMaxDistance(500);
+        Training training = testUtil.createValidTraining();
         //when
-        Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInMinutes());
+        Training trainingAfterAdaptation = sut.getAdaptedTrainingToMaxDistance(training, trainingRequirements.getMaxDistance());
         //then
-        assertThat(numberOfExercisesSeries).isEqualTo(2);
+        int distance = 0;
+        for (ExerciseSeries series : trainingAfterAdaptation.getExerciseSeries()) {
+            distance += series.getDistance() * series.getRepeats();
+        }
+        assertThat(distance).isLessThanOrEqualTo(trainingRequirements.getMaxDistance());
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenAverageMaxDurationAndLowIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
+    public void adaptTrainingToMaxDistance_whenMaxDistanceIsLongerThanTrainingDistance_shouldReturnTheSameTrainingAsGivenAsParameter() throws BusinessException {
         //given
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
-        trainingRequirements.setMaxDurationInMinutes(40);
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        trainingRequirements.setMaxDistance(8000);
+        Training training = testUtil.createValidTraining();
         //when
-        Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInMinutes());
+        Training trainingAfterAdaptation = sut.getAdaptedTrainingToMaxDistance(training, trainingRequirements.getMaxDistance());
         //then
-        assertThat(numberOfExercisesSeries).isEqualTo(3);
+        assertThat(trainingAfterAdaptation).isEqualTo(training);
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenLongMaxDurationAndLowIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
+    public void adaptTrainingToMaxDistance_whenMaxDistanceIsTheSameAsTrainingDistance_shouldReturnTheSameTrainingAsGivenAsParameter() throws BusinessException {
         //given
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
-        trainingRequirements.setMaxDurationInMinutes(60);
-        List<Integer> possibleNumberOfSeries = new ArrayList<>();
-        possibleNumberOfSeries.add(3);
-        possibleNumberOfSeries.add(4);
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        trainingRequirements.setMaxDistance(7500);
+        Training training = testUtil.createValidTraining();
         //when
-        Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInMinutes());
+        Training trainingAfterAdaptation = sut.getAdaptedTrainingToMaxDistance(training, trainingRequirements.getMaxDistance());
         //then
-        assertThat(numberOfExercisesSeries).isIn(possibleNumberOfSeries);
+        assertThat(trainingAfterAdaptation).isEqualTo(training);
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenLongMaxDurationAndHighIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
+    public void generateTraining_whenNoExercisesInGivenStyles_shouldReturn2ExerciseSeries() throws BusinessException {
         //given
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
-        trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
-        trainingRequirements.setMaxDurationInMinutes(50);
-        List<Integer> numberOfExerciseSeriesForHighLevel = new ArrayList<>();
-        numberOfExerciseSeriesForHighLevel.add(5);
-        numberOfExerciseSeriesForHighLevel.add(6);
-        numberOfExerciseSeriesForHighLevel.add(7);
+        User user = testUtil.createValidUser();
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        when(exerciseRepository.findByStyle(Style.FREESTYLE)).thenReturn(Collections.emptyList());
+        when(exerciseRepository.findByStyle(Style.BACKSTROKE)).thenReturn(Collections.emptyList());
+        Exercise exercise = new Exercise(Style.BACKSTROKE);
+        exercise.setWarmUpRelax(true);
+        when(exerciseRepository.findByWarmUpRelax(true)).thenReturn(Collections.singletonList(exercise));
         //when
-        Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInMinutes());
+        Training training = sut.generateTraining(user, trainingRequirements);
         //then
-        assertThat(numberOfExercisesSeries).isIn(numberOfExerciseSeriesForHighLevel);
-    }
-
-    @Test
-    public void getNumberOfExerciseSeries_whenAverageMaxDurationAndHighIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
-        //given
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
-        trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
-        trainingRequirements.setMaxDurationInMinutes(40);
-        List<Integer> numberOfExerciseSeriesForHighLevel = new ArrayList<>();
-        numberOfExerciseSeriesForHighLevel.add(3);
-        numberOfExerciseSeriesForHighLevel.add(4);
-        //when
-        Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInMinutes());
-        //then
-        assertThat(numberOfExercisesSeries).isIn(numberOfExerciseSeriesForHighLevel);
-    }
-
-    @Test
-    public void getNumberOfExerciseSeries_whenShortMaxDurationAndHighIntensityLevelGiven_shouldReturnNumberOfExerciseSeries() {
-        //given
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
-        trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
-        trainingRequirements.setMaxDurationInMinutes(25);
-        //when
-        Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInMinutes());
-        //then
-        assertThat(numberOfExercisesSeries).isEqualTo(3);
-    }
-
-    @Test
-    public void getNumberOfExerciseSeries_whenLittleMaxDurationGiven_shouldReturnNumberOfExerciseSeries() {
-        //given
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
-        trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
-        trainingRequirements.setMaxDurationInMinutes(10);
-        //when
-        Integer numberOfExercisesSeries = sut.getNumberOfExerciseSeries(trainingRequirements.getIntensityLevel(), trainingRequirements.getMaxDurationInMinutes());
-        //then
-        assertThat(numberOfExercisesSeries).isEqualTo(1);
-    }
-
-    @Test
-    public void getDurationOfOneExerciseSeries_whenNumberOfExerciseSeriesAndMaxDurationGiven_shouldReturnDurationOfOneExerciseSeries() {
-        //given
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
-        //when
-        Integer durationOfOneExerciseSeries = sut.getDurationOfOneExerciseSeries(8, trainingRequirements.getMaxDurationInMinutes());
-        //then
-        assertThat(durationOfOneExerciseSeries).isEqualTo(3);
-    }
-
-    @Test
-    public void getDurationOfOneExerciseRepeat_whenShortDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
-        //given
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
-        User user = createValidUser();
-        ExerciseSeries exerciseSeries = new ExerciseSeries();
-        exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
-        exerciseSeries.setDistance(100);
-        //when
-        Integer durationOfOneExerciseRepeat = sut.getDurationOfOneExerciseRepeatInSeconds(exerciseSeries, user);
-        StyleStatistics styleStatistics = user
-                .getStyleStatistics().stream()
-                .filter(styleStatistics1 -> styleStatistics1.getStyle().equals(exerciseSeries.getExercise().getStyle())).findFirst().get();
-        //then
-        assertThat(durationOfOneExerciseRepeat).isEqualTo(styleStatistics.getTimeInSeconds());
-    }
-
-    @Test
-    public void getDurationOfOneExerciseRepeat_whenVeryShortDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
-        //given
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
-        User user = createValidUser();
-        ExerciseSeries exerciseSeries = new ExerciseSeries();
-        exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
-        exerciseSeries.setDistance(50);
-        //when
-        Integer durationOfOneExerciseRepeat = sut.getDurationOfOneExerciseRepeatInSeconds(exerciseSeries, user);
-        StyleStatistics styleStatistics = user
-                .getStyleStatistics().stream()
-                .filter(styleStatistics1 -> styleStatistics1.getStyle().equals(exerciseSeries.getExercise().getStyle())).findFirst().get();
-        //then
-        assertThat(durationOfOneExerciseRepeat).isEqualTo(styleStatistics.getTimeInSeconds() / 2);
-    }
-
-    @Test
-    public void getDurationOfOneExerciseRepeat_whenMediumDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
-        //given
-        TrainingRequirements trainingRequirements = createValidTrainingRequirements();
-        User user = createValidUser();
-        ExerciseSeries exerciseSeries = new ExerciseSeries();
-        exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
-        exerciseSeries.setDistance(300);
-        //when
-        Integer durationOfOneExerciseRepeat = sut.getDurationOfOneExerciseRepeatInSeconds(exerciseSeries, user);
-        //then
-        assertThat(durationOfOneExerciseRepeat).isEqualTo(351);
-    }
-
-    @Test
-    public void getDurationOfOneExerciseRepeat_whenQuiteLongDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
-        //given
-        User user = createValidUser();
-        ExerciseSeries exerciseSeries = new ExerciseSeries();
-        exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
-        exerciseSeries.setDistance(500);
-        //when
-        Integer durationOfOneExerciseRepeat = sut.getDurationOfOneExerciseRepeatInSeconds(exerciseSeries, user);
-        //then
-        assertThat(durationOfOneExerciseRepeat).isEqualTo(642);
-    }
-
-    @Test
-    public void getDurationOfOneExerciseRepeat_whenLongDistanceAndStyleStatisticsGiven_shouldReturnDurationOfOneExerciseRepeat() {
-        //given
-        User user = createValidUser();
-        ExerciseSeries exerciseSeries = new ExerciseSeries();
-        exerciseSeries.setExercise(new Exercise(Style.FREESTYLE));
-        exerciseSeries.setDistance(800);
-        //when
-        Integer durationOfOneExerciseRepeat = sut.getDurationOfOneExerciseRepeatInSeconds(exerciseSeries, user);
-        //then
-        assertThat(durationOfOneExerciseRepeat).isEqualTo(1165);
-    }
-
-    @Test
-    public void getBreakOfOneExerciseRepeatInSeconds_whenLowIntensityLevelAndDurationOfOneExerciseSeriesGiven_shouldReturnBreakForOneExerciseRepeat() {
-        //given
-        int durationOfOneExerciseRepeat = 300;
-        IntensityLevel intensityLevel = IntensityLevel.LOW;
-        //when
-        int breakDurationOfOneExerciseRepeat = sut.getBreakOfOneExerciseRepeatInSeconds(intensityLevel, durationOfOneExerciseRepeat);
-        //then
-        assertThat(breakDurationOfOneExerciseRepeat).isEqualTo(50);
-    }
-
-    @Test
-    public void getBreakOfOneExerciseRepeatInSeconds_whenMediumIntensityLevelAndDurationOfOneExerciseSeriesGiven_shouldReturnBreakForOneExerciseRepeat() {
-        //given
-        int durationOfOneExerciseRepeat = 300;
-        IntensityLevel intensityLevel = IntensityLevel.MEDIUM;
-        //when
-        int breakDurationOfOneExerciseRepeat = sut.getBreakOfOneExerciseRepeatInSeconds(intensityLevel, durationOfOneExerciseRepeat);
-        //then
-        assertThat(breakDurationOfOneExerciseRepeat).isEqualTo(40);
-    }
-
-    @Test
-    public void getBreakOfOneExerciseRepeatInSeconds_whenHighIntensityLevelAndDurationOfOneExerciseSeriesGiven_shouldReturnBreakForOneExerciseRepeat() {
-        //given
-        int durationOfOneExerciseRepeat = 300;
-        IntensityLevel intensityLevel = IntensityLevel.HIGH;
-        //when
-        int breakDurationOfOneExerciseRepeat = sut.getBreakOfOneExerciseRepeatInSeconds(intensityLevel, durationOfOneExerciseRepeat);
-        //then
-        assertThat(breakDurationOfOneExerciseRepeat).isEqualTo(30);
-    }
-
-    private TrainingRequirements createValidTrainingRequirements() {
-        Collection<Style> styles = new ArrayList<>();
-        styles.add(Style.FREESTYLE);
-        styles.add(Style.BACKSTROKE);
-        Collection<Equipment> availableEquipment = new ArrayList<>();
-        availableEquipment.add(Equipment.TEMP);
-        Collection<TrainingPurpose> trainingPurposes = new ArrayList<>();
-        trainingPurposes.add(TrainingPurpose.IMPROVE_RECORDS);
-        return new TrainingRequirements(styles, DifficultyLevel.BEGINNER, IntensityLevel.LOW, 30, 1000,
-                availableEquipment, trainingPurposes);
-    }
-
-    private User createValidUser() {
-        Collection<StyleStatistics> styleStatistics = new ArrayList<>();
-        styleStatistics.add(new StyleStatistics(1L, Style.BACKSTROKE, 100, 120));
-        styleStatistics.add(new StyleStatistics(2L, Style.FREESTYLE, 100, 100));
-        styleStatistics.add(new StyleStatistics(3L, Style.BREASTSTROKE, 100, 200));
-        styleStatistics.add(new StyleStatistics(4L, Style.BUTTERFLY, 100, 230));
-        styleStatistics.add(new StyleStatistics(5L, Style.INDIVIDUAL_MEDLEY, 100, 140));
-
-        User user = new User();
-        user.setStyleStatistics(styleStatistics);
-        return user;
+        assertThat(training.getExerciseSeries().size()).isEqualTo(2);
     }
 }

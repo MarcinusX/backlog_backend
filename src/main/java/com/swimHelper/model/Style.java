@@ -7,6 +7,5 @@ public enum Style {
     FREESTYLE,
     BACKSTROKE,
     BREASTSTROKE,
-    BUTTERFLY,
-    INDIVIDUAL_MEDLEY
+    BUTTERFLY
 }

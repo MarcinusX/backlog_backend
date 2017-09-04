@@ -3,12 +3,15 @@ package com.swimHelper.security;
 import com.swimHelper.TestUtil;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.UserRepository;
+import com.swimHelper.service.UserService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
@@ -24,10 +27,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("security")
-public class SecurityIntegrationTest {
+public class UserSecurityIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
     @Autowired
     private TestRestTemplate testRestTemplate;
     @Autowired
@@ -35,6 +40,11 @@ public class SecurityIntegrationTest {
 
     @Before
     public void init() {
+        userRepository.deleteAll();
+    }
+
+    @After
+    public void cleanUp() {
         userRepository.deleteAll();
     }
 
@@ -122,6 +132,64 @@ public class SecurityIntegrationTest {
                         user2);
         //then
         assertThat(userResponseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void userCannotGetAllUsers() throws Exception {
+        //given
+        User user = createUser("user1@email.com", "pass1");
+        testUtil.postUser(testRestTemplate, user);
+        //when
+        ResponseEntity usersResponseEntity =
+                testRestTemplate
+                        .withBasicAuth("user1@email.com", "pass1")
+                        .getForEntity("/users", Object.class);
+        //then
+        assertThat(usersResponseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void adminCanGetAllUsers() throws Exception {
+        //given
+        User user = createUser("user1@email.com", "pass1");
+        User body = testUtil.postUser(testRestTemplate, user).getBody();
+        userService.makeUserAdmin(body.getId());
+        //when
+        ResponseEntity usersResponseEntity =
+                testRestTemplate
+                        .withBasicAuth("user1@email.com", "pass1")
+                        .getForEntity("/users/", Object.class);
+        //then
+        assertThat(usersResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    public void userCannotMakeAUserAdmin() throws Exception {
+        //given
+        User user = createUser("user1@email.com", "pass1");
+        user = testUtil.postUser(testRestTemplate, user).getBody();
+        //when
+        ResponseEntity usersResponseEntity =
+                testRestTemplate
+                        .withBasicAuth("user1@email.com", "pass1")
+                        .exchange("/users/admin/" + user.getId() + "/makeAdmin", HttpMethod.PUT, null, User.class);
+        //then
+        assertThat(usersResponseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void AdminCanMakeAUserAdmin() throws Exception {
+        //given
+        User user = createUser("user1@email.com", "pass1");
+        user = testUtil.postUser(testRestTemplate, user).getBody();
+        userService.makeUserAdmin(user.getId());
+        //when
+        ResponseEntity usersResponseEntity =
+                testRestTemplate
+                        .withBasicAuth("user1@email.com", "pass1")
+                        .exchange("/users/admin/" + user.getId() + "/makeAdmin", HttpMethod.PUT, null, User.class);
+        //then
+        assertThat(usersResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     private User createUser(String email, String password) {
