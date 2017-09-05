@@ -27,3 +27,7 @@ spring:
           auth: true
           starttls.enable: true
           ssl.trust: smtp.gmail.com
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+

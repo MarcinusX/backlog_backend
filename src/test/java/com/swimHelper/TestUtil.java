@@ -9,6 +9,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -74,7 +75,8 @@ public class TestUtil {
         Collection<Style> styles = new ArrayList<>();
         styles.add(Style.FREESTYLE);
         styles.add(Style.BACKSTROKE);
-        return new TrainingRequirements(styles, IntensityLevel.LOW, 3000, 1000);
+        LocalDateTime trainingDateTime = LocalDateTime.of(2100, 11, 20, 6, 40, 45);
+        return new TrainingRequirements(styles, IntensityLevel.LOW, 3000, 1000, trainingDateTime);
     }
 
     public Training createValidTraining() {

@@ -8,6 +8,7 @@ import com.swimHelper.util.RandomGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -38,6 +39,7 @@ public class TrainingGenerator {
         List<Exercise> matchingExercises = getMatchingExercises(trainingRequirements);
         //create training
         Training training = new Training();
+        training.setTrainingDateTime(trainingRequirements.getTrainingDateTime());
         //add warm up
         addWarmUpExerciseSeries(training);
         //add exercises
@@ -107,12 +109,15 @@ public class TrainingGenerator {
         Collection<Style> userStylesFromStatistics = user.getStyleStatistics().stream().map(StyleStatistics::getStyle).collect(Collectors.toList());
         boolean doesUserChoseStyles = !trainingRequirements.getStyles().isEmpty();
         boolean doesUserHaveStatisticsForChosenStyles = false;
+        LocalDateTime trainingDateTime = trainingRequirements.getTrainingDateTime();
+        boolean doesUserChoseTrainingDateTime = trainingDateTime != null && trainingDateTime.isAfter(LocalDateTime.now());
         if (doesUserChoseStyles) {
             doesUserHaveStatisticsForChosenStyles = trainingRequirements.getStyles().stream().allMatch(userStylesFromStatistics::contains);
         }
         boolean isMaxDurationOrMaxDistanceSet = (trainingRequirements.getMaxDistance() > 0 || trainingRequirements.getMaxDurationInSeconds() > 0);
         boolean isIntensityLevelSet = trainingRequirements.getIntensityLevel() != null;
-        return (doesUserHaveStatisticsForChosenStyles && doesUserChoseStyles && isMaxDurationOrMaxDistanceSet && isIntensityLevelSet);
+        return (doesUserHaveStatisticsForChosenStyles && doesUserChoseStyles && isMaxDurationOrMaxDistanceSet
+                && isIntensityLevelSet && doesUserChoseTrainingDateTime);
     }
 
     private ExerciseSeries createExerciseSeries(Exercise exercise, TrainingRequirements trainingRequirements, User user, int durationOfOneSeries) throws UnsatisfiedTimeRequirementsException {

@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -110,10 +111,10 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void generateTrainingTest_shouldReturnMoreThan2ExerciseSeriesNotLongerThan2000Seconds() throws BusinessException {
+    public void generateTrainingTest_shouldReturnMoreThan0ExerciseSeriesNotLongerThan3000Seconds() throws BusinessException {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
-        trainingRequirements.setMaxDurationInSeconds(2000);
+        trainingRequirements.setMaxDurationInSeconds(3000);
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
         testUtil.createAdminForTests(); //required to add exercises
         trainingTestUtil.addUser(testRestTemplate);
@@ -128,8 +129,8 @@ public class TrainingControllerEndToEndTest {
                 .distinct().collect(Collectors.toList());
         boolean areStylesCorrect = stylesUsed.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
         assertThat(areStylesCorrect).isTrue();
-        assertThat(trainingFromResponse.getExerciseSeries().size()).isGreaterThan(2);
-        assertThat(trainingFromResponse.getDurationInSeconds()).isGreaterThan(900).isLessThanOrEqualTo(2000);
+        assertThat(trainingFromResponse.getExerciseSeries().size()).isGreaterThan(0);
+        assertThat(trainingFromResponse.getDurationInSeconds()).isGreaterThan(900).isLessThanOrEqualTo(3000);
         assertThat(trainingFromResponse.getId()).isNotNull();
     }
 
@@ -203,5 +204,58 @@ public class TrainingControllerEndToEndTest {
                 es.getAverageDurationOfOneRepeatInSeconds() == 5 && es.getCompletedRepeats() == 5).collect(Collectors.toList());
         //then
         assertThat(exerciseSeriesFromUpdatedTraining.size()).isEqualTo(addedTraining.getExerciseSeries().size());
+    }
+
+    @Test
+    public void countDistanceTest_shouldReturnDistanceOfAllTrainingsForUser() throws BusinessException {
+        //given
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        testUtil.createAdminForTests(); //required to add exercises
+        User user = trainingTestUtil.addUser(testRestTemplate);
+        trainingTestUtil.addExercises(testRestTemplate);
+        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
+        //when
+        ResponseEntity<DistanceTrackerResult> responseEntity = trainingTestUtil.countDistance(testRestTemplate, null, null, null);
+        int distanceFromResponse = responseEntity.getBody().getDistance();
+        //then
+        assertThat(distanceFromResponse).isGreaterThan(0);
+    }
+
+    @Test
+    public void countDistanceTest_shouldReturnDistanceOfOneTrainingForUser() throws BusinessException {
+        //given
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        testUtil.createAdminForTests(); //required to add exercises
+        User user = trainingTestUtil.addUser(testRestTemplate);
+        trainingTestUtil.addExercises(testRestTemplate);
+        Training training = trainingTestUtil.addTraining(testRestTemplate, trainingRequirements);
+        //when
+        ResponseEntity<DistanceTrackerResult> responseEntity = trainingTestUtil.countDistance(testRestTemplate,
+                training.getId(),
+                null,
+                null);
+        int distanceFromResponse = responseEntity.getBody().getDistance();
+        //then
+        assertThat(distanceFromResponse).isGreaterThan(0);
+    }
+
+    @Test
+    public void countDistanceTest_shouldReturnDistanceOfTrainingsBetweenDatesForUser() throws BusinessException {
+        //given
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        testUtil.createAdminForTests(); //required to add exercises
+        User user = trainingTestUtil.addUser(testRestTemplate);
+        trainingTestUtil.addExercises(testRestTemplate);
+        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
+        LocalDateTime startDate = LocalDateTime.of(2100, 7, 30, 6, 40, 45);
+        LocalDateTime endDate = LocalDateTime.of(2100, 11, 30, 6, 40, 45);
+        //when
+        ResponseEntity<DistanceTrackerResult> responseEntity = trainingTestUtil.countDistance(testRestTemplate,
+                null,
+                startDate,
+                endDate);
+        int distanceFromResponse = responseEntity.getBody().getDistance();
+        //then
+        assertThat(distanceFromResponse).isGreaterThan(0);
     }
 }
