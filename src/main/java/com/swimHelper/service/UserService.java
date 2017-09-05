@@ -1,5 +1,6 @@
 package com.swimHelper.service;
 
+import com.swimHelper.aspect.TimeMeasured;
 import com.swimHelper.exception.BusinessException;
 import com.swimHelper.exception.InvalidUserException;
 import com.swimHelper.exception.UserExistsException;
@@ -39,6 +40,7 @@ public class UserService implements UserDetailsService {
      * @param user user to be added
      * @return added user
      */
+    @TimeMeasured
     public User addUser(User user) throws BusinessException {
         checkUserAddingPrerequisites(user);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
