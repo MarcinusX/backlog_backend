@@ -1,5 +1,6 @@
 package com.swimHelper.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.springframework.data.geo.Point;
 
@@ -27,6 +28,7 @@ public class Competition {
     @JoinTable(name = "competitions_participants",
             joinColumns = @JoinColumn(name = "competition_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JsonIgnoreProperties(value = "competitions", allowSetters = true)
     private Set<User> participants = new HashSet<>();
     @Column(nullable = false)
     private String name;
