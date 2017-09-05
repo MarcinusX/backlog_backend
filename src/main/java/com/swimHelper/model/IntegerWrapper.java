@@ -7,5 +7,5 @@ import lombok.Data;
  */
 @Data
 public class IntegerWrapper {
-    private Integer distance;
+    private Integer value;
 }

@@ -67,7 +67,7 @@ public class TrainingControllerStatusCodesTest {
     public void generateTraining_whenValidTrainingRequirements_returns200() throws Exception {
         //given
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         //when
@@ -80,7 +80,7 @@ public class TrainingControllerStatusCodesTest {
     public void generateTraining_whenMissingTrainingRequirements_returns400() throws Exception {
         //given
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(0);
@@ -94,7 +94,7 @@ public class TrainingControllerStatusCodesTest {
     public void generateTraining_whenUnsatisfiedTimeRequirements_returns400() throws Exception {
         //given
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(600);
@@ -107,7 +107,7 @@ public class TrainingControllerStatusCodesTest {
     @Test
     public void putTraining_whenInvalidTraining_returns400() throws Exception {
         //given
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         //then
         ResponseEntity<Training> responseEntity = trainingTestUtil.putTraining(testRestTemplate, null);
         //when
@@ -117,7 +117,7 @@ public class TrainingControllerStatusCodesTest {
     @Test
     public void putTraining_whenTrainingDoesntExistTraining_returns404() throws Exception {
         //given
-        User user = trainingTestUtil.addUser(testRestTemplate);
+        User user = testUtil.addUser(testRestTemplate);
         Training training = trainingTestUtil.createValidTraining(); //id = 1L
         training.setId(2L);
         training.setUser(user);
@@ -131,7 +131,7 @@ public class TrainingControllerStatusCodesTest {
     public void putTraining_whenValidTraining_returns200() throws Exception {
         //given
         testUtil.createAdminForTests();
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         ResponseEntity<Training> responseEntityAddedTraining = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
@@ -151,7 +151,7 @@ public class TrainingControllerStatusCodesTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = trainingTestUtil.addUser(testRestTemplate);
+        User user = testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
         //when
@@ -165,7 +165,7 @@ public class TrainingControllerStatusCodesTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = trainingTestUtil.addUser(testRestTemplate);
+        User user = testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
         LocalDateTime startDate = LocalDateTime.of(2017, 7, 1, 6, 40, 45);

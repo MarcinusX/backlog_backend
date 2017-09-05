@@ -50,7 +50,7 @@ public class TrainingController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         IntegerWrapper integerWrapper = new IntegerWrapper();
-        integerWrapper.setDistance(trainingService.countDistance(user.getId(), trainingId, startDate, endDate));
+        integerWrapper.setValue(trainingService.countDistance(user.getId(), trainingId, startDate, endDate));
         return integerWrapper;
     }
 }

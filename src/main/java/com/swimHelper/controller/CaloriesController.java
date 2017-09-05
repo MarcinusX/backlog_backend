@@ -38,7 +38,7 @@ public class CaloriesController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         IntegerWrapper integerWrapper = new IntegerWrapper();
-        integerWrapper.setDistance(caloriesService.calculateCalories(user.getId(), trainingId, startDate, endDate));
+        integerWrapper.setValue(caloriesService.calculateCalories(user.getId(), trainingId, startDate, endDate));
         return integerWrapper;
     }
 }

@@ -21,7 +21,7 @@ public class Training {
     @Id
     @GeneratedValue
     private Long id;
-    @OneToMany(cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private Collection<ExerciseSeries> exerciseSeries = new ArrayList<>();
     private LocalDateTime dateTime;
     private int durationInSeconds;

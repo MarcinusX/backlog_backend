@@ -2,6 +2,7 @@ package com.swimHelper.service.training;
 
 import com.swimHelper.ExerciseSeriesRepository;
 import com.swimHelper.TestUtil;
+import com.swimHelper.TrainingTestUtil;
 import com.swimHelper.exception.*;
 import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
@@ -37,21 +38,18 @@ public class TrainingServiceIntegrationTest {
 
     @Autowired
     private TrainingService sut;
-
     @Autowired
     private TrainingRepository trainingRepository;
-
     @Autowired
     private ExerciseRepository exerciseRepository;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private ExerciseSeriesRepository exerciseSeriesRepository;
-
     @Autowired
     private TestUtil testUtil;
+    @Autowired
+    private TrainingTestUtil trainingTestUtil;
 
     @After
     public void cleanUp() {
@@ -67,11 +65,11 @@ public class TrainingServiceIntegrationTest {
         exerciseSeriesRepository.deleteAll();
         userRepository.deleteAll();
         exerciseRepository.deleteAll();
-        addExercisesInSpecifiedStyle(Style.BACKSTROKE);
-        addExercisesInSpecifiedStyle(Style.FREESTYLE);
-        addExercisesInSpecifiedStyle(Style.BREASTSTROKE);
-        addExercisesInSpecifiedStyle(Style.BUTTERFLY);
-        addWarmUpRelaxExercises();
+        trainingTestUtil.addExercisesInSpecifiedStyle(Style.BACKSTROKE);
+        trainingTestUtil.addExercisesInSpecifiedStyle(Style.FREESTYLE);
+        trainingTestUtil.addExercisesInSpecifiedStyle(Style.BREASTSTROKE);
+        trainingTestUtil.addExercisesInSpecifiedStyle(Style.BUTTERFLY);
+        trainingTestUtil.addWarmUpRelaxExercises();
     }
 
     @Test
@@ -259,14 +257,16 @@ public class TrainingServiceIntegrationTest {
         assertThat(distance).isEqualTo(4500);
     }
 
-    private void addExercisesInSpecifiedStyle(Style style) {
-        String description = "description";
-        for (int i = 0; i < 12; i++) {
-            Exercise exercise = new Exercise(style);
-            exercise.setName(style.name() + i);
-            exercise.setDescription(description + i);
-            saveExercise(exercise);
-        }
+    @Test
+    public void countDistance_whenUserAndDates_shouldReturn0() throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
+        //given
+        User user = testUtil.createValidUser();
+        User savedUser = userRepository.saveAndFlush(user);
+        addTrainings(savedUser); //only one training is between given dates
+        //when
+        int distance = sut.countDistance(savedUser.getId(), null, LocalDateTime.of(2019, 1, 1, 6, 40, 45), LocalDateTime.of(2019, 1, 30, 6, 40, 45));
+        //given
+        assertThat(distance).isEqualTo(0);
     }
 
     private void addTrainings(User user) {
@@ -277,28 +277,5 @@ public class TrainingServiceIntegrationTest {
             training.setUser(user);
             trainingRepository.saveAndFlush(training);
         }
-    }
-
-    private void addWarmUpRelaxExercises() {
-        String name = "name";
-        String description = "description";
-        for (int i = 13; i < 17; i++) {
-            Exercise exercise = new Exercise(Style.BACKSTROKE);
-            exercise.setName(Style.BACKSTROKE.name() + i);
-            exercise.setDescription(description + i);
-            exercise.setWarmUpRelax(true);
-            saveExercise(exercise);
-        }
-        for (int i = 18; i < 23; i++) {
-            Exercise exercise = new Exercise(Style.BREASTSTROKE);
-            exercise.setName(Style.BREASTSTROKE.name() + i);
-            exercise.setDescription(description + i);
-            exercise.setWarmUpRelax(true);
-            saveExercise(exercise);
-        }
-    }
-
-    private void saveExercise(Exercise exercise) {
-        exerciseRepository.saveAndFlush(exercise);
     }
 }

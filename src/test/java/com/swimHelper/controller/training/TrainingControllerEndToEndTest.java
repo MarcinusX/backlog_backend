@@ -70,7 +70,7 @@ public class TrainingControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         //when
         ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
@@ -93,7 +93,7 @@ public class TrainingControllerEndToEndTest {
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(900);
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         //when
         ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
@@ -117,7 +117,7 @@ public class TrainingControllerEndToEndTest {
         trainingRequirements.setMaxDurationInSeconds(3000);
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         //when
         ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
@@ -142,7 +142,7 @@ public class TrainingControllerEndToEndTest {
         trainingRequirements.setMaxDurationInSeconds(5000);
         trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         //when
         ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
@@ -164,7 +164,7 @@ public class TrainingControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         ResponseEntity<Training> responseEntityFromAddingTraining = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
         Training addedTraining = responseEntityFromAddingTraining.getBody();
@@ -188,7 +188,7 @@ public class TrainingControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         ResponseEntity<Training> responseEntityFromAddingTraining = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
         Training addedTraining = responseEntityFromAddingTraining.getBody();
@@ -211,12 +211,12 @@ public class TrainingControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = trainingTestUtil.addUser(testRestTemplate);
+        User user = testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
         //when
         ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate, null, null, null);
-        int distanceFromResponse = responseEntity.getBody().getDistance();
+        int distanceFromResponse = responseEntity.getBody().getValue();
         //then
         assertThat(distanceFromResponse).isGreaterThan(0);
     }
@@ -226,7 +226,7 @@ public class TrainingControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = trainingTestUtil.addUser(testRestTemplate);
+        User user = testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         Training training = trainingTestUtil.addTraining(testRestTemplate, trainingRequirements);
         //when
@@ -234,7 +234,7 @@ public class TrainingControllerEndToEndTest {
                 training.getId(),
                 null,
                 null);
-        int distanceFromResponse = responseEntity.getBody().getDistance();
+        int distanceFromResponse = responseEntity.getBody().getValue();
         //then
         assertThat(distanceFromResponse).isGreaterThan(0);
     }
@@ -244,7 +244,7 @@ public class TrainingControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = trainingTestUtil.addUser(testRestTemplate);
+        User user = testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
         LocalDateTime startDate = LocalDateTime.of(2100, 7, 30, 6, 40, 45);
@@ -254,7 +254,7 @@ public class TrainingControllerEndToEndTest {
                 null,
                 startDate,
                 endDate);
-        int distanceFromResponse = responseEntity.getBody().getDistance();
+        int distanceFromResponse = responseEntity.getBody().getValue();
         //then
         assertThat(distanceFromResponse).isGreaterThan(0);
     }

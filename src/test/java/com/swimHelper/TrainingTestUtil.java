@@ -1,6 +1,7 @@
 package com.swimHelper;
 
 import com.swimHelper.model.*;
+import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.util.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -24,7 +25,9 @@ public class TrainingTestUtil {
     @Autowired
     private JsonUtil jsonUtil;
     @Autowired
-    private TestUtil testUtil;
+    private ExerciseRepository exerciseRepository;
+
+    //*********************END TO END TESTS METHODS********************************//
 
     public ResponseEntity<Exercise> postExercise(TestRestTemplate testRestTemplate, Exercise exercise, String email, String password) {
         String json = jsonUtil.toJson(exercise);
@@ -90,41 +93,43 @@ public class TrainingTestUtil {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
 
-        // Add url parameters
-        if (trainingId != null) {
-            url.append("trainingId=" + trainingId.toString() + "&");
-        }
-        if (startDate != null) {
-            url.append("startDate=" + startDate.toString() + "&");
-        }
-        if (endDate != null) {
-            url.append("endDate=" + endDate.toString());
-        }
         HttpEntity<?> entity = new HttpEntity<>(headers);
+        url = addParamsToUrl(url, trainingId, startDate, endDate);
 
-        return testRestTemplate.withBasicAuth(USER_EMAIL, USER_PASSWORD).
-                exchange(url.toString(), HttpMethod.GET, entity, IntegerWrapper.class);
+        return testRestTemplate.withBasicAuth(USER_EMAIL, USER_PASSWORD)
+                .exchange(url.toString(), HttpMethod.GET, entity, IntegerWrapper.class);
     }
 
-    public void addExercises(TestRestTemplate testRestTemplate) {
-        for (int i = 0; i < 6; i++) {
-            Exercise exercise = new Exercise(Style.BACKSTROKE);
-            exercise.setDescription("desc");
-            exercise.setName("name" + i);
-            if (i > 2) {
-                exercise.setWarmUpRelax(false);
-            } else {
-                exercise.setWarmUpRelax(true);
-            }
+    public ResponseEntity<IntegerWrapper> calculateCalories(TestRestTemplate testRestTemplate,
+                                                            Long trainingId,
+                                                            LocalDateTime startDate,
+                                                            LocalDateTime endDate) {
+        StringBuilder url = new StringBuilder().append("/calories?");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
 
-            ResponseEntity<Exercise> responseEntity = postExercise(testRestTemplate, exercise, ADMIN_EMAIL, ADMIN_PASSWORD);
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+        url = addParamsToUrl(url, trainingId, startDate, endDate);
+
+        return testRestTemplate.withBasicAuth(USER_EMAIL, USER_PASSWORD)
+                .exchange(url.toString(), HttpMethod.GET, entity, IntegerWrapper.class);
+    }
+
+    //*****************TRAININGS******************//
+
+    public void addTrainings(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements) {
+        for (int i = 0; i < 5; i++) {
+            addTraining(testRestTemplate, trainingRequirements);
         }
     }
 
-    public User addUser(TestRestTemplate testRestTemplate) {
-        User user = testUtil.createValidUser();
-        ResponseEntity<User> responseEntity = testUtil.postUser(testRestTemplate, user);
-        return responseEntity.getBody();
+    public Training addTraining(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements) {
+        Training training = postTrainingRequirements(testRestTemplate, trainingRequirements).getBody();
+        training.getExerciseSeries().forEach(es -> {
+            es.setCompletedRepeats(3);
+            es.setAverageDurationOfOneRepeatInSeconds(300);
+        });
+        return putTraining(testRestTemplate, training).getBody();
     }
 
     public Training createValidTraining() {
@@ -159,15 +164,68 @@ public class TrainingTestUtil {
         return training;
     }
 
-    public void addTrainings(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements) {
-        for (int i = 0; i < 5; i++) {
-            addTraining(testRestTemplate, trainingRequirements);
+    //*****************EXERCISES******************//
+
+    public void addExercises(TestRestTemplate testRestTemplate) {
+        for (int i = 0; i < 6; i++) {
+            Exercise exercise = new Exercise(Style.BACKSTROKE);
+            exercise.setDescription("desc");
+            exercise.setName("name" + i);
+            if (i > 2) {
+                exercise.setWarmUpRelax(false);
+            } else {
+                exercise.setWarmUpRelax(true);
+            }
+
+            ResponseEntity<Exercise> responseEntity = postExercise(testRestTemplate, exercise, ADMIN_EMAIL, ADMIN_PASSWORD);
         }
     }
 
-    public Training addTraining(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements) {
-        Training training = postTrainingRequirements(testRestTemplate, trainingRequirements).getBody();
-        training.getExerciseSeries().forEach(es -> es.setCompletedRepeats(3));
-        return putTraining(testRestTemplate, training).getBody();
+    public void addExercisesInSpecifiedStyle(Style style) {
+        String description = "description";
+        for (int i = 0; i < 12; i++) {
+            Exercise exercise = new Exercise(style);
+            exercise.setName(style.name() + i);
+            exercise.setDescription(description + i);
+            saveExercise(exercise);
+        }
+    }
+
+    public void addWarmUpRelaxExercises() {
+        String name = "name";
+        String description = "description";
+        for (int i = 13; i < 17; i++) {
+            Exercise exercise = new Exercise(Style.BACKSTROKE);
+            exercise.setName(Style.BACKSTROKE.name() + i);
+            exercise.setDescription(description + i);
+            exercise.setWarmUpRelax(true);
+            saveExercise(exercise);
+        }
+        for (int i = 18; i < 23; i++) {
+            Exercise exercise = new Exercise(Style.BREASTSTROKE);
+            exercise.setName(Style.BREASTSTROKE.name() + i);
+            exercise.setDescription(description + i);
+            exercise.setWarmUpRelax(true);
+            saveExercise(exercise);
+        }
+    }
+
+    private void saveExercise(Exercise exercise) {
+        exerciseRepository.saveAndFlush(exercise);
+    }
+
+    private StringBuilder addParamsToUrl(StringBuilder url, Long trainingId,
+                                         LocalDateTime startDate,
+                                         LocalDateTime endDate) {
+        if (trainingId != null) {
+            url.append("trainingId=" + trainingId.toString() + "&");
+        }
+        if (startDate != null) {
+            url.append("startDate=" + startDate.toString() + "&");
+        }
+        if (endDate != null) {
+            url.append("endDate=" + endDate.toString());
+        }
+        return url;
     }
 }

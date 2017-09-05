@@ -28,7 +28,6 @@ public class CaloriesCalculator {
         double actualSpeed = series.getDistance() / (series.getAverageDurationOfOneRepeatInSeconds() * 1.0);
         double speedFactor = 1 + CONST_SPEED_FACTOR * (actualSpeed - baseSpeed);
         int totalCalories = (int) (caloriesForSerie * speedFactor);
-        System.out.println(totalCalories);
         return totalCalories;
     }
 }

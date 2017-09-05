@@ -33,6 +33,7 @@ public class TestUtil {
         styleStatistics.add(new StyleStatistics(Style.BUTTERFLY, 100, 230));
 
         User user = new User();
+        user.setWeight(65);
         user.setStyleStatistics(styleStatistics);
         user.setEmail("some@email.com");
         user.setPassword("somePassword");
@@ -47,6 +48,7 @@ public class TestUtil {
         styleStatistics.add(new StyleStatistics(Style.BUTTERFLY, 100, 280));
 
         User user = new User();
+        user.setWeight(65);
         user.setStyleStatistics(styleStatistics);
         user.setEmail("some@email.com");
         user.setPassword("somePassword");
@@ -69,6 +71,12 @@ public class TestUtil {
         HttpEntity<String> entity = new HttpEntity<>(json, headers);
 
         return testRestTemplate.exchange("/users", HttpMethod.PUT, entity, User.class);
+    }
+
+    public User addUser(TestRestTemplate testRestTemplate) {
+        User user = createValidUser();
+        ResponseEntity<User> responseEntity = postUser(testRestTemplate, user);
+        return responseEntity.getBody();
     }
 
     public TrainingRequirements createValidTrainingRequirements() {
