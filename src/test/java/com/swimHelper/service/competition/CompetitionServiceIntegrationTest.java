@@ -1,9 +1,12 @@
 package com.swimHelper.service.competition;
 
 import com.swimHelper.CompetitionTestUtil;
+import com.swimHelper.TestUtil;
 import com.swimHelper.exception.InvalidCompetitionException;
 import com.swimHelper.model.Competition;
+import com.swimHelper.model.User;
 import com.swimHelper.repository.CompetitionRepository;
+import com.swimHelper.repository.UserRepository;
 import com.swimHelper.service.CompetitionService;
 import org.junit.After;
 import org.junit.Before;
@@ -29,6 +32,12 @@ public class CompetitionServiceIntegrationTest {
     @Autowired
     private CompetitionRepository competitionRepository;
 
+    @Autowired
+    private CompetitionService competitionService;
+
+    @Autowired
+    private UserRepository userRepository;
+
     @Before
     public void prepare() {
         cleanUp();
@@ -37,6 +46,7 @@ public class CompetitionServiceIntegrationTest {
     @After
     public void cleanUp() {
         competitionRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -70,5 +80,37 @@ public class CompetitionServiceIntegrationTest {
         //then
         assertThat(resultCompetition.isCancelled()).isTrue();
         assertThat(competitionRepository.findOne(competition.getId()).isCancelled()).isTrue();
+    }
+
+    @Test
+    public void assignToCompetitionTest() throws Exception {
+        //given
+        Competition competition = new CompetitionTestUtil().createValidCompetition();
+        competition = competitionRepository.saveAndFlush(competition);
+        User user = new TestUtil().createValidUser();
+        user = userRepository.saveAndFlush(user);
+        //when
+        Competition competitionReturned = sut.assignToCompetition(competition.getId(), user.getId());
+        //then
+        assertThat(competitionReturned.getParticipants()).contains(user);
+        assertThat(competitionReturned.getParticipantsCounter()).isEqualTo(1);
+        assertThat(userRepository.findOne(user.getId()).getCompetitions()).contains(competitionReturned);
+    }
+
+    @Test
+    public void leaveCompetitionTest() throws Exception {
+        //given
+        Competition competition = new CompetitionTestUtil().createValidCompetition();
+        competition = competitionRepository.saveAndFlush(competition);
+        User user = new TestUtil().createValidUser();
+        user = userRepository.saveAndFlush(user);
+        Competition competitionReturned = sut.assignToCompetition(competition.getId(), user.getId());
+        //when
+        sut.leaveCompetition(competition.getId(), user.getId());
+        //then
+        Competition competition1 = competitionService.getCompetition(competition.getId());
+        assertThat(competition1.getParticipants()).doesNotContain(user);
+        assertThat(competition1.getParticipantsCounter()).isEqualTo(0);
+        assertThat(userRepository.findOne(user.getId()).getCompetitions()).doesNotContain(competitionReturned);
     }
 }

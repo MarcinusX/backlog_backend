@@ -5,6 +5,7 @@ import org.springframework.data.geo.Point;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -12,6 +13,8 @@ import java.util.Set;
  */
 @Entity
 @Data
+@NamedEntityGraph(name = "graph.competition.participants",
+        attributeNodes = @NamedAttributeNode("participants"))
 public class Competition {
     @Id
     @GeneratedValue
@@ -20,8 +23,11 @@ public class Competition {
     private long version;
     private int participantsCounter;
     private int maxParticipants;
-    @ManyToMany
-    private Set<User> participants;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "competitions_participants",
+            joinColumns = @JoinColumn(name = "competition_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<User> participants = new HashSet<>();
     @Column(nullable = false)
     private String name;
     private String description;

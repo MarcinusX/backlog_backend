@@ -9,8 +9,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Marcin Szalek on 04.09.17.
@@ -69,19 +71,42 @@ public class CompetitionService {
     public Competition assignToCompetition(long competitionId, long userId) throws BusinessException {
         User user = userService.getUser(userId);
         Competition competition = safeGet(competitionId);
-        if (competition.getParticipants().contains(user)) {
-            throw new UserAlreadySignedToCompetition();
-        } else if (competition.getParticipantsCounter() >= competition.getMaxParticipants()) {
-            throw new CompetitionFullException();
-        } else {
-            return null;
-        }
+        checkAssignConditions(user, competition);
+
+        Set<User> participants = competition.getParticipants();
+        participants.add(user);
+        competition.setParticipantsCounter(competition.getParticipantsCounter() + 1);
+        competition.setParticipants(participants);
+        return safeEdit(competition);
     }
 
     public void leaveCompetition(long competitionId, long userId) throws BusinessException {
         User user = userService.getUser(userId);
         Competition competition = safeGet(competitionId);
 
+        Set<User> participants = competition.getParticipants();
+        if (!participants.contains(user)) {
+            throw new UserNotSignedToCompetition();
+        } else {
+            participants.remove(user);
+            competition.setParticipantsCounter(competition.getParticipantsCounter() - 1);
+            competition.setParticipants(participants);
+            safeEdit(competition);
+        }
+    }
+
+    private void checkAssignConditions(User user, Competition competition) throws BusinessException {
+        if (competition.getParticipants().contains(user)) {
+            throw new UserAlreadySignedToCompetition();
+        } else if (competition.getParticipantsCounter() >= competition.getMaxParticipants()) {
+            throw new CompetitionFullException();
+        } else if (competition.isCancelled()) {
+            throw new CompetitionExpiredException();
+        } else if (LocalDateTime.now().isAfter(competition.getDateTime())) {
+            throw new CompetitionExpiredException();
+        } else {
+            //all good - pass
+        }
     }
 
     private void assignValues(Competition to, Competition from) {

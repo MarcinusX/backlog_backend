@@ -27,8 +27,10 @@ import java.util.Set;
 @Data
 @NoArgsConstructor //jpa
 @EqualsAndHashCode(exclude = {"trainings", "records", "styleStatistics", "competitions"})
-@ToString(exclude = "trainings")
+@ToString(exclude = {"trainings", "competitions", "records", "styleStatistics"})
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@NamedEntityGraph(name = "graph.user.competitions",
+        attributeNodes = @NamedAttributeNode("competitions"))
 public class User implements UserDetails {
 
     @GeneratedValue
@@ -61,7 +63,7 @@ public class User implements UserDetails {
     @OneToMany
     private Collection<Record> records = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "participants")
     private Set<Competition> competitions;
 
     @OneToMany
