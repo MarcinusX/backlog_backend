@@ -1,6 +1,6 @@
 package com.swimHelper.component.training;
 
-import com.swimHelper.exception.TooManyDistanceTrackerArgumentsException;
+import com.swimHelper.exception.TooManyParametersException;
 import com.swimHelper.exception.TrainingNotFoundException;
 import com.swimHelper.exception.UserNotFoundException;
 import com.swimHelper.model.Training;
@@ -26,13 +26,13 @@ public class DistanceTracker {
         this.trainingRepository = trainingRepository;
     }
 
-    public Integer countDistance(Long userId, Long trainingId, LocalDateTime startDate, LocalDateTime endDate) throws UserNotFoundException, TooManyDistanceTrackerArgumentsException, TrainingNotFoundException {
+    public Integer countDistance(Long userId, Long trainingId, LocalDateTime startDate, LocalDateTime endDate) throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
         User user = userRepository.findOne(userId);
         if (user == null) {
             throw new UserNotFoundException("Could not find user with id: " + user.getId());
         }
         if (trainingId != null && (startDate != null || endDate != null)) {
-            throw new TooManyDistanceTrackerArgumentsException("Too many distance tracker parameters given");
+            throw new TooManyParametersException("Too many distance tracker parameters given");
         } else if (trainingId != null) {
             Training training = trainingRepository.findOne(trainingId);
             if (training == null) {

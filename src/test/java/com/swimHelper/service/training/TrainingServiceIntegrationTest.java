@@ -236,7 +236,7 @@ public class TrainingServiceIntegrationTest {
     }
 
     @Test
-    public void countDistance_whenUser_shouldReturnDistanceOfAllTrainingsForUser() throws UserNotFoundException, TooManyDistanceTrackerArgumentsException, TrainingNotFoundException {
+    public void countDistance_whenUser_shouldReturnDistanceOfAllTrainingsForUser() throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
         //given
         User user = testUtil.createValidUser();
         User savedUser = userRepository.saveAndFlush(user);
@@ -248,7 +248,7 @@ public class TrainingServiceIntegrationTest {
     }
 
     @Test
-    public void countDistance_whenUserAndDates_shouldReturnDistanceTrainingsBetweenDates() throws UserNotFoundException, TooManyDistanceTrackerArgumentsException, TrainingNotFoundException {
+    public void countDistance_whenUserAndDates_shouldReturnDistanceTrainingsBetweenDates() throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
         //given
         User user = testUtil.createValidUser();
         User savedUser = userRepository.saveAndFlush(user);

@@ -155,7 +155,7 @@ public class TrainingControllerStatusCodesTest {
         trainingTestUtil.addExercises(testRestTemplate);
         trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
         //when
-        ResponseEntity<DistanceTrackerResult> responseEntity = trainingTestUtil.countDistance(testRestTemplate, null, null, null);
+        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate, null, null, null);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -171,7 +171,7 @@ public class TrainingControllerStatusCodesTest {
         LocalDateTime startDate = LocalDateTime.of(2017, 7, 1, 6, 40, 45);
         LocalDateTime endDate = LocalDateTime.of(2017, 8, 30, 6, 40, 45);
         //when
-        ResponseEntity<DistanceTrackerResult> responseEntity = trainingTestUtil.countDistance(testRestTemplate, 1L, startDate, endDate);
+        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate, 1L, startDate, endDate);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

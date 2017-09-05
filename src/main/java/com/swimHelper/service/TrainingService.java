@@ -62,7 +62,7 @@ public class TrainingService {
         return trainingRepository.saveAndFlush(training);
     }
 
-    public Integer countDistance(Long userId, Long trainingId, LocalDateTime startDate, LocalDateTime endDate) throws UserNotFoundException, TooManyDistanceTrackerArgumentsException, TrainingNotFoundException {
+    public Integer countDistance(Long userId, Long trainingId, LocalDateTime startDate, LocalDateTime endDate) throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
         return distanceTracker.countDistance(userId, trainingId, startDate, endDate);
     }
 

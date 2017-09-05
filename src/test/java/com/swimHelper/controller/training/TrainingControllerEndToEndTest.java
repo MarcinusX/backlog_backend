@@ -215,7 +215,7 @@ public class TrainingControllerEndToEndTest {
         trainingTestUtil.addExercises(testRestTemplate);
         trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
         //when
-        ResponseEntity<DistanceTrackerResult> responseEntity = trainingTestUtil.countDistance(testRestTemplate, null, null, null);
+        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate, null, null, null);
         int distanceFromResponse = responseEntity.getBody().getDistance();
         //then
         assertThat(distanceFromResponse).isGreaterThan(0);
@@ -230,7 +230,7 @@ public class TrainingControllerEndToEndTest {
         trainingTestUtil.addExercises(testRestTemplate);
         Training training = trainingTestUtil.addTraining(testRestTemplate, trainingRequirements);
         //when
-        ResponseEntity<DistanceTrackerResult> responseEntity = trainingTestUtil.countDistance(testRestTemplate,
+        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate,
                 training.getId(),
                 null,
                 null);
@@ -250,7 +250,7 @@ public class TrainingControllerEndToEndTest {
         LocalDateTime startDate = LocalDateTime.of(2100, 7, 30, 6, 40, 45);
         LocalDateTime endDate = LocalDateTime.of(2100, 11, 30, 6, 40, 45);
         //when
-        ResponseEntity<DistanceTrackerResult> responseEntity = trainingTestUtil.countDistance(testRestTemplate,
+        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate,
                 null,
                 startDate,
                 endDate);

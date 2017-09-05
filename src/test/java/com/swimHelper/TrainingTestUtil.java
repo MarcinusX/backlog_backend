@@ -82,10 +82,10 @@ public class TrainingTestUtil {
                 exchange("/trainings", HttpMethod.PUT, entity, Training.class);
     }
 
-    public ResponseEntity<DistanceTrackerResult> countDistance(TestRestTemplate testRestTemplate,
-                                                               Long trainingId,
-                                                               LocalDateTime startDate,
-                                                               LocalDateTime endDate) {
+    public ResponseEntity<IntegerWrapper> countDistance(TestRestTemplate testRestTemplate,
+                                                        Long trainingId,
+                                                        LocalDateTime startDate,
+                                                        LocalDateTime endDate) {
         StringBuilder url = new StringBuilder().append("/trainings?");
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
@@ -103,7 +103,7 @@ public class TrainingTestUtil {
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
         return testRestTemplate.withBasicAuth(USER_EMAIL, USER_PASSWORD).
-                exchange(url.toString(), HttpMethod.GET, entity, DistanceTrackerResult.class);
+                exchange(url.toString(), HttpMethod.GET, entity, IntegerWrapper.class);
     }
 
     public void addExercises(TestRestTemplate testRestTemplate) {

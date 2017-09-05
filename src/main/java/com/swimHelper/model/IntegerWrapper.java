@@ -6,6 +6,6 @@ import lombok.Data;
  * Created by mstobieniecka on 2017-09-05.
  */
 @Data
-public class DistanceTrackerResult {
+public class IntegerWrapper {
     private Integer distance;
 }
