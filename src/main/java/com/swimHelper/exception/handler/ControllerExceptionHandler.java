@@ -94,4 +94,11 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         logger.error("Invalid training body.", ex.getMessage());
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
+
+    @ExceptionHandler(value = TooManyDistanceTrackerArgumentsException.class)
+    protected ResponseEntity<Object> handleTooManyDistanceTrackerArgumentsException(TooManyDistanceTrackerArgumentsException ex, WebRequest request) {
+        ApiError apiError = new ApiError("Invalid number of parameters given to distance tracker", ex);
+        logger.error("Invalid number of parameters given to distance tracker.", ex.getMessage());
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
 }

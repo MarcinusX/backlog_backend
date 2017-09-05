@@ -3,10 +3,7 @@ package com.swimHelper.controller.training;
 import com.swimHelper.ExerciseSeriesRepository;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
-import com.swimHelper.model.ExerciseSeries;
-import com.swimHelper.model.Training;
-import com.swimHelper.model.TrainingRequirements;
-import com.swimHelper.model.User;
+import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.repository.TrainingRepository;
 import com.swimHelper.repository.UserRepository;
@@ -22,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,5 +144,35 @@ public class TrainingControllerStatusCodesTest {
         ResponseEntity<Training> responseEntity = trainingTestUtil.putTraining(testRestTemplate, addedTraining);
         //when
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    public void countDistance_whenNoParameters_returns200() throws Exception {
+        //given
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        testUtil.createAdminForTests(); //required to add exercises
+        User user = trainingTestUtil.addUser(testRestTemplate);
+        trainingTestUtil.addExercises(testRestTemplate);
+        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
+        //when
+        ResponseEntity<DistanceTrackerResult> responseEntity = trainingTestUtil.countDistance(testRestTemplate, null, null, null);
+        //then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    public void countDistance_whenTooManyParameters_returns400() throws Exception {
+        //given
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        testUtil.createAdminForTests(); //required to add exercises
+        User user = trainingTestUtil.addUser(testRestTemplate);
+        trainingTestUtil.addExercises(testRestTemplate);
+        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
+        LocalDateTime startDate = LocalDateTime.of(2017, 7, 1, 6, 40, 45);
+        LocalDateTime endDate = LocalDateTime.of(2017, 8, 30, 6, 40, 45);
+        //when
+        ResponseEntity<DistanceTrackerResult> responseEntity = trainingTestUtil.countDistance(testRestTemplate, 1L, startDate, endDate);
+        //then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 }

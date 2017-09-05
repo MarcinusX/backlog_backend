@@ -1,5 +1,6 @@
 package com.swimHelper.service;
 
+import com.swimHelper.component.training.DistanceTracker;
 import com.swimHelper.exception.*;
 import com.swimHelper.generator.TrainingGenerator;
 import com.swimHelper.model.ExerciseSeries;
@@ -27,12 +28,17 @@ public class TrainingService {
     private final TrainingGenerator trainingGenerator;
     private final UserRepository userRepository;
     private final TrainingRepository trainingRepository;
+    private final DistanceTracker distanceTracker;
 
     @Autowired
-    public TrainingService(TrainingGenerator trainingGenerator, UserRepository userRepository, TrainingRepository trainingRepository) {
+    public TrainingService(TrainingGenerator trainingGenerator,
+                           UserRepository userRepository,
+                           TrainingRepository trainingRepository,
+                           DistanceTracker distanceTracker) {
         this.trainingGenerator = trainingGenerator;
         this.userRepository = userRepository;
         this.trainingRepository = trainingRepository;
+        this.distanceTracker = distanceTracker;
     }
 
     public Training generateTraining(TrainingRequirements trainingRequirements, Long userId) throws UnsatisfiedTimeRequirementsException, MissingTrainingRequirementsException, UserNotFoundException {
@@ -54,6 +60,10 @@ public class TrainingService {
             //TODO: throw Exception
         }
         return trainingRepository.saveAndFlush(training);
+    }
+
+    public Integer countDistance(Long userId, Long trainingId, LocalDateTime startDate, LocalDateTime endDate) throws UserNotFoundException, TooManyDistanceTrackerArgumentsException, TrainingNotFoundException {
+        return distanceTracker.countDistance(userId, trainingId, startDate, endDate);
     }
 
     public Training setTrainingCompletion(Training training) throws TrainingNotFoundException, InvalidTrainingException {

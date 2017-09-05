@@ -16,4 +16,19 @@ import java.util.List;
 public interface TrainingRepository extends JpaRepository<Training, Long> {
     @Query("select t from Training t where t.hasUserBeenNotified = false and t.notificationDateTime is not null and t.notificationDateTime < :currentDate ")
     List<Training> findTrainingsToBeNotified(@Param("currentDate") LocalDateTime currentLocalDateTime);
+
+    @Query("select t from Training t where t.user.id = :userId")
+    List<Training> findTrainingsByUser(@Param("userId") Long userId);
+
+    @Query("select t from Training t where t.user.id = :userId " +
+            " and t.id = :trainingId")
+    Training findTrainingByUserAndId(@Param("userId") Long userId,
+                                     @Param("trainingId") Long trainingId);
+
+    @Query("select t from Training t where t.user.id = :userId " +
+            " and t.trainingDateTime >= :startDate" +
+            " and t.trainingDateTime <= :endDate")
+    List<Training> findTrainingsByUserAndDates(@Param("userId") Long userId,
+                                               @Param("startDate") LocalDateTime startDate,
+                                               @Param("endDate") LocalDateTime endDate);
 }
