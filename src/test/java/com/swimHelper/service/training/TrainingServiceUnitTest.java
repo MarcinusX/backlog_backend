@@ -1,6 +1,7 @@
 package com.swimHelper.service.training;
 
 import com.swimHelper.TrainingTestUtil;
+import com.swimHelper.component.training.DistanceTracker;
 import com.swimHelper.exception.InvalidTrainingException;
 import com.swimHelper.exception.TrainingNotFoundException;
 import com.swimHelper.generator.TrainingGenerator;
@@ -24,7 +25,8 @@ public class TrainingServiceUnitTest {
     private final TrainingRepository trainingRepositoryMock = mock(TrainingRepository.class);
     private final TrainingGenerator trainingGeneratorMock = mock(TrainingGenerator.class);
     private final UserRepository userRepositoryMock = mock(UserRepository.class);
-    final TrainingService sut = new TrainingService(trainingGeneratorMock, userRepositoryMock, trainingRepositoryMock);
+    private final DistanceTracker distanceTrackerMock = mock(DistanceTracker.class);
+    final TrainingService sut = new TrainingService(trainingGeneratorMock, userRepositoryMock, trainingRepositoryMock, distanceTrackerMock);
 
     @Test
     public void putTraining_ifTrainingNotExists_throwsException() throws Exception {

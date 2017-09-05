@@ -22,7 +22,9 @@ public class LoggingAspect {
     public void trace(JoinPoint joinPoint) {
         logger.info("==>Method called: " + joinPoint.getSignature());
         for (Object o : joinPoint.getArgs()) {
-            logger.info("--With param: " + o.toString());
+            if (o != null) {
+                logger.info("--With param: " + o.toString());
+            }
         }
 
     }

@@ -7,6 +7,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,6 +82,30 @@ public class TrainingTestUtil {
                 exchange("/trainings", HttpMethod.PUT, entity, Training.class);
     }
 
+    public ResponseEntity<DistanceTrackerResult> countDistance(TestRestTemplate testRestTemplate,
+                                                               Long trainingId,
+                                                               LocalDateTime startDate,
+                                                               LocalDateTime endDate) {
+        StringBuilder url = new StringBuilder().append("/trainings?");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+
+        // Add url parameters
+        if (trainingId != null) {
+            url.append("trainingId=" + trainingId.toString() + "&");
+        }
+        if (startDate != null) {
+            url.append("startDate=" + startDate.toString() + "&");
+        }
+        if (endDate != null) {
+            url.append("endDate=" + endDate.toString());
+        }
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        return testRestTemplate.withBasicAuth(USER_EMAIL, USER_PASSWORD).
+                exchange(url.toString(), HttpMethod.GET, entity, DistanceTrackerResult.class);
+    }
+
     public void addExercises(TestRestTemplate testRestTemplate) {
         for (int i = 0; i < 6; i++) {
             Exercise exercise = new Exercise(Style.BACKSTROKE);
@@ -132,5 +157,17 @@ public class TrainingTestUtil {
         user.setPassword("somePassword");
         training.setUser(user);
         return training;
+    }
+
+    public void addTrainings(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements) {
+        for (int i = 0; i < 5; i++) {
+            addTraining(testRestTemplate, trainingRequirements);
+        }
+    }
+
+    public Training addTraining(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements) {
+        Training training = postTrainingRequirements(testRestTemplate, trainingRequirements).getBody();
+        training.getExerciseSeries().forEach(es -> es.setCompletedRepeats(3));
+        return putTraining(testRestTemplate, training).getBody();
     }
 }

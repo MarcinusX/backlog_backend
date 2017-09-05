@@ -2,9 +2,7 @@ package com.swimHelper.service.training;
 
 import com.swimHelper.ExerciseSeriesRepository;
 import com.swimHelper.TestUtil;
-import com.swimHelper.exception.BusinessException;
-import com.swimHelper.exception.MissingTrainingRequirementsException;
-import com.swimHelper.exception.UnsatisfiedTimeRequirementsException;
+import com.swimHelper.exception.*;
 import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.repository.TrainingRepository;
@@ -18,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -118,6 +119,9 @@ public class TrainingServiceIntegrationTest {
         Collection<Style> styles = new ArrayList<>();
         styles.add(Style.BUTTERFLY);
         trainingRequirements.setStyles(styles);
+        LocalDateTime dateTime = LocalDateTime.now();
+        LocalDateTime nextMonday = dateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        trainingRequirements.setTrainingDateTime(nextMonday);
         //when
         Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
         //then
@@ -137,6 +141,9 @@ public class TrainingServiceIntegrationTest {
         trainingRequirements.setMaxDurationInSeconds(3000);
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
         trainingRequirements.setStyles(Arrays.asList(Style.BACKSTROKE, Style.FREESTYLE));
+        LocalDateTime dateTime = LocalDateTime.now();
+        LocalDateTime nextMonday = dateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        trainingRequirements.setTrainingDateTime(nextMonday);
         //when
         Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
         //then
@@ -157,6 +164,9 @@ public class TrainingServiceIntegrationTest {
         trainingRequirements.setMaxDurationInSeconds(3000);
         trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
         trainingRequirements.setStyles(Arrays.asList(Style.BACKSTROKE, Style.FREESTYLE, Style.BREASTSTROKE));
+        LocalDateTime dateTime = LocalDateTime.now();
+        LocalDateTime nextMonday = dateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        trainingRequirements.setTrainingDateTime(nextMonday);
         //when
         Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
         //then
@@ -177,6 +187,9 @@ public class TrainingServiceIntegrationTest {
         trainingRequirements.setMaxDurationInSeconds(900);
         trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
         trainingRequirements.setStyles(Arrays.asList(Style.BACKSTROKE, Style.FREESTYLE));
+        LocalDateTime dateTime = LocalDateTime.now();
+        LocalDateTime nextMonday = dateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        trainingRequirements.setTrainingDateTime(nextMonday);
         //when
         Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
         //then
@@ -192,6 +205,9 @@ public class TrainingServiceIntegrationTest {
         TrainingRequirements trainingRequirements = new TrainingRequirements();
         trainingRequirements.setIntensityLevel(IntensityLevel.LOW);
         trainingRequirements.setMaxDurationInSeconds(600);
+        LocalDateTime dateTime = LocalDateTime.now();
+        LocalDateTime nextMonday = dateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        trainingRequirements.setTrainingDateTime(nextMonday);
         Collection<Style> styles = new ArrayList<>();
         styles.add(Style.BUTTERFLY);
         trainingRequirements.setStyles(styles);
@@ -210,10 +226,37 @@ public class TrainingServiceIntegrationTest {
         trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
         trainingRequirements.setMaxDurationInSeconds(3000);
         trainingRequirements.setStyles(Arrays.asList(Style.BACKSTROKE, Style.FREESTYLE));
+        LocalDateTime dateTime = LocalDateTime.now();
+        LocalDateTime nextMonday = dateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        trainingRequirements.setTrainingDateTime(nextMonday);
         //when
         Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
         //then
         assertThat(training.getExerciseSeries().size()).isGreaterThan(2);
+    }
+
+    @Test
+    public void countDistance_whenUser_shouldReturnDistanceOfAllTrainingsForUser() throws UserNotFoundException, TooManyDistanceTrackerArgumentsException, TrainingNotFoundException {
+        //given
+        User user = testUtil.createValidUser();
+        User savedUser = userRepository.saveAndFlush(user);
+        addTrainings(savedUser);
+        //when
+        int distance = sut.countDistance(savedUser.getId(), null, null, null);
+        //given
+        assertThat(distance).isGreaterThan(0);
+    }
+
+    @Test
+    public void countDistance_whenUserAndDates_shouldReturnDistanceTrainingsBetweenDates() throws UserNotFoundException, TooManyDistanceTrackerArgumentsException, TrainingNotFoundException {
+        //given
+        User user = testUtil.createValidUser();
+        User savedUser = userRepository.saveAndFlush(user);
+        addTrainings(savedUser); //only one training is between given dates
+        //when
+        int distance = sut.countDistance(savedUser.getId(), null, LocalDateTime.of(2017, 1, 1, 6, 40, 45), LocalDateTime.of(2017, 1, 30, 6, 40, 45));
+        //given
+        assertThat(distance).isEqualTo(4500);
     }
 
     private void addExercisesInSpecifiedStyle(Style style) {
@@ -223,6 +266,16 @@ public class TrainingServiceIntegrationTest {
             exercise.setName(style.name() + i);
             exercise.setDescription(description + i);
             saveExercise(exercise);
+        }
+    }
+
+    private void addTrainings(User user) {
+        for (int i = 1; i < 6; i++) {
+            Training training = testUtil.createValidTraining();
+            training.setTrainingDateTime(LocalDateTime.of(2017, i, 10, 6, 40, 45));
+            training.getExerciseSeries().forEach(es -> es.setCompletedRepeats(3));
+            training.setUser(user);
+            trainingRepository.saveAndFlush(training);
         }
     }
 
