@@ -30,4 +30,5 @@ public class Training {
     private User user;
     private boolean hasUserBeenNotified;
     private LocalDateTime notificationDateTime;
+    private LocalDateTime trainingDateTime;
 }
