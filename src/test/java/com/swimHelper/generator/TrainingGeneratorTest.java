@@ -1,7 +1,6 @@
 package com.swimHelper.generator;
 
 import com.swimHelper.TestUtil;
-import com.swimHelper.exception.BusinessException;
 import com.swimHelper.exception.MissingTrainingRequirementsException;
 import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
@@ -161,7 +160,7 @@ public class TrainingGeneratorTest {
 
     //when user generates training the most important are given styles
     @Test
-    public void generateTraining_whenStyles_shouldReturnTrainingInGivenStyles() throws BusinessException {
+    public void generateTraining_whenStyles_shouldReturnTrainingInGivenStyles() throws Exception {
         //given
         User user = testUtil.createValidUser();
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
@@ -207,7 +206,7 @@ public class TrainingGeneratorTest {
     }
 
     @Test
-    public void generateTraining_whenMaxDuration_shouldReturnTrainingWithGivenMaxDuration() throws BusinessException {
+    public void generateTraining_whenMaxDuration_shouldReturnTrainingWithGivenMaxDuration() throws Exception {
         //given
         User user = testUtil.createValidUser();
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
@@ -224,7 +223,7 @@ public class TrainingGeneratorTest {
     }
 
     @Test
-    public void adaptTrainingToMaxDistance_whenMaxDistanceIsShorterThanTrainingDistance_shouldReturnTrainingThatMaxDistanceIsLongerOrEqualToTrainingDistance() throws BusinessException {
+    public void adaptTrainingToMaxDistance_whenMaxDistanceIsShorterThanTrainingDistance_shouldReturnTrainingThatMaxDistanceIsLongerOrEqualToTrainingDistance() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDistance(500);
@@ -240,7 +239,7 @@ public class TrainingGeneratorTest {
     }
 
     @Test
-    public void adaptTrainingToMaxDistance_whenMaxDistanceIsLongerThanTrainingDistance_shouldReturnTheSameTrainingAsGivenAsParameter() throws BusinessException {
+    public void adaptTrainingToMaxDistance_whenMaxDistanceIsLongerThanTrainingDistance_shouldReturnTheSameTrainingAsGivenAsParameter() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDistance(8000);
@@ -252,7 +251,7 @@ public class TrainingGeneratorTest {
     }
 
     @Test
-    public void adaptTrainingToMaxDistance_whenMaxDistanceIsTheSameAsTrainingDistance_shouldReturnTheSameTrainingAsGivenAsParameter() throws BusinessException {
+    public void adaptTrainingToMaxDistance_whenMaxDistanceIsTheSameAsTrainingDistance_shouldReturnTheSameTrainingAsGivenAsParameter() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDistance(7500);
@@ -264,7 +263,7 @@ public class TrainingGeneratorTest {
     }
 
     @Test
-    public void generateTraining_whenNoExercisesInGivenStyles_shouldReturn2ExerciseSeries() throws BusinessException {
+    public void generateTraining_whenNoExercisesInGivenStyles_shouldReturn2ExerciseSeries() throws Exception {
         //given
         User user = testUtil.createValidUser();
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();

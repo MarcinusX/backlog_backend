@@ -56,7 +56,7 @@ public class ExerciseService {
         }
     }
 
-    public Exercise getExercise(Long id) throws ExerciseNotFoundException {
+    public Exercise getExercise(Long id) throws BusinessException {
         Exercise exercise = exerciseRepository.findOne(id);
         if (exercise == null) {
             throw new ExerciseNotFoundException(NOT_FOUND_EXERCISE_MESSAGE);

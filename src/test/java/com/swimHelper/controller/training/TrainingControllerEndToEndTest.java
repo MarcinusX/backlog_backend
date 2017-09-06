@@ -3,7 +3,6 @@ package com.swimHelper.controller.training;
 import com.swimHelper.ExerciseSeriesRepository;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
-import com.swimHelper.exception.BusinessException;
 import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.repository.TrainingRepository;
@@ -66,7 +65,7 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void generateTrainingTest_shouldReturnMoreThanTwoExerciseSeriesNotLongerThan3000Seconds() throws BusinessException {
+    public void generateTrainingTest_shouldReturnMoreThanTwoExerciseSeriesNotLongerThan3000Seconds() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
@@ -88,7 +87,7 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void generateTrainingTest_shouldReturnTrainingOnlyWarmUpExercises() throws BusinessException {
+    public void generateTrainingTest_shouldReturnTrainingOnlyWarmUpExercises() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(900);
@@ -111,7 +110,7 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void generateTrainingTest_shouldReturnMoreThan0ExerciseSeriesNotLongerThan3000Seconds() throws BusinessException {
+    public void generateTrainingTest_shouldReturnMoreThan0ExerciseSeriesNotLongerThan3000Seconds() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(3000);
@@ -135,7 +134,7 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void generateTrainingTest_shouldReturnMoreThan2ExerciseSeriesNotLongerThan5000Seconds() throws BusinessException {
+    public void generateTrainingTest_shouldReturnMoreThan2ExerciseSeriesNotLongerThan5000Seconds() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.getStyles().addAll(Arrays.asList(Style.BREASTSTROKE, Style.BUTTERFLY));
@@ -160,7 +159,7 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void putTrainingTest_shouldReturnTrainingWithOneExerciseSeriesUpdated() throws BusinessException {
+    public void putTrainingTest_shouldReturnTrainingWithOneExerciseSeriesUpdated() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
@@ -184,7 +183,7 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void putTrainingTest_shouldReturnTrainingWithEveryExerciseSeriesUpdated() throws BusinessException {
+    public void putTrainingTest_shouldReturnTrainingWithEveryExerciseSeriesUpdated() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
@@ -207,7 +206,7 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void countDistanceTest_shouldReturnDistanceOfAllTrainingsForUser() throws BusinessException {
+    public void countDistanceTest_shouldReturnDistanceOfAllTrainingsForUser() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
@@ -222,7 +221,7 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void countDistanceTest_shouldReturnDistanceOfOneTrainingForUser() throws BusinessException {
+    public void countDistanceTest_shouldReturnDistanceOfOneTrainingForUser() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
@@ -240,7 +239,7 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void countDistanceTest_shouldReturnDistanceOfTrainingsBetweenDatesForUser() throws BusinessException {
+    public void countDistanceTest_shouldReturnDistanceOfTrainingsBetweenDatesForUser() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises

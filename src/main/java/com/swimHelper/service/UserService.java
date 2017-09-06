@@ -89,7 +89,7 @@ public class UserService implements UserDetailsService {
         return userFromDB;
     }
 
-    private User getUserForUpdate(User user) throws InvalidUserException, UserNotFoundException {
+    private User getUserForUpdate(User user) throws BusinessException {
         if (user == null || user.getId() == null) {
             throw new InvalidUserException("Invalid user");
         }

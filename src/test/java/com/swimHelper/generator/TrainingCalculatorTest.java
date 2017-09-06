@@ -1,7 +1,6 @@
 package com.swimHelper.generator;
 
 import com.swimHelper.TestUtil;
-import com.swimHelper.exception.BusinessException;
 import com.swimHelper.exception.UnsatisfiedTimeRequirementsException;
 import com.swimHelper.model.*;
 import com.swimHelper.util.RandomGenerator;
@@ -24,7 +23,7 @@ public class TrainingCalculatorTest {
     private final TrainingCalculator sut = new TrainingCalculator(random);
 
     @Test
-    public void getNumberOfExerciseSeries_whenLittleMaxDurationAndLowIntensityLevel_shouldThrowException() throws BusinessException {
+    public void getNumberOfExerciseSeries_whenLittleMaxDurationAndLowIntensityLevel_shouldThrowException() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(600);
@@ -35,7 +34,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenAverageMaxDurationAndLowIntensityLevel_shouldReturnBetween4and6ExerciseSeries() throws BusinessException {
+    public void getNumberOfExerciseSeries_whenAverageMaxDurationAndLowIntensityLevel_shouldReturnBetween4and6ExerciseSeries() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(3300);
@@ -47,7 +46,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenLongMaxDurationAndLowIntensityLevel_shouldReturn5or6ExerciseSeries() throws BusinessException {
+    public void getNumberOfExerciseSeries_whenLongMaxDurationAndLowIntensityLevel_shouldReturn5or6ExerciseSeries() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(3700);
@@ -59,7 +58,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenLongMaxDurationAndHighIntensityLevel_shouldReturnBetween7and9ExerciseSeries() throws BusinessException {
+    public void getNumberOfExerciseSeries_whenLongMaxDurationAndHighIntensityLevel_shouldReturnBetween7and9ExerciseSeries() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
@@ -72,7 +71,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenAverageMaxDurationAndHighIntensityLevel_shouldReturnBetween7And9ExerciseSeries() throws BusinessException {
+    public void getNumberOfExerciseSeries_whenAverageMaxDurationAndHighIntensityLevel_shouldReturnBetween7And9ExerciseSeries() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
@@ -85,7 +84,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenShortMaxDurationAndHighIntensityLevel_shouldReturn1ExerciseSeries() throws BusinessException {
+    public void getNumberOfExerciseSeries_whenShortMaxDurationAndHighIntensityLevel_shouldReturn1ExerciseSeries() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
@@ -97,7 +96,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getNumberOfExerciseSeries_whenLittleMaxDuration_shouldReturn1ExerciseSeries() throws BusinessException {
+    public void getNumberOfExerciseSeries_whenLittleMaxDuration_shouldReturn1ExerciseSeries() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
@@ -223,7 +222,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getNumberOfRepeatsInOneSeries_whenSeriesDurationAndOneRepeatDurationAndBreak_shouldReturn3Repeats() throws BusinessException {
+    public void getNumberOfRepeatsInOneSeries_whenSeriesDurationAndOneRepeatDurationAndBreak_shouldReturn3Repeats() throws Exception {
         //given
         int durationOfOneExerciseRepeat = 200;
         int durationOfSeries = 800;
@@ -235,7 +234,7 @@ public class TrainingCalculatorTest {
     }
 
     @Test
-    public void getNumberOfRepeatsInOneSeries_whenSeriesDurationAndOneRepeatDurationAndBreak_shouldReturn0Repeats() throws BusinessException {
+    public void getNumberOfRepeatsInOneSeries_whenSeriesDurationAndOneRepeatDurationAndBreak_shouldReturn0Repeats() throws Exception {
         //given
         int durationOfOneExerciseRepeat = 200;
         int durationOfSeries = 200;

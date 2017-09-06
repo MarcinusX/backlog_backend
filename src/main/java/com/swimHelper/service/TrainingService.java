@@ -1,7 +1,10 @@
 package com.swimHelper.service;
 
 import com.swimHelper.component.training.DistanceTracker;
-import com.swimHelper.exception.*;
+import com.swimHelper.exception.BusinessException;
+import com.swimHelper.exception.InvalidTrainingException;
+import com.swimHelper.exception.TrainingNotFoundException;
+import com.swimHelper.exception.UserNotFoundException;
 import com.swimHelper.generator.TrainingGenerator;
 import com.swimHelper.model.ExerciseSeries;
 import com.swimHelper.model.Training;
@@ -41,7 +44,7 @@ public class TrainingService {
         this.distanceTracker = distanceTracker;
     }
 
-    public Training generateTraining(TrainingRequirements trainingRequirements, Long userId) throws UnsatisfiedTimeRequirementsException, MissingTrainingRequirementsException, UserNotFoundException {
+    public Training generateTraining(TrainingRequirements trainingRequirements, Long userId) throws BusinessException {
         User user = userRepository.findOne(userId);
         if (user == null) {
             throw new UserNotFoundException("Could not find user with id: " + user.getId());
@@ -54,20 +57,21 @@ public class TrainingService {
         return trainingRepository.findTrainingsToBeNotified(LocalDateTime.now());
     }
 
-    //TODO: ADD TESTS
-    public Training updateTraining(Training training) {
-        if (trainingRepository.findOne(training.getId()) == null) {
-            //TODO: throw Exception
-        }
-        return trainingRepository.saveAndFlush(training);
+    public Training setUserNotified(Long trainingId) throws BusinessException {
+        Training trainingFromDb = getTrainingForUpdate(trainingId);
+        trainingFromDb.setHasUserBeenNotified(true);
+        return trainingRepository.saveAndFlush(trainingFromDb);
     }
 
-    public Integer countDistance(Long userId, Long trainingId, LocalDateTime startDate, LocalDateTime endDate) throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
+    public int countDistance(Long userId, Long trainingId, LocalDateTime startDate, LocalDateTime endDate) throws BusinessException {
         return distanceTracker.countDistance(userId, trainingId, startDate, endDate);
     }
 
-    public Training setTrainingCompletion(Training training) throws TrainingNotFoundException, InvalidTrainingException {
-        Training trainingFromDb = getTrainingForUpdate(training);
+    public Training setTrainingCompletion(Training training) throws BusinessException {
+        if (training == null || training.getId() == null) {
+            throw new InvalidTrainingException("Invalid training");
+        }
+        Training trainingFromDb = getTrainingForUpdate(training.getId());
         updateTrainingSeries(training, trainingFromDb);
         try {
             return trainingRepository.saveAndFlush(trainingFromDb);
@@ -90,13 +94,13 @@ public class TrainingService {
         });
     }
 
-    private Training getTrainingForUpdate(Training training) throws InvalidTrainingException, TrainingNotFoundException {
-        if (training == null || training.getId() == null) {
+    private Training getTrainingForUpdate(Long trainingId) throws BusinessException {
+        if (trainingId == null) {
             throw new InvalidTrainingException("Invalid training");
         }
-        Training trainingFromDb = trainingRepository.findOne(training.getId());
+        Training trainingFromDb = trainingRepository.findOne(trainingId);
         if (trainingFromDb == null) {
-            throw new TrainingNotFoundException("Could not find training with id: " + training.getId());
+            throw new TrainingNotFoundException("Could not find training with id: " + trainingId);
         }
         return trainingFromDb;
     }

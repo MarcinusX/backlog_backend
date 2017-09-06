@@ -1,7 +1,7 @@
 package com.swimHelper.generator;
 
+import com.swimHelper.exception.BusinessException;
 import com.swimHelper.exception.MissingTrainingRequirementsException;
-import com.swimHelper.exception.UnsatisfiedTimeRequirementsException;
 import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.util.RandomGenerator;
@@ -32,7 +32,7 @@ public class TrainingGenerator {
         this.randomGenerator = randomGenerator;
     }
 
-    public Training generateTraining(User user, TrainingRequirements trainingRequirements) throws MissingTrainingRequirementsException, UnsatisfiedTimeRequirementsException {
+    public Training generateTraining(User user, TrainingRequirements trainingRequirements) throws BusinessException {
         if (!areTrainingRequirementsGiven(user, trainingRequirements)) {
             throw new MissingTrainingRequirementsException();
         }
@@ -70,7 +70,7 @@ public class TrainingGenerator {
 
     private void addExercises(User user, TrainingRequirements trainingRequirements,
                               Training training, int numberOfExerciseSeries, List<Exercise> matchingExercises)
-            throws UnsatisfiedTimeRequirementsException {
+            throws BusinessException {
         int durationOfOneExerciseSeriesInSeconds = trainingCalculator.getDurationOfOneExerciseSeries(numberOfExerciseSeries, trainingRequirements.getMaxDurationInSeconds() - 900);
         for (int i = 0; i < numberOfExerciseSeries; i++) {
             Exercise exercise = matchingExercises.get(randomGenerator.generateRandomInt(matchingExercises.size()));
@@ -120,7 +120,7 @@ public class TrainingGenerator {
                 && isIntensityLevelSet && doesUserChoseTrainingDateTime);
     }
 
-    private ExerciseSeries createExerciseSeries(Exercise exercise, TrainingRequirements trainingRequirements, User user, int durationOfOneSeries) throws UnsatisfiedTimeRequirementsException {
+    private ExerciseSeries createExerciseSeries(Exercise exercise, TrainingRequirements trainingRequirements, User user, int durationOfOneSeries) throws BusinessException {
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         int distance = trainingCalculator.getRandomDistanceForIntensityLevel(trainingRequirements.getIntensityLevel().getDistances());
         exerciseSeries.setDistance(distance);
@@ -138,7 +138,7 @@ public class TrainingGenerator {
         return exerciseSeries;
     }
 
-    private void addExerciseSeries(Training training, Exercise exercise, TrainingRequirements trainingRequirements, User user, int durationOfOneSeries) throws UnsatisfiedTimeRequirementsException {
+    private void addExerciseSeries(Training training, Exercise exercise, TrainingRequirements trainingRequirements, User user, int durationOfOneSeries) throws BusinessException {
         ExerciseSeries exerciseSeries = createExerciseSeries(exercise, trainingRequirements, user, durationOfOneSeries);
         if (exerciseSeries.getRepeats() > 0) {
             training.getExerciseSeries().add(exerciseSeries);

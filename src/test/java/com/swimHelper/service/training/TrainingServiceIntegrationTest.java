@@ -3,7 +3,9 @@ package com.swimHelper.service.training;
 import com.swimHelper.ExerciseSeriesRepository;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
-import com.swimHelper.exception.*;
+import com.swimHelper.exception.BusinessException;
+import com.swimHelper.exception.MissingTrainingRequirementsException;
+import com.swimHelper.exception.UnsatisfiedTimeRequirementsException;
 import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.repository.TrainingRepository;
@@ -216,7 +218,7 @@ public class TrainingServiceIntegrationTest {
     }
 
     @Test
-    public void generateTraining_whenUserWithWeakStatistics_shouldGenerateCorrectlyTraining() throws BusinessException {
+    public void generateTraining_whenUserWithWeakStatistics_shouldGenerateCorrectlyTraining() throws Exception {
         //given
         User user = testUtil.createValidUserWithWeakStatistics();
         User savedUser = userRepository.saveAndFlush(user);
@@ -234,7 +236,7 @@ public class TrainingServiceIntegrationTest {
     }
 
     @Test
-    public void countDistance_whenUser_shouldReturnDistanceOfAllTrainingsForUser() throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
+    public void countDistance_whenUser_shouldReturnDistanceOfAllTrainingsForUser() throws Exception {
         //given
         User user = testUtil.createValidUser();
         User savedUser = userRepository.saveAndFlush(user);
@@ -246,7 +248,7 @@ public class TrainingServiceIntegrationTest {
     }
 
     @Test
-    public void countDistance_whenUserAndDates_shouldReturnDistanceTrainingsBetweenDates() throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
+    public void countDistance_whenUserAndDates_shouldReturnDistanceTrainingsBetweenDates() throws Exception {
         //given
         User user = testUtil.createValidUser();
         User savedUser = userRepository.saveAndFlush(user);
@@ -258,7 +260,7 @@ public class TrainingServiceIntegrationTest {
     }
 
     @Test
-    public void countDistance_whenUserAndDates_shouldReturn0() throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
+    public void countDistance_whenUserAndDates_shouldReturn0() throws Exception {
         //given
         User user = testUtil.createValidUser();
         User savedUser = userRepository.saveAndFlush(user);

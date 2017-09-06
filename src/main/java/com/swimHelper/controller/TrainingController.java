@@ -1,6 +1,6 @@
 package com.swimHelper.controller;
 
-import com.swimHelper.exception.*;
+import com.swimHelper.exception.BusinessException;
 import com.swimHelper.model.IntegerWrapper;
 import com.swimHelper.model.Training;
 import com.swimHelper.model.TrainingRequirements;
@@ -39,14 +39,14 @@ public class TrainingController {
 
     @PreAuthorize("principal.id == #training.user.id")
     @PutMapping
-    public Training updateTraining(@RequestBody Training training) throws TrainingNotFoundException, InvalidTrainingException {
+    public Training updateTraining(@RequestBody Training training) throws BusinessException {
         return trainingService.setTrainingCompletion(training);
     }
 
     @GetMapping
     public IntegerWrapper countDistance(@RequestParam(required = false) Long trainingId,
                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-                                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
+                                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) throws BusinessException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         IntegerWrapper integerWrapper = new IntegerWrapper();

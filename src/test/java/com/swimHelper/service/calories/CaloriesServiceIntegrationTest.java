@@ -4,8 +4,6 @@ import com.swimHelper.ExerciseSeriesRepository;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
 import com.swimHelper.exception.TooManyParametersException;
-import com.swimHelper.exception.TrainingNotFoundException;
-import com.swimHelper.exception.UserNotFoundException;
 import com.swimHelper.model.Style;
 import com.swimHelper.model.Training;
 import com.swimHelper.model.User;
@@ -70,7 +68,7 @@ public class CaloriesServiceIntegrationTest {
     }
 
     @Test
-    public void calculateCalories_whenUser_shouldReturnBurnedCaloriesOfAllTrainingsForUser() throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
+    public void calculateCalories_whenUser_shouldReturnBurnedCaloriesOfAllTrainingsForUser() throws Exception {
         //given
         User user = testUtil.createValidUser();
         user.setWeight(80);
@@ -83,7 +81,7 @@ public class CaloriesServiceIntegrationTest {
     }
 
     @Test
-    public void calculateCalories_whenUserAndDates_shouldReturnBurnedCaloriesOfAllTrainingsBetweenDatesForUser() throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
+    public void calculateCalories_whenUserAndDates_shouldReturnBurnedCaloriesOfAllTrainingsBetweenDatesForUser() throws Exception {
         //given
         User user = testUtil.createValidUser();
         user.setWeight(80);
@@ -98,7 +96,7 @@ public class CaloriesServiceIntegrationTest {
     }
 
     @Test
-    public void calculateCalories_whenUserAndDates_shouldReturn0() throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
+    public void calculateCalories_whenUserAndDates_shouldReturn0() throws Exception {
         //given
         User user = testUtil.createValidUser();
         user.setWeight(80);
@@ -113,7 +111,7 @@ public class CaloriesServiceIntegrationTest {
     }
 
     @Test
-    public void calculateCalories_whenUserAndDatesAndTrainingId_shouldThrowException() throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
+    public void calculateCalories_whenUserAndDatesAndTrainingId_shouldThrowException() throws Exception {
         //given
         User user = testUtil.createValidUser();
         user.setWeight(80);

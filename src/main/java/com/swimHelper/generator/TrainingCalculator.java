@@ -1,5 +1,6 @@
 package com.swimHelper.generator;
 
+import com.swimHelper.exception.BusinessException;
 import com.swimHelper.exception.UnsatisfiedTimeRequirementsException;
 import com.swimHelper.model.*;
 import com.swimHelper.util.RandomGenerator;
@@ -29,7 +30,7 @@ public class TrainingCalculator {
         this.randomGenerator = randomGenerator;
     }
 
-    public int getNumberOfExerciseSeries(IntensityLevel intensityLevel, int maxDurationInSeconds) throws UnsatisfiedTimeRequirementsException {
+    public int getNumberOfExerciseSeries(IntensityLevel intensityLevel, int maxDurationInSeconds) throws BusinessException {
         int timeForMainPartOfTraining = maxDurationInSeconds - WARMUP_AND_RELAX_DURATION;
         if (timeForMainPartOfTraining < 0) {
             throw new UnsatisfiedTimeRequirementsException();
@@ -94,7 +95,7 @@ public class TrainingCalculator {
         return (breakOfOneExerciseRepeatInSeconds - breakOfOneExerciseRepeatInSeconds % 10);
     }
 
-    public int getNumberOfRepeatsInOneSeries(int durationOfSeriesInSeconds, int durationOfRepeatAndBreak) throws UnsatisfiedTimeRequirementsException {
+    public int getNumberOfRepeatsInOneSeries(int durationOfSeriesInSeconds, int durationOfRepeatAndBreak) throws BusinessException {
         return durationOfSeriesInSeconds / durationOfRepeatAndBreak;
     }
 

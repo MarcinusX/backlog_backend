@@ -2,6 +2,7 @@ package com.swimHelper.service;
 
 import com.swimHelper.component.calories.CaloriesCalculator;
 import com.swimHelper.component.calories.CaloriesCalculatorRecursiveTask;
+import com.swimHelper.exception.BusinessException;
 import com.swimHelper.exception.TooManyParametersException;
 import com.swimHelper.exception.TrainingNotFoundException;
 import com.swimHelper.exception.UserNotFoundException;
@@ -36,7 +37,7 @@ public class CaloriesService {
         this.caloriesCalculator = caloriesCalculator;
     }
 
-    public int calculateCalories(Long userId, Long trainingId, LocalDateTime startDate, LocalDateTime endDate) throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
+    public int calculateCalories(Long userId, Long trainingId, LocalDateTime startDate, LocalDateTime endDate) throws BusinessException {
         User user = userRepository.findOne(userId);
         if (user == null) {
             throw new UserNotFoundException("Could not find user with id: " + user.getId());

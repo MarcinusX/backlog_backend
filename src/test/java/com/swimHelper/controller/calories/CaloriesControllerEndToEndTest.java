@@ -3,7 +3,6 @@ package com.swimHelper.controller.calories;
 import com.swimHelper.ExerciseSeriesRepository;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
-import com.swimHelper.exception.BusinessException;
 import com.swimHelper.model.IntegerWrapper;
 import com.swimHelper.model.Training;
 import com.swimHelper.model.TrainingRequirements;
@@ -65,7 +64,7 @@ public class CaloriesControllerEndToEndTest {
     }
 
     @Test
-    public void calculateCaloriesTest_shouldReturnBurnedCaloriesOfAllTrainingsForUser() throws BusinessException {
+    public void calculateCaloriesTest_shouldReturnBurnedCaloriesOfAllTrainingsForUser() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
@@ -80,7 +79,7 @@ public class CaloriesControllerEndToEndTest {
     }
 
     @Test
-    public void calculateCaloriesTest_shouldReturnBurnedCaloriesOfOneTrainingForUser() throws BusinessException {
+    public void calculateCaloriesTest_shouldReturnBurnedCaloriesOfOneTrainingForUser() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
@@ -98,7 +97,7 @@ public class CaloriesControllerEndToEndTest {
     }
 
     @Test
-    public void calculateCaloriesTest_shouldReturnBurnedCaloriesOfTrainingsBetweenDatesForUser() throws BusinessException {
+    public void calculateCaloriesTest_shouldReturnBurnedCaloriesOfTrainingsBetweenDatesForUser() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises

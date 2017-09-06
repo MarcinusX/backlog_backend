@@ -1,8 +1,6 @@
 package com.swimHelper.controller;
 
-import com.swimHelper.exception.TooManyParametersException;
-import com.swimHelper.exception.TrainingNotFoundException;
-import com.swimHelper.exception.UserNotFoundException;
+import com.swimHelper.exception.BusinessException;
 import com.swimHelper.model.IntegerWrapper;
 import com.swimHelper.model.User;
 import com.swimHelper.service.CaloriesService;
@@ -34,7 +32,7 @@ public class CaloriesController {
     @GetMapping
     public IntegerWrapper getCaloriesBurned(@RequestParam(required = false) Long trainingId,
                                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) throws UserNotFoundException, TooManyParametersException, TrainingNotFoundException {
+                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) throws BusinessException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         IntegerWrapper integerWrapper = new IntegerWrapper();
