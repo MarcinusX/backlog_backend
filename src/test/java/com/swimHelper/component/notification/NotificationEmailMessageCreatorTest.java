@@ -35,7 +35,6 @@ public class NotificationEmailMessageCreatorTest {
         assertThat(emailMessage.getTo().getEmailAddress()).isEqualTo(user.getEmail());
         assertThat(emailMessage.getFrom().getName()).isEqualTo(AUTHOR_NAME);
         assertThat(emailMessage.getFrom().getEmailAddress()).isEqualTo(AUTHOR_ADDRESS);
-        //TODO: test injecting message?
     }
 
 }
