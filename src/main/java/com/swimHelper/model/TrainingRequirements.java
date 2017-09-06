@@ -20,4 +20,5 @@ public class TrainingRequirements {
     private int maxDurationInSeconds;
     private int maxDistance;
     private LocalDateTime trainingDateTime;
+    private LocalDateTime notificationDateTime;
 }

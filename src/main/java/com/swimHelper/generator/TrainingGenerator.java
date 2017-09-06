@@ -40,6 +40,7 @@ public class TrainingGenerator {
         //create training
         Training training = new Training();
         training.setTrainingDateTime(trainingRequirements.getTrainingDateTime());
+        training.setNotificationDateTime(trainingRequirements.getNotificationDateTime());
         //add warm up
         addWarmUpExerciseSeries(training);
         //add exercises

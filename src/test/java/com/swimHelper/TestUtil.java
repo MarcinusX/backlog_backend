@@ -84,7 +84,8 @@ public class TestUtil {
         styles.add(Style.FREESTYLE);
         styles.add(Style.BACKSTROKE);
         LocalDateTime trainingDateTime = LocalDateTime.of(2100, 11, 20, 6, 40, 45);
-        return new TrainingRequirements(styles, IntensityLevel.LOW, 3000, 1000, trainingDateTime);
+        LocalDateTime notificationDateTime = LocalDateTime.of(2100, 11, 20, 5, 40, 45);
+        return new TrainingRequirements(styles, IntensityLevel.LOW, 3000, 1000, trainingDateTime, notificationDateTime);
     }
 
     public Training createValidTraining() {
