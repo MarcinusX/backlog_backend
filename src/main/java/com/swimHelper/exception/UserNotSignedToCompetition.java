@@ -8,19 +8,4 @@ public class UserNotSignedToCompetition extends BusinessException {
         super();
     }
 
-    public UserNotSignedToCompetition(String message) {
-        super(message);
-    }
-
-    public UserNotSignedToCompetition(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public UserNotSignedToCompetition(Throwable cause) {
-        super(cause);
-    }
-
-    protected UserNotSignedToCompetition(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }

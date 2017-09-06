@@ -84,7 +84,7 @@ public class CompetitionEndToEndTest {
                 testRestTemplate.withBasicAuth("new@email.com", "somePassword")
                         .postForEntity("/competitions/" + competitionId, null, Competition.class);
 
-        assertThat(competitionResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(competitionResponse.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
 
         //update request
         competition.setMaxParticipants(2);

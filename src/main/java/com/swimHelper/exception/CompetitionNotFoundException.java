@@ -11,16 +11,4 @@ public class CompetitionNotFoundException extends BusinessException {
     public CompetitionNotFoundException(String message) {
         super(message);
     }
-
-    public CompetitionNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public CompetitionNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
-    protected CompetitionNotFoundException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }

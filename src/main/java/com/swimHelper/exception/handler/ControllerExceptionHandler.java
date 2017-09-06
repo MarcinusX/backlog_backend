@@ -113,7 +113,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleCompetitionFullException(CompetitionFullException ex, WebRequest request) {
         ApiError apiError = new ApiError("Competition is full", ex);
         logger.error("Competition is full.", ex.getMessage());
-        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
 
     @ExceptionHandler(value = CompetitionNotFoundException.class)
@@ -134,20 +134,20 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleOptimisticLockException(OptimisticLockException ex, WebRequest request) {
         ApiError apiError = new ApiError("Data you were working is old", ex);
         logger.error("Optimistic lock occured.", ex.getMessage());
-        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
 
     @ExceptionHandler(value = UserAlreadySignedToCompetition.class)
     protected ResponseEntity<Object> handleUserAlreadySignedToCompetition(UserAlreadySignedToCompetition ex, WebRequest request) {
         ApiError apiError = new ApiError("You are already assigned to that competition", ex);
         logger.error("User already assigned to that competition.", ex.getMessage());
-        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
 
     @ExceptionHandler(value = UserNotSignedToCompetition.class)
     protected ResponseEntity<Object> handleUserNotSignedToCompetition(UserNotSignedToCompetition ex, WebRequest request) {
         ApiError apiError = new ApiError("You are not assigned to that competition", ex);
         logger.error("User not assigned to that competition.", ex.getMessage());
-        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
 }
