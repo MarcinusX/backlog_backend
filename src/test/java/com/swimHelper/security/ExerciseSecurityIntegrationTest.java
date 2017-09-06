@@ -67,7 +67,7 @@ public class ExerciseSecurityIntegrationTest {
         Exercise exercise = new Exercise(Style.BACKSTROKE);
         exercise.setName("name");
         exercise.setDescription("description");
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         //when
         ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
         //then
@@ -112,7 +112,7 @@ public class ExerciseSecurityIntegrationTest {
         exerciseRepository.saveAndFlush(exercise);
         Exercise exercise1 = new Exercise(Style.BACKSTROKE);
         exercise1.setName("name1");
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         //when
         ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, exercise1, TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
         //then
@@ -126,7 +126,7 @@ public class ExerciseSecurityIntegrationTest {
         exercise.setName("name");
         exercise.setDescription("description");
         Exercise savedExercise = exerciseRepository.saveAndFlush(exercise);
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         //when
         ResponseEntity<Exercise> responseEntity = trainingTestUtil.getExercise(testRestTemplate, savedExercise.getId(),
                 TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);

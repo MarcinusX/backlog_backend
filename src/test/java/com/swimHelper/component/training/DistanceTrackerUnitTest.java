@@ -2,9 +2,7 @@ package com.swimHelper.component.training;
 
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
-import com.swimHelper.exception.TooManyDistanceTrackerArgumentsException;
-import com.swimHelper.exception.TrainingNotFoundException;
-import com.swimHelper.exception.UserNotFoundException;
+import com.swimHelper.exception.TooManyParametersException;
 import com.swimHelper.model.Training;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.TrainingRepository;
@@ -33,7 +31,7 @@ public class DistanceTrackerUnitTest {
     final DistanceTracker sut = new DistanceTracker(userRepositoryMock, trainingRepositoryMock);
 
     @Test
-    public void countDistance_whenUserId_shouldReturnDistanceOfAllTrainings() throws UserNotFoundException, TooManyDistanceTrackerArgumentsException, TrainingNotFoundException {
+    public void countDistance_whenUserId_shouldReturnDistanceOfAllTrainings() throws Exception {
         //given
         User user = new TestUtil().createValidUser();
         List<Training> trainings = createTrainingsForUser(user);
@@ -46,7 +44,7 @@ public class DistanceTrackerUnitTest {
     }
 
     @Test
-    public void countDistance_whenUserIdAndTrainingId_shouldReturnDistanceOfChosenTraining() throws UserNotFoundException, TooManyDistanceTrackerArgumentsException, TrainingNotFoundException {
+    public void countDistance_whenUserIdAndTrainingId_shouldReturnDistanceOfChosenTraining() throws Exception {
         //given
         User user = new TestUtil().createValidUser();
         Training training = new TrainingTestUtil().createValidTraining();
@@ -61,7 +59,7 @@ public class DistanceTrackerUnitTest {
     }
 
     @Test
-    public void countDistance_whenUserIdAndDates_shouldReturnDistanceOfTrainingsBetweenDates() throws UserNotFoundException, TooManyDistanceTrackerArgumentsException, TrainingNotFoundException {
+    public void countDistance_whenUserIdAndDates_shouldReturnDistanceOfTrainingsBetweenDates() throws Exception {
         //given
         User user = new TestUtil().createValidUser();
         List<Training> trainings = createTrainingsForUser(user);
@@ -77,7 +75,7 @@ public class DistanceTrackerUnitTest {
     }
 
     @Test
-    public void countDistance_whenUserIdAndDatesAndTrainingId_shouldThrowException() throws UserNotFoundException, TooManyDistanceTrackerArgumentsException, TrainingNotFoundException {
+    public void countDistance_whenUserIdAndDatesAndTrainingId_shouldThrowException() throws Exception {
         //given
         User user = new TestUtil().createValidUser();
         LocalDateTime endDate = LocalDateTime.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
@@ -86,7 +84,7 @@ public class DistanceTrackerUnitTest {
         //when
         Throwable thrown = catchThrowable(() -> sut.countDistance(1L, 1L, startDate, endDate));
         //then
-        assertThat(thrown).isInstanceOf(TooManyDistanceTrackerArgumentsException.class);
+        assertThat(thrown).isInstanceOf(TooManyParametersException.class);
     }
 
 

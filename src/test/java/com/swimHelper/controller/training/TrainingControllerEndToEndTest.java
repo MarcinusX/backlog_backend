@@ -3,7 +3,6 @@ package com.swimHelper.controller.training;
 import com.swimHelper.ExerciseSeriesRepository;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
-import com.swimHelper.exception.BusinessException;
 import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.repository.TrainingRepository;
@@ -66,11 +65,11 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void generateTrainingTest_shouldReturnMoreThanTwoExerciseSeriesNotLongerThan3000Seconds() throws BusinessException {
+    public void generateTrainingTest_shouldReturnMoreThanTwoExerciseSeriesNotLongerThan3000Seconds() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         //when
         ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
@@ -88,12 +87,12 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void generateTrainingTest_shouldReturnTrainingOnlyWarmUpExercises() throws BusinessException {
+    public void generateTrainingTest_shouldReturnTrainingOnlyWarmUpExercises() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(900);
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         //when
         ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
@@ -111,13 +110,13 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void generateTrainingTest_shouldReturnMoreThan0ExerciseSeriesNotLongerThan3000Seconds() throws BusinessException {
+    public void generateTrainingTest_shouldReturnMoreThan0ExerciseSeriesNotLongerThan3000Seconds() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(3000);
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         //when
         ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
@@ -135,14 +134,14 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void generateTrainingTest_shouldReturnMoreThan2ExerciseSeriesNotLongerThan5000Seconds() throws BusinessException {
+    public void generateTrainingTest_shouldReturnMoreThan2ExerciseSeriesNotLongerThan5000Seconds() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.getStyles().addAll(Arrays.asList(Style.BREASTSTROKE, Style.BUTTERFLY));
         trainingRequirements.setMaxDurationInSeconds(5000);
         trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         //when
         ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
@@ -160,11 +159,11 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void putTrainingTest_shouldReturnTrainingWithOneExerciseSeriesUpdated() throws BusinessException {
+    public void putTrainingTest_shouldReturnTrainingWithOneExerciseSeriesUpdated() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         ResponseEntity<Training> responseEntityFromAddingTraining = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
         Training addedTraining = responseEntityFromAddingTraining.getBody();
@@ -184,11 +183,11 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void putTrainingTest_shouldReturnTrainingWithEveryExerciseSeriesUpdated() throws BusinessException {
+    public void putTrainingTest_shouldReturnTrainingWithEveryExerciseSeriesUpdated() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        trainingTestUtil.addUser(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         ResponseEntity<Training> responseEntityFromAddingTraining = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
         Training addedTraining = responseEntityFromAddingTraining.getBody();
@@ -207,54 +206,54 @@ public class TrainingControllerEndToEndTest {
     }
 
     @Test
-    public void countDistanceTest_shouldReturnDistanceOfAllTrainingsForUser() throws BusinessException {
+    public void countDistanceTest_shouldReturnDistanceOfAllTrainingsForUser() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = trainingTestUtil.addUser(testRestTemplate);
+        User user = testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
         //when
-        ResponseEntity<DistanceTrackerResult> responseEntity = trainingTestUtil.countDistance(testRestTemplate, null, null, null);
-        int distanceFromResponse = responseEntity.getBody().getDistance();
+        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate, null, null, null);
+        int distanceFromResponse = responseEntity.getBody().getValue();
         //then
         assertThat(distanceFromResponse).isGreaterThan(0);
     }
 
     @Test
-    public void countDistanceTest_shouldReturnDistanceOfOneTrainingForUser() throws BusinessException {
+    public void countDistanceTest_shouldReturnDistanceOfOneTrainingForUser() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = trainingTestUtil.addUser(testRestTemplate);
+        User user = testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         Training training = trainingTestUtil.addTraining(testRestTemplate, trainingRequirements);
         //when
-        ResponseEntity<DistanceTrackerResult> responseEntity = trainingTestUtil.countDistance(testRestTemplate,
+        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate,
                 training.getId(),
                 null,
                 null);
-        int distanceFromResponse = responseEntity.getBody().getDistance();
+        int distanceFromResponse = responseEntity.getBody().getValue();
         //then
         assertThat(distanceFromResponse).isGreaterThan(0);
     }
 
     @Test
-    public void countDistanceTest_shouldReturnDistanceOfTrainingsBetweenDatesForUser() throws BusinessException {
+    public void countDistanceTest_shouldReturnDistanceOfTrainingsBetweenDatesForUser() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = trainingTestUtil.addUser(testRestTemplate);
+        User user = testUtil.addUser(testRestTemplate);
         trainingTestUtil.addExercises(testRestTemplate);
         trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
         LocalDateTime startDate = LocalDateTime.of(2100, 7, 30, 6, 40, 45);
         LocalDateTime endDate = LocalDateTime.of(2100, 11, 30, 6, 40, 45);
         //when
-        ResponseEntity<DistanceTrackerResult> responseEntity = trainingTestUtil.countDistance(testRestTemplate,
+        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate,
                 null,
                 startDate,
                 endDate);
-        int distanceFromResponse = responseEntity.getBody().getDistance();
+        int distanceFromResponse = responseEntity.getBody().getValue();
         //then
         assertThat(distanceFromResponse).isGreaterThan(0);
     }

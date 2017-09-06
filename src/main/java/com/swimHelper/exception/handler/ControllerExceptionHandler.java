@@ -95,10 +95,10 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
-    @ExceptionHandler(value = TooManyDistanceTrackerArgumentsException.class)
-    protected ResponseEntity<Object> handleTooManyDistanceTrackerArgumentsException(TooManyDistanceTrackerArgumentsException ex, WebRequest request) {
-        ApiError apiError = new ApiError("Invalid number of parameters given to distance tracker", ex);
-        logger.error("Invalid number of parameters given to distance tracker.", ex.getMessage());
+    @ExceptionHandler(value = TooManyParametersException.class)
+    protected ResponseEntity<Object> handleTooManyDistanceTrackerArgumentsException(TooManyParametersException ex, WebRequest request) {
+        ApiError apiError = new ApiError("Invalid number of parameters given", ex);
+        logger.error("Invalid number of parameters given", ex.getMessage());
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 }

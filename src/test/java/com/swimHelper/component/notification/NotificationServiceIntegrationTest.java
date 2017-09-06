@@ -1,5 +1,6 @@
 package com.swimHelper.component.notification;
 
+import com.swimHelper.TrainingTestUtil;
 import com.swimHelper.model.Training;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.TrainingRepository;
@@ -29,6 +30,8 @@ public class NotificationServiceIntegrationTest {
 
     @Autowired
     private NotificationService sut;
+    @Autowired
+    private TrainingTestUtil trainingTestUtil;
 
     @MockBean
     private TrainingRepository trainingRepository;
@@ -38,11 +41,13 @@ public class NotificationServiceIntegrationTest {
     @Test
     public void notificationScheduler_callsMailSender() {
         //given
-        Training training = new Training();
+        Training training = trainingTestUtil.createValidTraining();
         User user = new User();
         user.setEmail("some@email.com");
         user.setFirstname("Zbyszek");
         training.setUser(user);
+        training.setId(1L);
+        when(trainingRepository.findOne(anyLong())).thenReturn(training);
         when(trainingRepository.findTrainingsToBeNotified(any())).thenReturn(Collections.singletonList(training));
         when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
         //when
