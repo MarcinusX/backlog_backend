@@ -1,6 +1,7 @@
 package com.swimHelper.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,8 +26,11 @@ import java.util.Set;
 @Entity
 @Data
 @NoArgsConstructor //jpa
-@EqualsAndHashCode(exclude = {"trainings", "records", "styleStatistics"})
-@ToString(exclude = "trainings")
+@EqualsAndHashCode(exclude = {"trainings", "records", "styleStatistics", "competitions"})
+@ToString(exclude = {"trainings", "competitions", "records", "styleStatistics"})
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@NamedEntityGraph(name = "graph.user.competitions",
+        attributeNodes = @NamedAttributeNode("competitions"))
 public class User implements UserDetails {
 
     @GeneratedValue
@@ -58,6 +62,9 @@ public class User implements UserDetails {
 
     @OneToMany
     private Collection<Record> records = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "participants")
+    private Set<Competition> competitions;
 
     @OneToMany
     @Cascade(CascadeType.ALL)
