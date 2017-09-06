@@ -1,6 +1,7 @@
 package com.swimHelper.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -58,10 +59,8 @@ public class User implements UserDetails {
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnoreProperties("user")
     private Collection<Training> trainings = new ArrayList<>();
-
-    @OneToMany
-    private Collection<Record> records = new ArrayList<>();
 
     @ManyToMany(mappedBy = "participants")
     private Set<Competition> competitions;

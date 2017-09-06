@@ -37,7 +37,7 @@ public class MainApplication implements CommandLineRunner {
 
         Training training = new Training();
         training.setNotificationDateTime(LocalDateTime.now());
-        training.setDateTime(LocalDateTime.now().plusMinutes(30));
+        training.setTrainingDateTime(LocalDateTime.now().plusMinutes(30));
         training.setUser(user);
         //trainingRepository.saveAndFlush(training);
 

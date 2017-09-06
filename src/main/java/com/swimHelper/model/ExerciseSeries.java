@@ -22,7 +22,6 @@ public class ExerciseSeries {
     private Exercise exercise;
     private int distance;
     private int repeats;
-    private int orderNumber;
     private int breakInSeconds;
     private int durationOfOneExerciseInSeconds;
     private int completedRepeats;

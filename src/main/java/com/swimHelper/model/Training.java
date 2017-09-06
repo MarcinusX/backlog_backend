@@ -23,7 +23,6 @@ public class Training {
     private Long id;
     @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private Collection<ExerciseSeries> exerciseSeries = new ArrayList<>();
-    private LocalDateTime dateTime;
     private int durationInSeconds;
     @ManyToOne
     @JsonIgnoreProperties(value = {"trainings"}, allowSetters = true)

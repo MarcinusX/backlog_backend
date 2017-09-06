@@ -85,7 +85,6 @@ public class UserService implements UserDetailsService {
         userFromDB.setEmail(userFromRequest.getEmail());
         userFromDB.setWeight(userFromRequest.getWeight());
         userFromDB.setStyleStatistics(userFromRequest.getStyleStatistics());
-        userFromDB.setRecords(userFromRequest.getRecords());
         return userFromDB;
     }
 

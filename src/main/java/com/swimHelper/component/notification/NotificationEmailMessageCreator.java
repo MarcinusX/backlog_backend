@@ -33,7 +33,7 @@ public class NotificationEmailMessageCreator {
         EmailMessage emailMessage = new EmailMessage();
         emailMessage.setSubject(subject);
         emailMessage.setTextContent(
-                MessageFormat.format(textTemplate, user.getFirstname(), training.getDateTime()));
+                MessageFormat.format(textTemplate, user.getFirstname(), training.getTrainingDateTime()));
         emailMessage.setTo(
                 new EmailMessage.Person(createRecipientName(user), user.getEmail()));
         emailMessage.setFrom(
