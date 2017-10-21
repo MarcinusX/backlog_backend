@@ -176,6 +176,8 @@ public class TrainingTestUtil {
             } else {
                 exercise.setWarmUpRelax(true);
             }
+            exercise.getRequiredTrainingEquipment().add(TrainingEquipment.FINS);
+            exercise.getRequiredTrainingEquipment().add(TrainingEquipment.PADDLES);
 
             ResponseEntity<Exercise> responseEntity = postExercise(testRestTemplate, exercise, ADMIN_EMAIL, ADMIN_PASSWORD);
         }

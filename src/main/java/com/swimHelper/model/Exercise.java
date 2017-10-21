@@ -3,11 +3,10 @@ package com.swimHelper.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by Monia on 2017-07-18.
@@ -27,6 +26,11 @@ public class Exercise {
     @NotNull
     private Style style;
     private boolean warmUpRelax;
+    @ElementCollection(targetClass = TrainingEquipment.class)
+    @JoinTable(name = "training_equipment", joinColumns = @JoinColumn(name = "exercise_id"))
+    @Column(name = "equipment", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Collection<TrainingEquipment> requiredTrainingEquipment = new ArrayList<>();
     public Exercise(Style style) {
         this.style = style;
     }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -83,9 +84,10 @@ public class TestUtil {
         Collection<Style> styles = new ArrayList<>();
         styles.add(Style.FREESTYLE);
         styles.add(Style.BACKSTROKE);
+        Collection<TrainingEquipment> trainingEquipment = Arrays.asList(TrainingEquipment.KICKBOARD, TrainingEquipment.FINS, TrainingEquipment.PADDLES);
         LocalDateTime trainingDateTime = LocalDateTime.of(2100, 11, 20, 6, 40, 45);
         LocalDateTime notificationDateTime = LocalDateTime.of(2100, 11, 20, 5, 40, 45);
-        return new TrainingRequirements(styles, IntensityLevel.LOW, 3000, 1000, trainingDateTime, notificationDateTime);
+        return new TrainingRequirements(styles, IntensityLevel.LOW, 3000, 1000, trainingDateTime, notificationDateTime, trainingEquipment);
     }
 
     public Training createValidTraining() {

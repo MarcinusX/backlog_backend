@@ -57,8 +57,8 @@ public class TrainingCalculator {
         }
     }
 
-    public int getDurationOfOneExerciseSeries(int numberOfExerciseSeries, int maxDurationInMinutes) {
-        return maxDurationInMinutes / numberOfExerciseSeries;
+    public int getDurationOfOneExerciseSeries(int numberOfExerciseSeries, int maxDurationInSeconds) {
+        return maxDurationInSeconds / numberOfExerciseSeries;
     }
 
     //before invoking this method there is checking if user has style statistics according to

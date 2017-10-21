@@ -129,7 +129,7 @@ public class TrainingControllerEndToEndTest {
         boolean areStylesCorrect = stylesUsed.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
         assertThat(areStylesCorrect).isTrue();
         assertThat(trainingFromResponse.getExerciseSeries().size()).isGreaterThan(0);
-        assertThat(trainingFromResponse.getDurationInSeconds()).isGreaterThan(900).isLessThanOrEqualTo(3000);
+        assertThat(trainingFromResponse.getDurationInSeconds()).isLessThanOrEqualTo(3000);
         assertThat(trainingFromResponse.getId()).isNotNull();
     }
 
@@ -256,5 +256,28 @@ public class TrainingControllerEndToEndTest {
         int distanceFromResponse = responseEntity.getBody().getValue();
         //then
         assertThat(distanceFromResponse).isGreaterThan(0);
+    }
+
+    @Test
+    public void generateTrainingTest_shouldReturnTrainingWithExercisesWithEquipment() throws Exception {
+        //given
+        TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
+        trainingRequirements.setMaxDurationInSeconds(3000);
+        testUtil.createAdminForTests(); //required to add exercises
+        testUtil.addUser(testRestTemplate);
+        trainingTestUtil.addExercises(testRestTemplate);
+        //when
+        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        Training trainingFromResponse = responseEntity.getBody();
+        //then
+        List<Boolean> doExercisesContainOnlyAvailableEquimpent = trainingFromResponse.getExerciseSeries()
+                .stream()
+                .map(exerciseSeries1 -> exerciseSeries1.getExercise().getRequiredTrainingEquipment().isEmpty()
+                        || trainingRequirements.getAvailableTrainingEquipment().containsAll(exerciseSeries1.getExercise()
+                        .getRequiredTrainingEquipment()))
+                .collect(Collectors.toList());
+        boolean areExercisesCorrect = doExercisesContainOnlyAvailableEquimpent.contains(true);
+        assertThat(areExercisesCorrect).isTrue();
+        assertThat(trainingFromResponse.getId()).isNotNull();
     }
 }

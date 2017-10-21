@@ -39,8 +39,6 @@ public class TrainingGenerator {
         List<Exercise> matchingExercises = getMatchingExercises(trainingRequirements);
         //create training
         Training training = new Training();
-        training.setTrainingDateTime(trainingRequirements.getTrainingDateTime());
-        training.setNotificationDateTime(trainingRequirements.getNotificationDateTime());
         //add warm up
         addWarmUpExerciseSeries(training);
         //add exercises
@@ -56,6 +54,8 @@ public class TrainingGenerator {
         if (trainingRequirements.getMaxDistance() != 0) {
             training = getAdaptedTrainingToMaxDistance(training, trainingRequirements.getMaxDistance());
         }
+        training.setTrainingDateTime(trainingRequirements.getTrainingDateTime());
+        training.setNotificationDateTime(trainingRequirements.getNotificationDateTime());
         training.setDurationInSeconds(getDurationOfTraining(training));
         training.setUser(user);
         return training;
@@ -81,15 +81,22 @@ public class TrainingGenerator {
     }
 
     private List<Exercise> getMatchingExercises(TrainingRequirements trainingRequirements) {
-        return trainingRequirements.getStyles().stream()
+        List<Exercise> matchingExercises = trainingRequirements.getStyles().stream()
                 .flatMap(style -> exerciseRepository.findByStyle(style).stream())
                 .filter(e -> !e.isWarmUpRelax()).collect(Collectors.toList());
+        if(trainingRequirements.getAvailableTrainingEquipment().size() > 0) {
+            matchingExercises = matchingExercises.stream().filter(e -> e.getRequiredTrainingEquipment()
+                    .isEmpty() || trainingRequirements.getAvailableTrainingEquipment().containsAll(e.getRequiredTrainingEquipment()))
+                    .collect(Collectors.toList());
+        }
+        return matchingExercises;
     }
 
     private void addWarmUpExerciseSeries(Training training) {
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setRepeats(1);
-        exerciseSeries.setDistance(200);
+        List<Integer> availableWarmUpDistances = IntensityLevel.WARM_UP.getDistances();
+        exerciseSeries.setDistance(randomGenerator.generateRandomInt(availableWarmUpDistances.size()));
         List<Exercise> exerciseList = exerciseRepository.findByWarmUpRelax(true);
         Exercise exercise = exerciseList.get(randomGenerator.generateRandomInt(exerciseList.size()));
         exerciseSeries.setExercise(exercise);
@@ -99,7 +106,8 @@ public class TrainingGenerator {
     private void addRelaxExerciseSeries(Training training) {
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setRepeats(1);
-        exerciseSeries.setDistance(100);
+        List<Integer> availableRelaxDistances = IntensityLevel.RELAX.getDistances();
+        exerciseSeries.setDistance(randomGenerator.generateRandomInt(availableRelaxDistances.size()));
         List<Exercise> exerciseList = exerciseRepository.findByWarmUpRelax(true);
         Exercise exercise = exerciseList.get(randomGenerator.generateRandomInt(exerciseList.size()));
         exerciseSeries.setExercise(exercise);

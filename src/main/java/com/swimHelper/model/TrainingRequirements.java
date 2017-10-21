@@ -21,4 +21,5 @@ public class TrainingRequirements {
     private int maxDistance;
     private LocalDateTime trainingDateTime;
     private LocalDateTime notificationDateTime;
+    private Collection<TrainingEquipment> availableTrainingEquipment = new ArrayList<>();
 }

@@ -9,7 +9,9 @@ import java.util.List;
 public enum IntensityLevel {
     LOW(200, 250, 300),
     MEDIUM(100, 150, 200),
-    HIGH(25, 50, 75);
+    HIGH(25, 50, 75),
+    WARM_UP(100, 200, 250),
+    RELAX(50, 100, 200);
 
     private Integer firstDistance;
     private Integer secondDistance;
