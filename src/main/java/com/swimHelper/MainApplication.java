@@ -32,8 +32,8 @@ public class MainApplication implements CommandLineRunner {
         User user = new User();
         user.setEmail("admin@admin.pl");
         user.setPassword("admin");
-        //user = userService.addUser(user);
-        //userService.makeUserAdmin(user.getId());
+        user = userService.addUser(user);
+        userService.makeUserAdmin(user.getId());
 
         Training training = new Training();
         training.setNotificationDateTime(LocalDateTime.now());

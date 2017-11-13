@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
+import java.util.List;
 
 /**
  * Created by mstobieniecka on 2017-08-26.
@@ -38,5 +39,12 @@ public class ExerciseController {
     @RolesAllowed({Role.NAME_ADMIN})
     public Exercise getExercise(@PathVariable Long id) throws BusinessException {
         return exerciseService.getExercise(id);
+    }
+
+    @GetMapping("all")
+    @RolesAllowed({Role.NAME_ADMIN})
+    @CrossOrigin(origins = "http://localhost:4200")
+    public List<Exercise> getExercises() {
+        return exerciseService.getExercises();
     }
 }

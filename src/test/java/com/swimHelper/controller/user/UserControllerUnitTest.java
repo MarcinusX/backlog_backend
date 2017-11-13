@@ -3,8 +3,10 @@ package com.swimHelper.controller.user;
 import com.swimHelper.controller.UserController;
 import com.swimHelper.exception.UserNotFoundException;
 import com.swimHelper.model.User;
+import com.swimHelper.security.JwtTokenUtil;
 import com.swimHelper.service.UserService;
 import org.junit.Test;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -18,7 +20,9 @@ import static org.mockito.Mockito.when;
 public class UserControllerUnitTest {
 
     private final UserService userServiceMock = mock(UserService.class);
-    private final UserController sut = new UserController(userServiceMock);
+    private final JwtTokenUtil jwtTokenUtil = mock(JwtTokenUtil.class);
+    private final UserDetailsService userDetailsService = mock(UserDetailsService.class);
+    private final UserController sut = new UserController(userServiceMock, jwtTokenUtil, userDetailsService);
 
     @Test
     public void addUser_shouldReturnAddedUser() throws Exception {

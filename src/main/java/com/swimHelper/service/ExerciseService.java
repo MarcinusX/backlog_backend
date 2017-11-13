@@ -11,6 +11,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolationException;
+import java.util.List;
 
 /**
  * Created by mstobieniecka on 2017-08-26.
@@ -62,5 +63,9 @@ public class ExerciseService {
             throw new ExerciseNotFoundException(NOT_FOUND_EXERCISE_MESSAGE);
         }
         return exercise;
+    }
+
+    public List<Exercise> getExercises() {
+        return exerciseRepository.findAll();
     }
 }
