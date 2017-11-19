@@ -72,7 +72,7 @@ public class ExerciseControllerStatusCodesTest {
         exercise.setName("name");
         exercise.setDescription("description");
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null, null);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -84,7 +84,7 @@ public class ExerciseControllerStatusCodesTest {
         exercise.setName("name");
         exercise.setDescription("description");
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null, null);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
@@ -99,7 +99,7 @@ public class ExerciseControllerStatusCodesTest {
         Exercise exerciseWithExistingName = new Exercise(Style.BACKSTROKE);
         exerciseWithExistingName.setName("name");
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exerciseWithExistingName, null, null);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exerciseWithExistingName, null);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
@@ -113,7 +113,7 @@ public class ExerciseControllerStatusCodesTest {
         Exercise savedExercise = exerciseRepository.saveAndFlush(exercise);
         savedExercise.setName("name1");
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise, null, null);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise, null);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -127,7 +127,7 @@ public class ExerciseControllerStatusCodesTest {
         Exercise savedExercise = exerciseRepository.saveAndFlush(exercise);
         savedExercise.setStyle(null);
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise, null, null);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise, null);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
@@ -145,7 +145,7 @@ public class ExerciseControllerStatusCodesTest {
         Exercise savedExercise2 = exerciseRepository.saveAndFlush(exercise2);
         savedExercise2.setName("name");
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise2, null, null);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise2, null);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }

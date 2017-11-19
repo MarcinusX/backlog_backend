@@ -1,15 +1,13 @@
 package com.swimHelper.controller.calories;
 
-import com.swimHelper.ExerciseSeriesRepository;
-import com.swimHelper.TestUtil;
-import com.swimHelper.TrainingTestUtil;
-import com.swimHelper.model.IntegerWrapper;
-import com.swimHelper.model.Training;
-import com.swimHelper.model.TrainingRequirements;
-import com.swimHelper.model.User;
+import com.swimHelper.*;
+import com.swimHelper.exception.BusinessException;
+import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.repository.TrainingRepository;
 import com.swimHelper.repository.UserRepository;
+import com.swimHelper.security.JwtUser;
+import com.swimHelper.util.JsonUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +31,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("security")
 public class CaloriesControllerEndToEndTest {
     @Autowired
+    private JsonUtil jsonUtil;
+    @Autowired
     private ExerciseRepository exerciseRepository;
     @Autowired
     private UserRepository userRepository;
@@ -48,7 +48,7 @@ public class CaloriesControllerEndToEndTest {
     private TrainingTestUtil trainingTestUtil;
 
     @Before
-    public void prepare() {
+    public void prepare() throws BusinessException {
         trainingRepository.deleteAll();
         exerciseSeriesRepository.deleteAll();
         userRepository.deleteAll();
@@ -68,11 +68,13 @@ public class CaloriesControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
-        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
+        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements, authorizationHeader);
         //when
-        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate, null, null, null);
+        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate, null, null, null, authorizationHeader);
         int calculatedCaloriesFromResponse = responseEntity.getBody().getValue();
         //then
         assertThat(calculatedCaloriesFromResponse).isGreaterThan(0);
@@ -83,14 +85,17 @@ public class CaloriesControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
-        Training training = trainingTestUtil.addTraining(testRestTemplate, trainingRequirements);
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
+        Training training = trainingTestUtil.addTraining(testRestTemplate, trainingRequirements, authorizationHeader);
         //when
         ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate,
                 training.getId(),
                 null,
-                null);
+                null,
+                authorizationHeader);
         int distanceFromResponse = responseEntity.getBody().getValue();
         //then
         assertThat(distanceFromResponse).isGreaterThan(0);
@@ -101,18 +106,23 @@ public class CaloriesControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
-        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
+        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements, authorizationHeader);
         LocalDateTime startDate = LocalDateTime.of(2100, 7, 30, 6, 40, 45);
         LocalDateTime endDate = LocalDateTime.of(2100, 11, 30, 6, 40, 45);
         //when
         ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate,
                 null,
                 startDate,
-                endDate);
+                endDate,
+                authorizationHeader);
         int distanceFromResponse = responseEntity.getBody().getValue();
         //then
         assertThat(distanceFromResponse).isGreaterThan(0);
     }
+
+
 }

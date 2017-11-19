@@ -1,6 +1,7 @@
 package com.swimHelper.controller.training;
 
 import com.swimHelper.ExerciseSeriesRepository;
+import com.swimHelper.security.JwtUser;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
 import com.swimHelper.model.*;
@@ -69,10 +70,12 @@ public class TrainingControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
         testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
         //when
-        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements, authorizationHeader);
         Training trainingFromResponse = responseEntity.getBody();
         //then
         List<Style> stylesUsed = trainingFromResponse.getExerciseSeries()
@@ -92,10 +95,12 @@ public class TrainingControllerEndToEndTest {
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         trainingRequirements.setMaxDurationInSeconds(900);
         testUtil.createAdminForTests(); //required to add exercises
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
         testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
         //when
-        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements, authorizationHeader);
         Training trainingFromResponse = responseEntity.getBody();
         //then
         List<Boolean> areWarmUpRelaxExercises = trainingFromResponse.getExerciseSeries()
@@ -116,10 +121,12 @@ public class TrainingControllerEndToEndTest {
         trainingRequirements.setMaxDurationInSeconds(3000);
         trainingRequirements.setIntensityLevel(IntensityLevel.HIGH);
         testUtil.createAdminForTests(); //required to add exercises
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
         testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
         //when
-        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements, authorizationHeader);
         Training trainingFromResponse = responseEntity.getBody();
         //then
         List<Style> stylesUsed = trainingFromResponse.getExerciseSeries()
@@ -141,10 +148,12 @@ public class TrainingControllerEndToEndTest {
         trainingRequirements.setMaxDurationInSeconds(5000);
         trainingRequirements.setIntensityLevel(IntensityLevel.MEDIUM);
         testUtil.createAdminForTests(); //required to add exercises
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
         testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
         //when
-        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements, authorizationHeader);
         Training trainingFromResponse = responseEntity.getBody();
         //then
         List<Style> stylesUsed = trainingFromResponse.getExerciseSeries()
@@ -163,15 +172,17 @@ public class TrainingControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
         testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
-        ResponseEntity<Training> responseEntityFromAddingTraining = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
+        ResponseEntity<Training> responseEntityFromAddingTraining = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements, authorizationHeader);
         Training addedTraining = responseEntityFromAddingTraining.getBody();
         ExerciseSeries exerciseSeriesToUpdate = new ArrayList<>(addedTraining.getExerciseSeries()).get(0);
         exerciseSeriesToUpdate.setCompletedRepeats(5);
         exerciseSeriesToUpdate.setAverageDurationOfOneRepeatInSeconds(300);
         //when
-        ResponseEntity<Training> responseEntity = trainingTestUtil.putTraining(testRestTemplate, addedTraining);
+        ResponseEntity<Training> responseEntity = trainingTestUtil.putTraining(testRestTemplate, addedTraining, authorizationHeader);
         Training trainingFromResponse = responseEntity.getBody();
         ExerciseSeries updatedExerciseSeries = trainingFromResponse.getExerciseSeries()
                 .stream()
@@ -187,9 +198,11 @@ public class TrainingControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
         testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
-        ResponseEntity<Training> responseEntityFromAddingTraining = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
+        ResponseEntity<Training> responseEntityFromAddingTraining = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements, authorizationHeader);
         Training addedTraining = responseEntityFromAddingTraining.getBody();
         addedTraining.getExerciseSeries().forEach(es -> {
                     es.setAverageDurationOfOneRepeatInSeconds(5);
@@ -197,7 +210,7 @@ public class TrainingControllerEndToEndTest {
                 }
         );
         //when
-        ResponseEntity<Training> responseEntity = trainingTestUtil.putTraining(testRestTemplate, addedTraining);
+        ResponseEntity<Training> responseEntity = trainingTestUtil.putTraining(testRestTemplate, addedTraining, authorizationHeader);
         Training trainingFromResponse = responseEntity.getBody();
         List<ExerciseSeries> exerciseSeriesFromUpdatedTraining = trainingFromResponse.getExerciseSeries().stream().filter(es ->
                 es.getAverageDurationOfOneRepeatInSeconds() == 5 && es.getCompletedRepeats() == 5).collect(Collectors.toList());
@@ -210,11 +223,14 @@ public class TrainingControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
-        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
+        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements, authorizationHeader);
         //when
-        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate, null, null, null);
+        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate, null, null, null,
+                                                                                        authorizationHeader);
         int distanceFromResponse = responseEntity.getBody().getValue();
         //then
         assertThat(distanceFromResponse).isGreaterThan(0);
@@ -225,14 +241,17 @@ public class TrainingControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
-        Training training = trainingTestUtil.addTraining(testRestTemplate, trainingRequirements);
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
+        Training training = trainingTestUtil.addTraining(testRestTemplate, trainingRequirements, authorizationHeader);
         //when
         ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate,
                 training.getId(),
                 null,
-                null);
+                null,
+                authorizationHeader);
         int distanceFromResponse = responseEntity.getBody().getValue();
         //then
         assertThat(distanceFromResponse).isGreaterThan(0);
@@ -243,16 +262,19 @@ public class TrainingControllerEndToEndTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
-        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
+        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements, authorizationHeader);
         LocalDateTime startDate = LocalDateTime.of(2100, 7, 30, 6, 40, 45);
         LocalDateTime endDate = LocalDateTime.of(2100, 11, 30, 6, 40, 45);
         //when
         ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate,
                 null,
                 startDate,
-                endDate);
+                endDate,
+                authorizationHeader);
         int distanceFromResponse = responseEntity.getBody().getValue();
         //then
         assertThat(distanceFromResponse).isGreaterThan(0);
@@ -262,12 +284,13 @@ public class TrainingControllerEndToEndTest {
     public void generateTrainingTest_shouldReturnTrainingWithExercisesWithEquipment() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
-        trainingRequirements.setMaxDurationInSeconds(3000);
         testUtil.createAdminForTests(); //required to add exercises
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
         testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
         //when
-        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements);
+        ResponseEntity<Training> responseEntity = trainingTestUtil.postTrainingRequirements(testRestTemplate, trainingRequirements, authorizationHeader);
         Training trainingFromResponse = responseEntity.getBody();
         //then
         List<Boolean> doExercisesContainOnlyAvailableEquimpent = trainingFromResponse.getExerciseSeries()

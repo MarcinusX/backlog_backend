@@ -49,7 +49,7 @@ public class ExerciseControllerEndToEndTest {
         exercise.setName("name");
         exercise.setStyle(Style.BACKSTROKE);
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null, null);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null);
         Exercise exerciseFromResponse = responseEntity.getBody();
         //then
         assertThat(exerciseFromResponse.getName()).isEqualTo("name");
@@ -65,11 +65,11 @@ public class ExerciseControllerEndToEndTest {
         exercise.setDescription("description");
         exercise.setName("name");
         exercise.setStyle(Style.BACKSTROKE);
-        ResponseEntity<Exercise> savedResponseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null, null);
+        ResponseEntity<Exercise> savedResponseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null);
         Exercise savedExercise = savedResponseEntity.getBody();
         savedExercise.setDescription("description1");
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise, null, null);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.putExercise(testRestTemplate, savedExercise, null);
         Exercise exerciseFromResponse = responseEntity.getBody();
         //then
         assertThat(exerciseFromResponse.getName()).isEqualTo("name");
@@ -85,10 +85,10 @@ public class ExerciseControllerEndToEndTest {
         exercise.setDescription("description");
         exercise.setName("name");
         exercise.setStyle(Style.BACKSTROKE);
-        ResponseEntity<Exercise> savedResponseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null, null);
+        ResponseEntity<Exercise> savedResponseEntity = trainingTestUtil.postExercise(testRestTemplate, exercise, null);
         Exercise savedExercise = savedResponseEntity.getBody();
         //when
-        ResponseEntity<Exercise> responseEntity = trainingTestUtil.getExercise(testRestTemplate, savedExercise.getId(), null, null);
+        ResponseEntity<Exercise> responseEntity = trainingTestUtil.getExercise(testRestTemplate, savedExercise.getId(), null);
         Exercise exerciseFromResponse = responseEntity.getBody();
         //then
         assertThat(exerciseFromResponse.getName()).isEqualTo("name");

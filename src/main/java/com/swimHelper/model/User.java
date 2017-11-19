@@ -40,6 +40,7 @@ public class User implements UserDetails {
     @NotNull
     @Column(unique = true)
     private String email;
+    private String username;
     private String firstname;
     private String lastname;
     private double weight;
@@ -72,6 +73,7 @@ public class User implements UserDetails {
     public User(String email, String password) {
         this.email = email;
         this.password = password;
+        this.username = email;
     }
 
     @JsonIgnore
@@ -96,7 +98,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 
     @Override

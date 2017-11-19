@@ -1,7 +1,9 @@
 package com.swimHelper.controller.competition;
 
 import com.swimHelper.CompetitionTestUtil;
+import com.swimHelper.security.JwtUser;
 import com.swimHelper.TestUtil;
+import com.swimHelper.TrainingTestUtil;
 import com.swimHelper.controller.CompetitionController;
 import com.swimHelper.exception.*;
 import com.swimHelper.repository.UserRepository;
@@ -13,12 +15,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static com.swimHelper.security.SecurityConstants.HEADER_STRING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -44,6 +45,8 @@ public class CompetitionStatusCodeTest {
     @Autowired
     CompetitionTestUtil competitionTestUtil;
     @Autowired
+    TrainingTestUtil trainingTestUtil;
+    @Autowired
     UserRepository userRepository;
 
     @Before
@@ -57,9 +60,9 @@ public class CompetitionStatusCodeTest {
         //given
         when(competitionControllerMock.assignToCompetition(anyLong()))
                 .thenThrow(new CompetitionExpiredException());
+        HttpEntity<String> entity = createHttpEntity();
         //when
-        ResponseEntity<Object> response = testRestTemplate.withBasicAuth("some@email.com", "somePassword")
-                .exchange("/competitions/1", HttpMethod.POST, null, Object.class);
+        ResponseEntity<Object> response = testRestTemplate.exchange("/competitions/1", HttpMethod.POST, entity, Object.class);
         //then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
@@ -69,9 +72,9 @@ public class CompetitionStatusCodeTest {
         //given
         when(competitionControllerMock.assignToCompetition(anyLong()))
                 .thenThrow(new CompetitionFullException());
+        HttpEntity<String> entity = createHttpEntity();
         //when
-        ResponseEntity<Object> response = testRestTemplate.withBasicAuth("some@email.com", "somePassword")
-                .exchange("/competitions/1", HttpMethod.POST, null, Object.class);
+        ResponseEntity<Object> response = testRestTemplate.exchange("/competitions/1", HttpMethod.POST, entity, Object.class);
         //then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
@@ -81,9 +84,9 @@ public class CompetitionStatusCodeTest {
         //given
         when(competitionControllerMock.getCompetition(anyLong()))
                 .thenThrow(new CompetitionNotFoundException());
+        HttpEntity<String> entity = createHttpEntity();
         //when
-        ResponseEntity<Object> response = testRestTemplate.withBasicAuth("some@email.com", "somePassword")
-                .exchange("/competitions/1", HttpMethod.GET, null, Object.class);
+        ResponseEntity<Object> response = testRestTemplate.exchange("/competitions/1", HttpMethod.GET, entity, Object.class);
         //then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
@@ -93,9 +96,9 @@ public class CompetitionStatusCodeTest {
         //given
         when(competitionControllerMock.addCompetition(any()))
                 .thenThrow(new InvalidCompetitionException(new Throwable()));
+        HttpEntity<String> entity = createHttpEntity();
         //when
-        ResponseEntity<Object> response = testRestTemplate.withBasicAuth("some@email.com", "somePassword")
-                .exchange("/competitions", HttpMethod.POST, null, Object.class);
+        ResponseEntity<Object> response = testRestTemplate.exchange("/competitions", HttpMethod.POST, entity, Object.class);
         //then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
@@ -105,9 +108,9 @@ public class CompetitionStatusCodeTest {
         //given
         when(competitionControllerMock.assignToCompetition(anyLong()))
                 .thenThrow(new OptimisticLockException());
+        HttpEntity<String> entity = createHttpEntity();
         //when
-        ResponseEntity<Object> response = testRestTemplate.withBasicAuth("some@email.com", "somePassword")
-                .exchange("/competitions/1", HttpMethod.POST, null, Object.class);
+        ResponseEntity<Object> response = testRestTemplate.exchange("/competitions/1", HttpMethod.POST, entity, Object.class);
         //then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
@@ -117,9 +120,9 @@ public class CompetitionStatusCodeTest {
         //given
         when(competitionControllerMock.assignToCompetition(anyLong()))
                 .thenThrow(new UserAlreadySignedToCompetition());
+        HttpEntity<String> entity = createHttpEntity();
         //when
-        ResponseEntity<Object> response = testRestTemplate.withBasicAuth("some@email.com", "somePassword")
-                .exchange("/competitions/1", HttpMethod.POST, null, Object.class);
+        ResponseEntity<Object> response = testRestTemplate.exchange("/competitions/1", HttpMethod.POST, entity, Object.class);
         //then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
@@ -129,11 +132,19 @@ public class CompetitionStatusCodeTest {
         //given
         doThrow(new UserNotSignedToCompetition())
                 .when(competitionControllerMock).leaveCompetition(anyLong());
+        HttpEntity<String> entity = createHttpEntity();
         //when
-        ResponseEntity<Object> response = testRestTemplate.withBasicAuth("some@email.com", "somePassword")
-                .exchange("/competitions/leave/1", HttpMethod.DELETE, null, Object.class);
+        ResponseEntity<Object> response = testRestTemplate.exchange("/competitions/leave/1", HttpMethod.DELETE, entity, Object.class);
         //then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    private HttpEntity<String> createHttpEntity() {
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set(HEADER_STRING, authorizationHeader);
+        return new HttpEntity<>(httpHeaders);
     }
 
 }

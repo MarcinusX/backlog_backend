@@ -1,12 +1,12 @@
 package com.swimHelper.controller.calories;
 
 import com.swimHelper.ExerciseSeriesRepository;
+import com.swimHelper.security.JwtUser;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
 import com.swimHelper.model.IntegerWrapper;
 import com.swimHelper.model.Training;
 import com.swimHelper.model.TrainingRequirements;
-import com.swimHelper.model.User;
 import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.repository.TrainingRepository;
 import com.swimHelper.repository.UserRepository;
@@ -68,12 +68,15 @@ public class CaloriesControllerStatusCodesTest {
     public void calculateCalories_whenNoParameters_returns200() throws Exception {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
-        testUtil.createAdminForTests(); //required to add exercises
-        User user = testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
-        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
+        testUtil.createAdminForTests();
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
+        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements, authorizationHeader);
         //when
-        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate, null, null, null);
+        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate, null, null, null,
+                                                                                            authorizationHeader);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -83,13 +86,16 @@ public class CaloriesControllerStatusCodesTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
-        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
+        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements, authorizationHeader);
         LocalDateTime startDate = LocalDateTime.of(2017, 7, 1, 6, 40, 45);
         LocalDateTime endDate = LocalDateTime.of(2017, 8, 30, 6, 40, 45);
         //when
-        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate, null, startDate, endDate);
+        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate, null, startDate, endDate,
+                                                                                            authorizationHeader);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -99,11 +105,14 @@ public class CaloriesControllerStatusCodesTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
-        Training training = trainingTestUtil.addTraining(testRestTemplate, trainingRequirements);
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
+        Training training = trainingTestUtil.addTraining(testRestTemplate, trainingRequirements, authorizationHeader);
         //when
-        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate, training.getId(), null, null);
+        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate, training.getId(), null, null,
+                                                                                            authorizationHeader);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -113,13 +122,16 @@ public class CaloriesControllerStatusCodesTest {
         //given
         TrainingRequirements trainingRequirements = testUtil.createValidTrainingRequirements();
         testUtil.createAdminForTests(); //required to add exercises
-        User user = testUtil.addUser(testRestTemplate);
-        trainingTestUtil.addExercises(testRestTemplate);
-        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements);
+        trainingTestUtil.addExercisesByAdmin(testRestTemplate);
+        testUtil.addUser(testRestTemplate);
+        JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
+        trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements, authorizationHeader);
         LocalDateTime startDate = LocalDateTime.of(2017, 7, 1, 6, 40, 45);
         LocalDateTime endDate = LocalDateTime.of(2017, 8, 30, 6, 40, 45);
         //when
-        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate, 1L, startDate, endDate);
+        ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate, 1L, startDate, endDate,
+                                                                                            authorizationHeader);
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

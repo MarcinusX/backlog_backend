@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static com.swimHelper.security.SecurityConstants.HEADER_STRING;
+
 /**
  * Created by Marcin Szalek on 20.07.17.
  */
@@ -62,13 +64,14 @@ public class TestUtil {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(json, headers);
 
-        return testRestTemplate.postForEntity("/users", entity, User.class);
+        return testRestTemplate.exchange("/users", HttpMethod.POST, entity, User.class);
     }
 
-    public ResponseEntity<User> putUser(TestRestTemplate testRestTemplate, User user) {
+    public ResponseEntity<User> putUser(TestRestTemplate testRestTemplate, User user, String authorizationHeader) {
         String json = jsonUtil.toJson(user);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HEADER_STRING, authorizationHeader);
         HttpEntity<String> entity = new HttpEntity<>(json, headers);
 
         return testRestTemplate.exchange("/users", HttpMethod.PUT, entity, User.class);

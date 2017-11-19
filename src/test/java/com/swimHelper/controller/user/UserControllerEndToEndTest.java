@@ -1,6 +1,7 @@
 package com.swimHelper.controller.user;
 
 import com.swimHelper.TestUtil;
+import com.swimHelper.TrainingTestUtil;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.UserRepository;
 import org.junit.Test;
@@ -32,6 +33,8 @@ public class UserControllerEndToEndTest {
 
     @Autowired
     private TestUtil testUtil;
+    @Autowired
+    private TrainingTestUtil trainingTestUtil;
 
     @Test
     public void addUpdateAndGetUser() throws Exception {
@@ -44,7 +47,7 @@ public class UserControllerEndToEndTest {
         ResponseEntity<User> responseEntity1 = testUtil.postUser(testRestTemplate, user);
         User userToUpdate = responseEntity1.getBody();
         userToUpdate.setWeight(75.0);
-        ResponseEntity<User> responseEntity2 = testUtil.putUser(testRestTemplate, userToUpdate);
+        ResponseEntity<User> responseEntity2 = testUtil.putUser(testRestTemplate, userToUpdate, null);
         ResponseEntity<User> responseEntity3 = testRestTemplate.getForEntity("/users/" + userToUpdate.getId(), User.class);
         //then
         assertThat(responseEntity3.getBody().getEmail()).isEqualTo("some@email.com");

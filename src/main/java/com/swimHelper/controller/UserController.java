@@ -4,8 +4,6 @@ import com.swimHelper.exception.BusinessException;
 import com.swimHelper.exception.UserNotFoundException;
 import com.swimHelper.model.Role;
 import com.swimHelper.model.User;
-import com.swimHelper.security.JwtTokenUtil;
-import com.swimHelper.security.JwtUser;
 import com.swimHelper.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,13 +26,11 @@ public class UserController {
     @Value("${jwt.header}")
     private String tokenHeader;
 
-    private final JwtTokenUtil jwtTokenUtil;
 
     private final UserDetailsService userDetailsService;
 
-    public UserController(UserService userService, JwtTokenUtil jwtTokenUtil, UserDetailsService userDetailsService) {
+    public UserController(UserService userService, UserDetailsService userDetailsService) {
         this.userService = userService;
-        this.jwtTokenUtil = jwtTokenUtil;
         this.userDetailsService = userDetailsService;
     }
 
@@ -69,13 +65,5 @@ public class UserController {
     @RolesAllowed({Role.NAME_ADMIN})
     public User makeUserAdmin(@PathVariable Long userId) throws BusinessException {
         return userService.makeUserAdmin(userId);
-    }
-
-    @RequestMapping(value = "user", method = RequestMethod.GET)
-    public JwtUser getAuthenticatedUser(HttpServletRequest request) {
-        String token = request.getHeader(tokenHeader).substring(7);
-        String username = jwtTokenUtil.getUsernameFromToken(token);
-        JwtUser user = (JwtUser) userDetailsService.loadUserByUsername(username);
-        return user;
     }
 }

@@ -1,6 +1,7 @@
 package com.swimHelper.security;
 
 import com.swimHelper.TestUtil;
+import com.swimHelper.TrainingTestUtil;
 import com.swimHelper.model.User;
 import com.swimHelper.repository.UserRepository;
 import com.swimHelper.service.UserService;
@@ -11,14 +12,13 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Collections;
 
+import static com.swimHelper.security.SecurityConstants.HEADER_STRING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -37,6 +37,8 @@ public class UserSecurityIntegrationTest {
     private TestRestTemplate testRestTemplate;
     @Autowired
     private TestUtil testUtil;
+    @Autowired
+    private TrainingTestUtil trainingTestUtil;
 
     @Before
     public void init() {
@@ -60,15 +62,17 @@ public class UserSecurityIntegrationTest {
     }
 
     @Test
-    public void unauthenticatedUserCantAccessUserData() throws Exception {
+    public void unauthorizedUserCantAccessUserData() throws Exception {
         //given
         User user = createUser("some@email.com", "12345");
         ResponseEntity<User> createdUserEntity = testRestTemplate.postForEntity("/users", user, User.class);
         //when
+        HttpHeaders httpHeaders = new HttpHeaders();
+        HttpEntity httpEntity = new HttpEntity(httpHeaders);
         ResponseEntity<User> userResponseEntity =
-                testRestTemplate.getForEntity("/users/" + createdUserEntity.getBody().getId(), User.class);
+                testRestTemplate.exchange("/users/" + createdUserEntity.getBody().getId(), HttpMethod.GET, httpEntity, User.class);
         //then
-        assertThat(userResponseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(userResponseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -76,11 +80,14 @@ public class UserSecurityIntegrationTest {
         //given
         User user = createUser("some@email.com", "12345");
         ResponseEntity<User> createdUserEntity = testUtil.postUser(testRestTemplate, user);
+        JwtUser jwtUser = new JwtUser("some@email.com", "12345");
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, jwtUser);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set(HEADER_STRING, authorizationHeader);
+        HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
         //when
         ResponseEntity<User> userResponseEntity =
-                testRestTemplate
-                        .withBasicAuth("some@email.com", "12345")
-                        .getForEntity("/users/" + createdUserEntity.getBody().getId(), User.class);
+                testRestTemplate.exchange("/users/" + createdUserEntity.getBody().getId(), HttpMethod.GET, httpEntity, User.class);
         //then
         assertThat(userResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(userResponseEntity.getBody()).isNotNull();
@@ -109,9 +116,10 @@ public class UserSecurityIntegrationTest {
         ResponseEntity<User> createdUserEntity = testUtil.postUser(testRestTemplate, user);
         user = createdUserEntity.getBody();
         user.setWeight(23.0);
+        JwtUser jwtUser = new JwtUser("some@email.com", "12345");
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, jwtUser);
         //when
-        ResponseEntity<User> userResponseEntity = testUtil.putUser(testRestTemplate
-                .withBasicAuth("some@email.com", "12345"), user);
+        ResponseEntity<User> userResponseEntity = testUtil.putUser(testRestTemplate, user, authorizationHeader);
         //then
         assertThat(userResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(userResponseEntity.getBody()).isNotNull();
@@ -126,10 +134,11 @@ public class UserSecurityIntegrationTest {
         ResponseEntity<User> createdUserEntity2 = testUtil.postUser(testRestTemplate, user2);
         user2 = createdUserEntity2.getBody();
         user2.setStyleStatistics(Collections.emptyList());
+        JwtUser jwtUser = new JwtUser("user1@email.com", "pass1");
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, jwtUser);
         //when
         ResponseEntity<User> userResponseEntity =
-                testUtil.putUser(testRestTemplate.withBasicAuth("user1@email.com", "pass1"),
-                        user2);
+                testUtil.putUser(testRestTemplate, user2, authorizationHeader);
         //then
         assertThat(userResponseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
@@ -154,11 +163,15 @@ public class UserSecurityIntegrationTest {
         User user = createUser("user1@email.com", "pass1");
         User body = testUtil.postUser(testRestTemplate, user).getBody();
         userService.makeUserAdmin(body.getId());
+        JwtUser jwtUser = new JwtUser("user1@email.com", "pass1");
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, jwtUser);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set(HEADER_STRING, authorizationHeader);
+        HttpEntity httpEntity = new HttpEntity(httpHeaders);
         //when
         ResponseEntity usersResponseEntity =
                 testRestTemplate
-                        .withBasicAuth("user1@email.com", "pass1")
-                        .getForEntity("/users/", Object.class);
+                        .exchange("/users/", HttpMethod.GET, httpEntity, Object.class);
         //then
         assertThat(usersResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -183,11 +196,14 @@ public class UserSecurityIntegrationTest {
         User user = createUser("user1@email.com", "pass1");
         user = testUtil.postUser(testRestTemplate, user).getBody();
         userService.makeUserAdmin(user.getId());
+        JwtUser jwtUser = new JwtUser("user1@email.com", "pass1");
+        String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, jwtUser);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set(HEADER_STRING, authorizationHeader);
+        HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
         //when
         ResponseEntity usersResponseEntity =
-                testRestTemplate
-                        .withBasicAuth("user1@email.com", "pass1")
-                        .exchange("/users/admin/" + user.getId() + "/makeAdmin", HttpMethod.PUT, null, User.class);
+                testRestTemplate.exchange("/users/admin/" + user.getId() + "/makeAdmin", HttpMethod.PUT, httpEntity, User.class);
         //then
         assertThat(usersResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }

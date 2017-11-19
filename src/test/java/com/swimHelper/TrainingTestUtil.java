@@ -1,16 +1,21 @@
 package com.swimHelper;
 
+import com.swimHelper.exception.BusinessException;
 import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
+import com.swimHelper.security.JwtUser;
 import com.swimHelper.util.JsonUtil;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+import static com.swimHelper.security.SecurityConstants.HEADER_STRING;
 
 /**
  * Created by mstobieniecka on 2017-08-26.
@@ -29,107 +34,96 @@ public class TrainingTestUtil {
 
     //*********************END TO END TESTS METHODS********************************//
 
-    public ResponseEntity<Exercise> postExercise(TestRestTemplate testRestTemplate, Exercise exercise, String email, String password) {
+    public ResponseEntity<Exercise> postExercise(TestRestTemplate testRestTemplate, Exercise exercise, String authorizationHeader) throws IOException, JSONException {
         String json = jsonUtil.toJson(exercise);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HEADER_STRING, authorizationHeader);
         HttpEntity<String> entity = new HttpEntity<>(json, headers);
-        if (email == null || password == null) {
-            return testRestTemplate.postForEntity("/exercises", entity, Exercise.class);
-        } else {
-            return testRestTemplate.withBasicAuth(email, password).postForEntity("/exercises", entity, Exercise.class);
-        }
+        return testRestTemplate.postForEntity("/exercises", entity, Exercise.class);
     }
 
-    public ResponseEntity<Exercise> putExercise(TestRestTemplate testRestTemplate, Exercise exercise, String email, String password) {
+    public ResponseEntity<Exercise> putExercise(TestRestTemplate testRestTemplate, Exercise exercise, String authorizationHeader) {
         String json = jsonUtil.toJson(exercise);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HEADER_STRING, authorizationHeader);
         HttpEntity<String> entity = new HttpEntity<>(json, headers);
-
-        if (email == null || password == null) {
-            return testRestTemplate.exchange("/exercises", HttpMethod.PUT, entity, Exercise.class);
-        } else {
-            return testRestTemplate.withBasicAuth(email, password).exchange("/exercises", HttpMethod.PUT, entity, Exercise.class);
-        }
+        return testRestTemplate.exchange("/exercises", HttpMethod.PUT, entity, Exercise.class);
     }
 
-    public ResponseEntity<Exercise> getExercise(TestRestTemplate testRestTemplate, Long id, String email, String password) {
+    public ResponseEntity<Exercise> getExercise(TestRestTemplate testRestTemplate, Long id, String authorizationHeader) {
         HttpHeaders headers = new HttpHeaders();
+        headers.set(HEADER_STRING, authorizationHeader);
         HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        if (email == null || password == null) {
-            return testRestTemplate.exchange("/exercises/" + id, HttpMethod.GET, entity, Exercise.class);
-        } else {
-            return testRestTemplate.withBasicAuth(email, password).exchange("/exercises/" + id, HttpMethod.GET, entity, Exercise.class);
-        }
+        return testRestTemplate.exchange("/exercises/" + id, HttpMethod.GET, entity, Exercise.class);
     }
 
-    public ResponseEntity<Training> postTrainingRequirements(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements) {
+    public ResponseEntity<Training> postTrainingRequirements(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements, String authorizationHeader) {
         String json = jsonUtil.toJson(trainingRequirements);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HEADER_STRING, authorizationHeader);
         HttpEntity<String> entity = new HttpEntity<>(json, headers);
-
-        return testRestTemplate.withBasicAuth(USER_EMAIL, USER_PASSWORD).
-                exchange("/trainings", HttpMethod.POST, entity, Training.class);
+        return testRestTemplate.exchange("/trainings", HttpMethod.POST, entity, Training.class);
     }
 
-    public ResponseEntity<Training> putTraining(TestRestTemplate testRestTemplate, Training training) {
+    public ResponseEntity<Training> putTraining(TestRestTemplate testRestTemplate, Training training, String authorizationHeader) throws IOException, JSONException {
         String json = jsonUtil.toJson(training);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HEADER_STRING, authorizationHeader);
         HttpEntity<String> entity = new HttpEntity<>(json, headers);
 
-        return testRestTemplate.withBasicAuth(USER_EMAIL, USER_PASSWORD).
-                exchange("/trainings", HttpMethod.PUT, entity, Training.class);
+        return testRestTemplate.exchange("/trainings", HttpMethod.PUT, entity, Training.class);
     }
 
     public ResponseEntity<IntegerWrapper> countDistance(TestRestTemplate testRestTemplate,
                                                         Long trainingId,
                                                         LocalDateTime startDate,
-                                                        LocalDateTime endDate) {
+                                                        LocalDateTime endDate,
+                                                        String authorizationHeader) {
         StringBuilder url = new StringBuilder().append("/trainings?");
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+        headers.set(HEADER_STRING, authorizationHeader);
 
         HttpEntity<?> entity = new HttpEntity<>(headers);
         url = addParamsToUrl(url, trainingId, startDate, endDate);
 
-        return testRestTemplate.withBasicAuth(USER_EMAIL, USER_PASSWORD)
-                .exchange(url.toString(), HttpMethod.GET, entity, IntegerWrapper.class);
+        return testRestTemplate.exchange(url.toString(), HttpMethod.GET, entity, IntegerWrapper.class);
     }
 
     public ResponseEntity<IntegerWrapper> calculateCalories(TestRestTemplate testRestTemplate,
                                                             Long trainingId,
                                                             LocalDateTime startDate,
-                                                            LocalDateTime endDate) {
+                                                            LocalDateTime endDate,
+                                                            String authorizationHeader) throws IOException, JSONException {
         StringBuilder url = new StringBuilder().append("/calories?");
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-
+        headers.set(HEADER_STRING, authorizationHeader);
         HttpEntity<?> entity = new HttpEntity<>(headers);
         url = addParamsToUrl(url, trainingId, startDate, endDate);
 
-        return testRestTemplate.withBasicAuth(USER_EMAIL, USER_PASSWORD)
-                .exchange(url.toString(), HttpMethod.GET, entity, IntegerWrapper.class);
+        return testRestTemplate.exchange(url.toString(), HttpMethod.GET, entity, IntegerWrapper.class);
     }
 
     //*****************TRAININGS******************//
 
-    public void addTrainings(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements) {
+    public void addTrainings(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements, String authorizationHeader) throws IOException, JSONException {
         for (int i = 0; i < 5; i++) {
-            addTraining(testRestTemplate, trainingRequirements);
+            addTraining(testRestTemplate, trainingRequirements, authorizationHeader);
         }
     }
 
-    public Training addTraining(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements) {
-        Training training = postTrainingRequirements(testRestTemplate, trainingRequirements).getBody();
+    public Training addTraining(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements, String authorizationHeader) throws IOException, JSONException {
+        Training training = postTrainingRequirements(testRestTemplate, trainingRequirements, authorizationHeader).getBody();
         training.getExerciseSeries().forEach(es -> {
             es.setCompletedRepeats(3);
             es.setAverageDurationOfOneRepeatInSeconds(300);
         });
-        return putTraining(testRestTemplate, training).getBody();
+        return putTraining(testRestTemplate, training, authorizationHeader).getBody();
     }
 
     public Training createValidTraining() {
@@ -166,7 +160,7 @@ public class TrainingTestUtil {
 
     //*****************EXERCISES******************//
 
-    public void addExercises(TestRestTemplate testRestTemplate) {
+    public void addExercises(TestRestTemplate testRestTemplate, String authorizationHeader) throws IOException, JSONException {
         for (int i = 0; i < 6; i++) {
             Exercise exercise = new Exercise(Style.BACKSTROKE);
             exercise.setDescription("desc");
@@ -179,7 +173,7 @@ public class TrainingTestUtil {
             exercise.getRequiredTrainingEquipment().add(TrainingEquipment.FINS);
             exercise.getRequiredTrainingEquipment().add(TrainingEquipment.PADDLES);
 
-            ResponseEntity<Exercise> responseEntity = postExercise(testRestTemplate, exercise, ADMIN_EMAIL, ADMIN_PASSWORD);
+            ResponseEntity<Exercise> responseEntity = postExercise(testRestTemplate, exercise, authorizationHeader);
         }
     }
 
@@ -229,5 +223,20 @@ public class TrainingTestUtil {
             url.append("endDate=" + endDate.toString());
         }
         return url;
+    }
+
+    public String getAuthorizationHeader(TestRestTemplate testRestTemplate, JwtUser user) {
+        String json = jsonUtil.toJson(user);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(json, headers);
+        ResponseEntity<Object> responseEntity = testRestTemplate.postForEntity("/login", entity, Object.class);
+        return responseEntity.getHeaders().get(HEADER_STRING).get(0); //return HEADER_STRING header with token
+    }
+
+    public void addExercisesByAdmin(TestRestTemplate testRestTemplate) throws BusinessException, IOException, JSONException {
+        JwtUser admin = new JwtUser(TrainingTestUtil.ADMIN_EMAIL, TrainingTestUtil.ADMIN_PASSWORD);
+        String authorizationHeader = getAuthorizationHeader(testRestTemplate, admin);
+        addExercises(testRestTemplate, authorizationHeader);
     }
 }
