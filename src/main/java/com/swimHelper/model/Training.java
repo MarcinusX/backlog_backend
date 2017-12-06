@@ -30,4 +30,5 @@ public class Training {
     private boolean hasUserBeenNotified;
     private LocalDateTime notificationDateTime;
     private LocalDateTime trainingDateTime;
+    private double completedPercentage;
 }

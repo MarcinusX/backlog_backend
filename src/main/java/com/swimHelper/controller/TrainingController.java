@@ -14,6 +14,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by mstobieniecka on 2017-07-19.
@@ -37,7 +40,7 @@ public class TrainingController {
         return training;
     }
 
-    @PreAuthorize("principal.id == #training.user.id")
+//    @PreAuthorize("principal.id == #training.user.id")
     @PutMapping
     public Training updateTraining(@RequestBody Training training) throws BusinessException {
         return trainingService.setTrainingCompletion(training);
@@ -52,6 +55,30 @@ public class TrainingController {
         IntegerWrapper integerWrapper = new IntegerWrapper();
         integerWrapper.setValue(trainingService.countDistance(user.getId(), trainingId, startDate, endDate));
         return integerWrapper;
+    }
+
+    @GetMapping("upcoming")
+    public List<Training> getUpcompingTrainings() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return trainingService.getUpcomingTrainings(user.getId());
+    }
+
+    @GetMapping("finished")
+    public List<Training> getFinishedTrainings() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return trainingService.getFinishedTrainings(user.getId());
+    }
+
+    @GetMapping("completed")
+    public List<Training> getCompletedTrainings() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return trainingService.getCompletedTrainings(user.getId());
+    }
+
+    @GetMapping("uncompleted")
+    public List<Training> getUncompletedTrainings() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return trainingService.getUncompletedTrainings(user.getId());
     }
 }
 

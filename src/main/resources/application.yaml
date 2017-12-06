@@ -34,7 +34,7 @@ spring:
   #Local Date Time
   jackson:
     serialization:
-      WRITE_DATES_AS_TIMESTAMPS: false
+      write_dates_as_timestamps: false
   #Database
   h2:
     console:
