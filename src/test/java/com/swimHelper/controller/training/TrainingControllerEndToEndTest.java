@@ -1,13 +1,13 @@
 package com.swimHelper.controller.training;
 
 import com.swimHelper.ExerciseSeriesRepository;
-import com.swimHelper.security.JwtUser;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
 import com.swimHelper.model.*;
 import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.repository.TrainingRepository;
 import com.swimHelper.repository.UserRepository;
+import com.swimHelper.security.JwtUser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -267,8 +268,11 @@ public class TrainingControllerEndToEndTest {
         JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
         String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
         trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements, authorizationHeader);
-        LocalDateTime startDate = LocalDateTime.of(2100, 7, 30, 6, 40, 45);
-        LocalDateTime endDate = LocalDateTime.of(2100, 11, 30, 6, 40, 45);
+        String endDateString = "2100-11-30 06:40";
+        String startDateString = "2100-07-30 06:40";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime endDate = LocalDateTime.parse(endDateString, formatter);
+        LocalDateTime startDate = LocalDateTime.parse(startDateString, formatter);
         //when
         ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate,
                 null,

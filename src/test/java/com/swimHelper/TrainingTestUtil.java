@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.swimHelper.security.SecurityConstants.HEADER_STRING;
 
@@ -118,7 +119,8 @@ public class TrainingTestUtil {
     }
 
     public Training addTraining(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements, String authorizationHeader) throws IOException, JSONException {
-        Training training = postTrainingRequirements(testRestTemplate, trainingRequirements, authorizationHeader).getBody();
+        ResponseEntity<Training> trainingResponseEntity = postTrainingRequirements(testRestTemplate, trainingRequirements, authorizationHeader);
+        Training training = trainingResponseEntity.getBody();
         training.getExerciseSeries().forEach(es -> {
             es.setCompletedRepeats(3);
             es.setAverageDurationOfOneRepeatInSeconds(300);

@@ -84,7 +84,7 @@ public class TrainingGenerator {
         List<Exercise> matchingExercises = trainingRequirements.getStyles().stream()
                 .flatMap(style -> exerciseRepository.findByStyle(style).stream())
                 .filter(e -> !e.isWarmUpRelax()).collect(Collectors.toList());
-        if(trainingRequirements.getAvailableTrainingEquipment().size() > 0) {
+        if(!trainingRequirements.getAvailableTrainingEquipment().isEmpty()) {
             matchingExercises = matchingExercises.stream().filter(e -> e.getRequiredTrainingEquipment()
                     .isEmpty() || trainingRequirements.getAvailableTrainingEquipment().containsAll(e.getRequiredTrainingEquipment()))
                     .collect(Collectors.toList());
