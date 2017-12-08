@@ -1,6 +1,7 @@
 package com.swimHelper.controller;
 
 import com.swimHelper.exception.BusinessException;
+import com.swimHelper.exception.ForbiddenAccessException;
 import com.swimHelper.model.IntegerWrapper;
 import com.swimHelper.model.Training;
 import com.swimHelper.model.TrainingRequirements;
@@ -8,13 +9,12 @@ import com.swimHelper.model.User;
 import com.swimHelper.service.TrainingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,13 +60,15 @@ public class TrainingController {
     @GetMapping("upcoming")
     public List<Training> getUpcompingTrainings() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return trainingService.getUpcomingTrainings(user.getId());
+        return trainingService.getUpcomingTrainings(user.getId()).stream()
+                .sorted(Comparator.comparing(Training::getTrainingDateTime)).collect(Collectors.toList());
     }
 
     @GetMapping("finished")
     public List<Training> getFinishedTrainings() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return trainingService.getFinishedTrainings(user.getId());
+        return trainingService.getFinishedTrainings(user.getId()).stream()
+                .sorted(Comparator.comparing(Training::getTrainingDateTime).reversed()).collect(Collectors.toList());
     }
 
     @GetMapping("completed")
@@ -79,6 +81,12 @@ public class TrainingController {
     public List<Training> getUncompletedTrainings() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return trainingService.getUncompletedTrainings(user.getId());
+    }
+
+    @GetMapping("{id}")
+    public Training getTraining(@PathVariable ("id") Long id) throws ForbiddenAccessException {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return trainingService.getTraining(user.getId(), id);
     }
 }
 

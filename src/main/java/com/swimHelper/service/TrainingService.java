@@ -1,10 +1,7 @@
 package com.swimHelper.service;
 
 import com.swimHelper.component.training.DistanceTracker;
-import com.swimHelper.exception.BusinessException;
-import com.swimHelper.exception.InvalidTrainingException;
-import com.swimHelper.exception.TrainingNotFoundException;
-import com.swimHelper.exception.UserNotFoundException;
+import com.swimHelper.exception.*;
 import com.swimHelper.generator.TrainingGenerator;
 import com.swimHelper.model.ExerciseSeries;
 import com.swimHelper.model.Training;
@@ -104,6 +101,15 @@ public class TrainingService {
         return trainings.stream().filter(t ->
                 t.getTrainingDateTime().isBefore(LocalDateTime.now()) && countCompletedDistance(t) == 0
         ).collect(Collectors.toList());
+    }
+
+    public Training getTraining(Long userId, Long trainingId) throws ForbiddenAccessException {
+        Training training = trainingRepository.findOne(trainingId);
+        if(userId.equals(training.getUser().getId())) {
+            return training;
+        } else {
+            throw  new ForbiddenAccessException();
+        }
     }
 
     private int countCompletedDistance(Training training) {

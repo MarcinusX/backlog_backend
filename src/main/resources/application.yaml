@@ -42,7 +42,7 @@ spring:
       path: /h2
   # Datasource
   datasource:
-    url: jdbc:h2:file:~/test
+    url: jdbc:h2:file:~/test1
     username: sa
     password:
     driver-class-name: org.h2.Driver
