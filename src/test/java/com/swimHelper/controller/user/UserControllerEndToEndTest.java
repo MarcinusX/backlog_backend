@@ -3,6 +3,7 @@ package com.swimHelper.controller.user;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
 import com.swimHelper.model.User;
+import com.swimHelper.repository.TrainingRepository;
 import com.swimHelper.repository.UserRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +30,9 @@ public class UserControllerEndToEndTest {
     private UserRepository userRepository;
 
     @Autowired
+    private TrainingRepository trainingRepository;
+
+    @Autowired
     private TestRestTemplate testRestTemplate;
 
     @Autowired
@@ -39,6 +43,7 @@ public class UserControllerEndToEndTest {
     @Test
     public void addUpdateAndGetUser() throws Exception {
         //given
+        trainingRepository.deleteAll();
         userRepository.deleteAll();
         User user = new User();
         user.setEmail("some@email.com");
