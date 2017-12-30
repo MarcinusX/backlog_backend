@@ -1,12 +1,12 @@
 package com.swimHelper.controller.competition;
 
 import com.swimHelper.CompetitionTestUtil;
-import com.swimHelper.security.JwtUser;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
 import com.swimHelper.controller.CompetitionController;
 import com.swimHelper.exception.*;
 import com.swimHelper.repository.UserRepository;
+import com.swimHelper.security.JwtUser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,7 +51,6 @@ public class CompetitionStatusCodeTest {
 
     @Before
     public void addUser() {
-        userRepository.deleteAll();
         testUtil.postUser(testRestTemplate, testUtil.createValidUser());
     }
 

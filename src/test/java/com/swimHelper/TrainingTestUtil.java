@@ -12,8 +12,11 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.swimHelper.security.SecurityConstants.HEADER_STRING;
 
@@ -60,6 +63,7 @@ public class TrainingTestUtil {
     }
 
     public ResponseEntity<Training> postTrainingRequirements(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements, String authorizationHeader) {
+        LocalDateTime trainingDateTime = trainingRequirements.getTrainingDateTime();
         String json = jsonUtil.toJson(trainingRequirements);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -80,8 +84,8 @@ public class TrainingTestUtil {
 
     public ResponseEntity<IntegerWrapper> countDistance(TestRestTemplate testRestTemplate,
                                                         Long trainingId,
-                                                        LocalDateTime startDate,
-                                                        LocalDateTime endDate,
+                                                        LocalDate startDate,
+                                                        LocalDate endDate,
                                                         String authorizationHeader) {
         StringBuilder url = new StringBuilder().append("/trainings?");
         HttpHeaders headers = new HttpHeaders();
@@ -96,8 +100,8 @@ public class TrainingTestUtil {
 
     public ResponseEntity<IntegerWrapper> calculateCalories(TestRestTemplate testRestTemplate,
                                                             Long trainingId,
-                                                            LocalDateTime startDate,
-                                                            LocalDateTime endDate,
+                                                            LocalDate startDate,
+                                                            LocalDate endDate,
                                                             String authorizationHeader) throws IOException, JSONException {
         StringBuilder url = new StringBuilder().append("/calories?");
         HttpHeaders headers = new HttpHeaders();
@@ -118,7 +122,8 @@ public class TrainingTestUtil {
     }
 
     public Training addTraining(TestRestTemplate testRestTemplate, TrainingRequirements trainingRequirements, String authorizationHeader) throws IOException, JSONException {
-        Training training = postTrainingRequirements(testRestTemplate, trainingRequirements, authorizationHeader).getBody();
+        ResponseEntity<Training> trainingResponseEntity = postTrainingRequirements(testRestTemplate, trainingRequirements, authorizationHeader);
+        Training training = trainingResponseEntity.getBody();
         training.getExerciseSeries().forEach(es -> {
             es.setCompletedRepeats(3);
             es.setAverageDurationOfOneRepeatInSeconds(300);
@@ -211,16 +216,17 @@ public class TrainingTestUtil {
     }
 
     private StringBuilder addParamsToUrl(StringBuilder url, Long trainingId,
-                                         LocalDateTime startDate,
-                                         LocalDateTime endDate) {
+                                         LocalDate startDate,
+                                         LocalDate endDate) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         if (trainingId != null) {
             url.append("trainingId=" + trainingId.toString() + "&");
         }
         if (startDate != null) {
-            url.append("startDate=" + startDate.toString() + "&");
+            url.append("startDate=" + startDate.format(dateTimeFormatter)+ "&");
         }
         if (endDate != null) {
-            url.append("endDate=" + endDate.toString());
+            url.append("endDate=" + endDate.format(dateTimeFormatter));
         }
         return url;
     }

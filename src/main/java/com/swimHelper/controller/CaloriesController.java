@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /**
  * Created by Marcin Szalek on 04.09.17.
@@ -31,12 +33,18 @@ public class CaloriesController {
 
     @GetMapping
     public IntegerWrapper getCaloriesBurned(@RequestParam(required = false) Long trainingId,
-                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) throws BusinessException {
+                                            @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate startDate,
+                                            @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate endDate) throws BusinessException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         IntegerWrapper integerWrapper = new IntegerWrapper();
-        integerWrapper.setValue(caloriesService.calculateCalories(user.getId(), trainingId, startDate, endDate));
+        LocalDateTime startDateTime = null;
+        LocalDateTime endDateTime = null;
+        if(startDate != null && endDate != null) {
+            startDateTime = LocalDateTime.of(startDate, LocalTime.MIN);
+            endDateTime = LocalDateTime.of(endDate, LocalTime.MAX);
+        }
+        integerWrapper.setValue(caloriesService.calculateCalories(user.getId(), trainingId, startDateTime, endDateTime));
         return integerWrapper;
     }
 }

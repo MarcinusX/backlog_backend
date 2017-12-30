@@ -1,5 +1,6 @@
 package com.swimHelper.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,6 +29,9 @@ public class Training {
     @JsonIgnoreProperties(value = {"trainings"}, allowSetters = true)
     private User user;
     private boolean hasUserBeenNotified;
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime notificationDateTime;
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime trainingDateTime;
+    private double completedPercentage;
 }

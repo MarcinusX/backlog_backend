@@ -3,10 +3,9 @@ package com.swimHelper.model;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Created by Monia on 2017-07-18.
@@ -26,4 +25,5 @@ public class ExerciseSeries {
     private int durationOfOneExerciseInSeconds;
     private int completedRepeats;
     private int averageDurationOfOneRepeatInSeconds;
+    private double completedPercentage = 0;
 }

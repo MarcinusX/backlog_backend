@@ -1,8 +1,12 @@
 package com.swimHelper.controller.calories;
 
-import com.swimHelper.*;
+import com.swimHelper.ExerciseSeriesRepository;
+import com.swimHelper.TestUtil;
+import com.swimHelper.TrainingTestUtil;
 import com.swimHelper.exception.BusinessException;
-import com.swimHelper.model.*;
+import com.swimHelper.model.IntegerWrapper;
+import com.swimHelper.model.Training;
+import com.swimHelper.model.TrainingRequirements;
 import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.repository.TrainingRepository;
 import com.swimHelper.repository.UserRepository;
@@ -19,7 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -111,8 +116,11 @@ public class CaloriesControllerEndToEndTest {
         JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
         String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
         trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements, authorizationHeader);
-        LocalDateTime startDate = LocalDateTime.of(2100, 7, 30, 6, 40, 45);
-        LocalDateTime endDate = LocalDateTime.of(2100, 11, 30, 6, 40, 45);
+        String endDateString = "30/11/2100";
+        String startDateString = "07/03/2100";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate endDate = LocalDate.parse(endDateString, formatter);
+        LocalDate startDate = LocalDate.parse(startDateString, formatter);
         //when
         ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate,
                 null,

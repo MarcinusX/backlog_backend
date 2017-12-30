@@ -1,10 +1,7 @@
 package com.swimHelper.service;
 
 import com.swimHelper.component.training.DistanceTracker;
-import com.swimHelper.exception.BusinessException;
-import com.swimHelper.exception.InvalidTrainingException;
-import com.swimHelper.exception.TrainingNotFoundException;
-import com.swimHelper.exception.UserNotFoundException;
+import com.swimHelper.exception.*;
 import com.swimHelper.generator.TrainingGenerator;
 import com.swimHelper.model.ExerciseSeries;
 import com.swimHelper.model.Training;
@@ -20,6 +17,7 @@ import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by mstobieniecka on 2017-07-19.
@@ -80,6 +78,58 @@ public class TrainingService {
         }
     }
 
+    public Training updateTrainingDate(Long trainingId, LocalDateTime trainingDateTime) throws BusinessException {
+        Training trainingFromDb = getTrainingForUpdate(trainingId);
+        trainingFromDb.setTrainingDateTime(trainingDateTime);
+        trainingFromDb.setNotificationDateTime(trainingDateTime.minusHours(1));
+        try {
+            return trainingRepository.saveAndFlush(trainingFromDb);
+        } catch (ConstraintViolationException e) {
+            throw new InvalidTrainingException(e.getMessage());
+        }
+    }
+
+    public List<Training> getUpcomingTrainings(Long id) {
+        List<Training> trainings = trainingRepository.findTrainingsByUser(id);
+        return trainings.stream().filter(t -> t.getTrainingDateTime().isAfter(LocalDateTime.now())).collect(Collectors.toList());
+    }
+
+    public List<Training> getFinishedTrainings(Long id) {
+        List<Training> trainings = trainingRepository.findTrainingsByUser(id);
+        return trainings.stream().filter(t ->
+                t.getTrainingDateTime().isBefore(LocalDateTime.now())).collect(Collectors.toList());
+    }
+
+    public List<Training> getCompletedTrainings(Long id) {
+        List<Training> trainings = trainingRepository.findTrainingsByUser(id);
+        return trainings.stream().filter(t ->
+            t.getTrainingDateTime().isBefore(LocalDateTime.now()) && countCompletedDistance(t) > 0
+        ).collect(Collectors.toList());
+    }
+
+    public List<Training> getUncompletedTrainings(Long id) {
+        List<Training> trainings = trainingRepository.findTrainingsByUser(id);
+        return trainings.stream().filter(t ->
+                t.getTrainingDateTime().isBefore(LocalDateTime.now()) && countCompletedDistance(t) == 0
+        ).collect(Collectors.toList());
+    }
+
+    public Training getTraining(Long userId, Long trainingId) throws ForbiddenAccessException {
+        Training training = trainingRepository.findOne(trainingId);
+        if(userId.equals(training.getUser().getId())) {
+            return training;
+        } else {
+            throw  new ForbiddenAccessException();
+        }
+    }
+
+    private int countCompletedDistance(Training training) {
+        int percentage = 0;
+        for (ExerciseSeries exerciseSeries : training.getExerciseSeries()) {
+            percentage += exerciseSeries.getCompletedPercentage();
+        }
+        return percentage;
+    }
     private void updateTrainingSeries(Training training, Training trainingFromDb) {
         List<ExerciseSeries> existingExerciseSeries = new ArrayList<>(trainingFromDb.getExerciseSeries());
         List<ExerciseSeries> exerciseSeriesToUpdate = new ArrayList<>(training.getExerciseSeries());
@@ -89,9 +139,22 @@ public class TrainingService {
                     .ifPresent(es -> {
                                 es.setAverageDurationOfOneRepeatInSeconds(series.getAverageDurationOfOneRepeatInSeconds());
                                 es.setCompletedRepeats(series.getCompletedRepeats());
+                                es.setCompletedPercentage(series.getCompletedRepeats() / es.getRepeats());
                             }
                     );
         });
+        trainingFromDb.setCompletedPercentage(countCompletedPercentageForTraining(training));
+    }
+
+    private double countCompletedPercentageForTraining (Training training) {
+        int completedRepeats = 0;
+        int allRepeats = 0;
+        for(ExerciseSeries series: training.getExerciseSeries()) {
+            completedRepeats += series.getCompletedRepeats();
+            allRepeats += series.getRepeats();
+        }
+
+        return completedRepeats * 100.0 / allRepeats;
     }
 
     private Training getTrainingForUpdate(Long trainingId) throws BusinessException {

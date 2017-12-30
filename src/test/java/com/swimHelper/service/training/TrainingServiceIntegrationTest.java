@@ -150,7 +150,7 @@ public class TrainingServiceIntegrationTest {
         List<Style> stylesInGeneratedTraining = training.getExerciseSeries().
                 stream().filter(s -> !s.getExercise().isWarmUpRelax()).map(s -> s.getExercise().getStyle()).collect(Collectors.toList());
         boolean areStylesCorrect = stylesInGeneratedTraining.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
-        assertThat(training.getUser()).isEqualTo(savedUser);
+        assertThat(training.getUser().getId()).isEqualTo(savedUser.getId());
         assertThat(training.getDurationInSeconds()).isLessThanOrEqualTo(trainingRequirements.getMaxDurationInSeconds());
         assertThat(areStylesCorrect).isTrue();
     }
@@ -167,13 +167,14 @@ public class TrainingServiceIntegrationTest {
         LocalDateTime dateTime = LocalDateTime.now();
         LocalDateTime nextMonday = dateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         trainingRequirements.setTrainingDateTime(nextMonday);
+        trainingRequirements.setTrainingDateTime(nextMonday.minusHours(1));
         //when
         Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
         //then
         List<Style> stylesInGeneratedTraining = training.getExerciseSeries().
                 stream().filter(s -> !s.getExercise().isWarmUpRelax()).map(s -> s.getExercise().getStyle()).collect(Collectors.toList());
         boolean areStylesCorrect = stylesInGeneratedTraining.stream().allMatch(style -> trainingRequirements.getStyles().contains(style));
-        assertThat(training.getUser()).isEqualTo(savedUser);
+        assertThat(training.getUser().getId()).isEqualTo(savedUser.getId());
         assertThat(training.getDurationInSeconds()).isLessThanOrEqualTo(trainingRequirements.getMaxDurationInSeconds());
         assertThat(areStylesCorrect).isTrue();
     }
@@ -190,10 +191,11 @@ public class TrainingServiceIntegrationTest {
         LocalDateTime dateTime = LocalDateTime.now();
         LocalDateTime nextMonday = dateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         trainingRequirements.setTrainingDateTime(nextMonday);
+        trainingRequirements.setNotificationDateTime(nextMonday.minusHours(1));
         //when
         Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
         //then
-        assertThat(training.getUser()).isEqualTo(savedUser);
+        assertThat(training.getUser().getId()).isEqualTo(savedUser.getId());
         assertThat(training.getExerciseSeries().size()).isEqualTo(2);
     }
 
@@ -229,6 +231,7 @@ public class TrainingServiceIntegrationTest {
         LocalDateTime dateTime = LocalDateTime.now();
         LocalDateTime nextMonday = dateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         trainingRequirements.setTrainingDateTime(nextMonday);
+        trainingRequirements.setNotificationDateTime(nextMonday.minusHours(1));
         //when
         Training training = sut.generateTraining(trainingRequirements, savedUser.getId());
         //then

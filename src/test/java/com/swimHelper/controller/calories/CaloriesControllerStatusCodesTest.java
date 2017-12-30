@@ -1,7 +1,6 @@
 package com.swimHelper.controller.calories;
 
 import com.swimHelper.ExerciseSeriesRepository;
-import com.swimHelper.security.JwtUser;
 import com.swimHelper.TestUtil;
 import com.swimHelper.TrainingTestUtil;
 import com.swimHelper.model.IntegerWrapper;
@@ -10,6 +9,7 @@ import com.swimHelper.model.TrainingRequirements;
 import com.swimHelper.repository.ExerciseRepository;
 import com.swimHelper.repository.TrainingRepository;
 import com.swimHelper.repository.UserRepository;
+import com.swimHelper.security.JwtUser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -91,8 +91,8 @@ public class CaloriesControllerStatusCodesTest {
         JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
         String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
         trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements, authorizationHeader);
-        LocalDateTime startDate = LocalDateTime.of(2017, 7, 1, 6, 40, 45);
-        LocalDateTime endDate = LocalDateTime.of(2017, 8, 30, 6, 40, 45);
+        LocalDate startDate = LocalDate.of(2017, 7, 1);
+        LocalDate endDate = LocalDate.of(2017, 8, 30);
         //when
         ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate, null, startDate, endDate,
                                                                                             authorizationHeader);
@@ -127,8 +127,8 @@ public class CaloriesControllerStatusCodesTest {
         JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
         String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
         trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements, authorizationHeader);
-        LocalDateTime startDate = LocalDateTime.of(2017, 7, 1, 6, 40, 45);
-        LocalDateTime endDate = LocalDateTime.of(2017, 8, 30, 6, 40, 45);
+        LocalDate startDate = LocalDate.of(2017, 7, 1);
+        LocalDate endDate = LocalDate.of(2017, 8, 30);
         //when
         ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.calculateCalories(testRestTemplate, 1L, startDate, endDate,
                                                                                             authorizationHeader);

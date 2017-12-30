@@ -79,6 +79,10 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    public User getUser(String username) {
+        return userRepository.findByEmail(username);
+    }
+
     private User copyUpdatableFields(User userFromDB, User userFromRequest) {
         userFromDB.setFirstname(userFromRequest.getFirstname());
         userFromDB.setLastname(userFromRequest.getLastname());

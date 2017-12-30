@@ -1,12 +1,11 @@
 package com.swimHelper.config;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.lang.reflect.Type;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 
 /**
@@ -17,13 +16,13 @@ public class JsonConfig {
     @Bean
     public Gson gson() {
         return new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeConverter())
                 .create();
     }
 
-    class LocalDateAdapter implements JsonSerializer<LocalDateTime> {
-        public JsonElement serialize(LocalDateTime date, Type typeOfSrc, JsonSerializationContext context) {
-            return new JsonPrimitive(date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)); // "yyyy-mm-dd"
-        }
-    }
+//    class LocalDateAdapter implements JsonSerializer<LocalDateTime> {
+//        public JsonElement serialize(LocalDateTime date, Type typeOfSrc, JsonSerializationContext context) {
+//            return new JsonPrimitive(date.format(DateTimeFormatter.ofP)); // "yyyy-mm-dd"
+//        }
+//    }
 }

@@ -34,7 +34,7 @@ spring:
   #Local Date Time
   jackson:
     serialization:
-      WRITE_DATES_AS_TIMESTAMPS: false
+      write_dates_as_timestamps: false
   #Database
   h2:
     console:
@@ -42,10 +42,14 @@ spring:
       path: /h2
   # Datasource
   datasource:
-    url: jdbc:h2:file:~/test
+    url: jdbc:h2:file:~/test1
     username: sa
     password:
     driver-class-name: org.h2.Driver
+  jpa:
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
 jwt:
   header: Authorization
   secret: mySecret

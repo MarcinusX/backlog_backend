@@ -67,7 +67,7 @@ public class DistanceTrackerUnitTest {
         LocalDateTime endDate = LocalDateTime.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         LocalDateTime startDate = LocalDateTime.of(2014, 9, 10, 6, 40, 45);
         when(userRepositoryMock.findOne(anyLong())).thenReturn(user);
-        when(trainingRepositoryMock.findTrainingsByUserAndDates(anyLong(), eq(startDate), eq(endDate))).thenReturn(trainings);
+        when(trainingRepositoryMock.findByUserIdAndTrainingDateTimeAfterAndTrainingDateTimeBefore(anyLong(), eq(startDate), eq(endDate))).thenReturn(trainings);
         //when
         int distance = sut.countDistance(1L, null, startDate, endDate);
         //then
