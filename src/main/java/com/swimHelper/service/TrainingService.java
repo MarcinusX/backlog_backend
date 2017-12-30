@@ -78,6 +78,17 @@ public class TrainingService {
         }
     }
 
+    public Training updateTrainingDate(Long trainingId, LocalDateTime trainingDateTime) throws BusinessException {
+        Training trainingFromDb = getTrainingForUpdate(trainingId);
+        trainingFromDb.setTrainingDateTime(trainingDateTime);
+        trainingFromDb.setNotificationDateTime(trainingDateTime.minusHours(1));
+        try {
+            return trainingRepository.saveAndFlush(trainingFromDb);
+        } catch (ConstraintViolationException e) {
+            throw new InvalidTrainingException(e.getMessage());
+        }
+    }
+
     public List<Training> getUpcomingTrainings(Long id) {
         List<Training> trainings = trainingRepository.findTrainingsByUser(id);
         return trainings.stream().filter(t -> t.getTrainingDateTime().isAfter(LocalDateTime.now())).collect(Collectors.toList());
@@ -132,7 +143,7 @@ public class TrainingService {
                             }
                     );
         });
-        training.setCompletedPercentage(countCompletedPercentageForTraining(training));
+        trainingFromDb.setCompletedPercentage(countCompletedPercentageForTraining(training));
     }
 
     private double countCompletedPercentageForTraining (Training training) {

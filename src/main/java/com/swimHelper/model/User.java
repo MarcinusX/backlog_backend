@@ -27,8 +27,8 @@ import java.util.Set;
 @Entity
 @Data
 @NoArgsConstructor //jpa
-@EqualsAndHashCode(exclude = {"trainings", "records", "styleStatistics", "competitions"})
-@ToString(exclude = {"trainings", "competitions", "records", "styleStatistics"})
+@EqualsAndHashCode(exclude = {"trainings", "records", "competitions", "styleStatistics"})
+@ToString(exclude = {"trainings", "records", "competitions", "styleStatistics"})
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @NamedEntityGraph(name = "graph.user.competitions",
         attributeNodes = @NamedAttributeNode("competitions"))

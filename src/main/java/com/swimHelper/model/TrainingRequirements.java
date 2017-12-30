@@ -20,9 +20,9 @@ public class TrainingRequirements {
     private IntensityLevel intensityLevel;
     private int maxDurationInSeconds;
     private int maxDistance;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime trainingDateTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime notificationDateTime;
     private Collection<TrainingEquipment> availableTrainingEquipment = new ArrayList<>();
 }

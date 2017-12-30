@@ -46,6 +46,10 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+  jpa:
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
 jwt:
   header: Authorization
   secret: mySecret

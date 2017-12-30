@@ -3,7 +3,6 @@ package com.swimHelper.controller;
 import com.swimHelper.exception.BusinessException;
 import com.swimHelper.exception.UserNotFoundException;
 import com.swimHelper.model.Role;
-import com.swimHelper.model.Training;
 import com.swimHelper.model.User;
 import com.swimHelper.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,12 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by marcinus on 19.04.17.

@@ -49,7 +49,7 @@ public class DistanceTracker {
     }
 
     private int countDistanceByDates(User user, LocalDateTime startDate, LocalDateTime endDate) {
-        List<Training> trainings = trainingRepository.findTrainingsByUserAndDates(user.getId(), startDate, endDate);
+        List<Training> trainings = trainingRepository.findByUserIdAndTrainingDateTimeAfterAndTrainingDateTimeBefore(user.getId(), startDate, endDate);
         return trainings.stream().mapToInt(this::countDistanceForOneTraining).sum();
     }
 

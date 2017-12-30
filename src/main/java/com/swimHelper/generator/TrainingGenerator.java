@@ -36,6 +36,9 @@ public class TrainingGenerator {
         if (!areTrainingRequirementsGiven(user, trainingRequirements)) {
             throw new MissingTrainingRequirementsException();
         }
+        if(trainingRequirements.getNotificationDateTime() == null) {
+            trainingRequirements.setNotificationDateTime(trainingRequirements.getTrainingDateTime().minusHours(1));
+        }
         List<Exercise> matchingExercises = getMatchingExercises(trainingRequirements);
         //create training
         Training training = new Training();
@@ -55,7 +58,11 @@ public class TrainingGenerator {
             training = getAdaptedTrainingToMaxDistance(training, trainingRequirements.getMaxDistance());
         }
         training.setTrainingDateTime(trainingRequirements.getTrainingDateTime());
-        training.setNotificationDateTime(trainingRequirements.getNotificationDateTime());
+        if(training.getNotificationDateTime() == null) {
+            training.setNotificationDateTime(trainingRequirements.getNotificationDateTime().minusHours(1));
+        } else {
+            training.setNotificationDateTime(trainingRequirements.getNotificationDateTime());
+        }
         training.setDurationInSeconds(getDurationOfTraining(training));
         training.setUser(user);
         return training;
@@ -96,7 +103,7 @@ public class TrainingGenerator {
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setRepeats(1);
         List<Integer> availableWarmUpDistances = IntensityLevel.WARM_UP.getDistances();
-        exerciseSeries.setDistance(randomGenerator.generateRandomInt(availableWarmUpDistances.size()));
+        exerciseSeries.setDistance(availableWarmUpDistances.get(randomGenerator.generateRandomInt(availableWarmUpDistances.size())));
         List<Exercise> exerciseList = exerciseRepository.findByWarmUpRelax(true);
         Exercise exercise = exerciseList.get(randomGenerator.generateRandomInt(exerciseList.size()));
         exerciseSeries.setExercise(exercise);
@@ -107,7 +114,7 @@ public class TrainingGenerator {
         ExerciseSeries exerciseSeries = new ExerciseSeries();
         exerciseSeries.setRepeats(1);
         List<Integer> availableRelaxDistances = IntensityLevel.RELAX.getDistances();
-        exerciseSeries.setDistance(randomGenerator.generateRandomInt(availableRelaxDistances.size()));
+        exerciseSeries.setDistance(availableRelaxDistances.get(randomGenerator.generateRandomInt(availableRelaxDistances.size())));
         List<Exercise> exerciseList = exerciseRepository.findByWarmUpRelax(true);
         Exercise exercise = exerciseList.get(randomGenerator.generateRandomInt(exerciseList.size()));
         exerciseSeries.setExercise(exercise);

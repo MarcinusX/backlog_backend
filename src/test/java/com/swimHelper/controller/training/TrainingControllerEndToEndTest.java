@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -268,11 +268,11 @@ public class TrainingControllerEndToEndTest {
         JwtUser user = new JwtUser(TrainingTestUtil.USER_EMAIL, TrainingTestUtil.USER_PASSWORD);
         String authorizationHeader = trainingTestUtil.getAuthorizationHeader(testRestTemplate, user);
         trainingTestUtil.addTrainings(testRestTemplate, trainingRequirements, authorizationHeader);
-        String endDateString = "2100-11-30 06:40";
-        String startDateString = "2100-07-30 06:40";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime endDate = LocalDateTime.parse(endDateString, formatter);
-        LocalDateTime startDate = LocalDateTime.parse(startDateString, formatter);
+        String endDateString = "30/11/2100";
+        String startDateString = "30/07/2100";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate endDate = LocalDate.parse(endDateString, formatter);
+        LocalDate startDate = LocalDate.parse(startDateString, formatter);
         //when
         ResponseEntity<IntegerWrapper> responseEntity = trainingTestUtil.countDistance(testRestTemplate,
                 null,

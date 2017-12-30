@@ -9,14 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @SpringBootApplication
 @EnableScheduling
@@ -46,6 +44,8 @@ public class MainApplication implements CommandLineRunner {
         user = userService.addUser(user);
 
         User user1 = new User();
+        user1.setFirstname("Klara");
+        user1.setLastname("Klarowska");
         user1.setEmail("user@user.pl");
         user1.setPassword("admin");
         Collection<StyleStatistics> styleStatistics = new ArrayList<>();
@@ -69,7 +69,7 @@ public class MainApplication implements CommandLineRunner {
         trainingRepository.findAll().forEach(System.out::println);
         userService.getAll().forEach(System.out::println);
 
-        for (int i = 0; i < 6; i++) {
+        for(int i = 0; i <10; i++) {
             Exercise exercise = new Exercise(Style.BACKSTROKE);
             exercise.setDescription("desc");
             exercise.setName("name" + i);
@@ -79,29 +79,30 @@ public class MainApplication implements CommandLineRunner {
                 exercise.setWarmUpRelax(true);
             }
             exerciseRepository.save(exercise);
-        }
-
-        for(int i = 0; i <10; i++) {
-            Training training1 = new Training();
-            training1.setUser(user1);
-            if(i < 3) {
-                training1.setNotificationDateTime(LocalDateTime.now().plusDays(i + 1));
-                training1.setTrainingDateTime(LocalDateTime.now().plusMonths(i + 1).minusHours(1));
-            } else {
-                training1.setNotificationDateTime(LocalDateTime.now().minusMonths(i - 2));
-                training1.setTrainingDateTime(LocalDateTime.now().minusMonths(i - 2).minusHours(1));
-            }
-
-            List<ExerciseSeries> series = new ArrayList<>();
-            ExerciseSeries exerciseSeries = new ExerciseSeries();
-            exerciseSeries.setRepeats(i);
-            if(i >=3 && i < 7) {
-                exerciseSeries.setCompletedPercentage(i * 10);
-            }
-            series.add(exerciseSeries);
-            training1.setExerciseSeries(series);
-            training1.setCompletedPercentage(i * 10);
-            trainingRepository.save(training1);
+//            Training training1 = new Training();
+//            training1.setUser(user1);
+//            if(i < 3) {
+//                training1.setNotificationDateTime(LocalDateTime.now().plusDays(i + 1));
+//                training1.setTrainingDateTime(LocalDateTime.now().plusMonths(i + 1).minusHours(1));
+//            } else {
+//                training1.setNotificationDateTime(LocalDateTime.now().minusMonths(i - 2));
+//                training1.setTrainingDateTime(LocalDateTime.now().minusMonths(i - 2).minusHours(1));
+//            }
+//
+//            List<ExerciseSeries> series = new ArrayList<>();
+//            ExerciseSeries exerciseSeries = new ExerciseSeries();
+//            exerciseSeries.setExercise(exercise);
+//            exerciseSeries.setRepeats(i);
+//            exerciseSeries.setDistance(i * 100);
+//            if(i >=3 && i < 7) {
+//                exerciseSeries.setCompletedPercentage(i * 10);
+//                exerciseSeries.setCompletedRepeats(3);
+//                exerciseSeries.setAverageDurationOfOneRepeatInSeconds(300);
+//            }
+//            series.add(exerciseSeries);
+//            training1.setExerciseSeries(series);
+//            training1.setCompletedPercentage(i * 10);
+//            trainingRepository.save(training1);
         }
     }
 }

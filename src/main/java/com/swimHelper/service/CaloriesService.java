@@ -69,7 +69,7 @@ public class CaloriesService {
     }
 
     private int calculateCaloriesForPeriod(User user, LocalDateTime startDate, LocalDateTime endDate) {
-        List<Training> trainingList = trainingRepository.findTrainingsByUserAndDates(user.getId(), startDate, endDate);
+        List<Training> trainingList = trainingRepository.findByUserIdAndTrainingDateTimeAfterAndTrainingDateTimeBefore(user.getId(), startDate, endDate);
         return getCaloriesCalculationResultFromForkJoin(trainingList, user);
     }
 

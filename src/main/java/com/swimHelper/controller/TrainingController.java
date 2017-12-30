@@ -13,7 +13,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,14 +49,26 @@ public class TrainingController {
         return trainingService.setTrainingCompletion(training);
     }
 
+    @PutMapping("/date")
+    public Training updateTrainingDateTime(@RequestParam("trainingId") Long trainingId, @RequestParam("trainingDateTime") LocalDateTime trainingDateTime) throws BusinessException {
+        return trainingService.updateTrainingDate(trainingId, trainingDateTime);
+    }
+
     @GetMapping
     public IntegerWrapper countDistance(@RequestParam(required = false) Long trainingId,
-                                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-                                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) throws BusinessException {
+                                        @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate startDate,
+                                        @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate endDate) throws BusinessException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
+        LocalDateTime startDateTime = null;
+        LocalDateTime endDateTime = null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        if(startDate != null && endDate != null) {
+            startDateTime = LocalDateTime.of(startDate, LocalTime.MIN);
+            endDateTime = LocalDateTime.of(endDate, LocalTime.MAX);
+        }
         IntegerWrapper integerWrapper = new IntegerWrapper();
-        integerWrapper.setValue(trainingService.countDistance(user.getId(), trainingId, startDate, endDate));
+        integerWrapper.setValue(trainingService.countDistance(user.getId(), trainingId, startDateTime, endDateTime));
         return integerWrapper;
     }
 
