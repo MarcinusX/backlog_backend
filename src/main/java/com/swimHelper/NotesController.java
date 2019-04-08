@@ -56,4 +56,10 @@ public class NotesController {
             return ResponseEntity.ok(note);
         }
     }
+
+    @DeleteMapping
+    public boolean delete(@RequestParam(name = "id", required = true) Long id) {
+        repository.delete(id);
+        return true;
+    }
 }
