@@ -25,8 +25,8 @@ public class MainApplication implements CommandLineRunner {
     private void addInitialDataToDatabase() {
         Note note = new Note();
         note.setAuthor("Marcin");
-        note.setText("Cokolwiek");
-        note.setColor(0L);
+        note.setText("Zróbmy refresh indicator");
+        note.setColor(Long.decode("0xFFF44336"));
         note.setLikes(0);
         notesRepository.save(note);
     }
